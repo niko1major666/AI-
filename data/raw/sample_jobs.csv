@@ -1,0 +1,10 @@
+job_id,company,title,location,salary,experience,education,jd_text
+hw_001,华为技术有限公司,AI算法工程师（计算机视觉）,深圳,30-60K·15薪,3-5年,硕士,负责计算机视觉算法研发与落地。熟悉Python、PyTorch、TensorFlow等框架；掌握Transformer、目标检测、图像分割；有分布式训练经验者优先。
+hw_002,华为技术有限公司,大模型算法工程师,北京,40-70K·15薪,3年以上,硕士,负责大模型预训练与微调。熟悉PyTorch、DeepSpeed、Megatron；了解RAG检索增强、向量数据库、LoRA微调；深入理解Transformer与注意力机制。
+ali_001,阿里巴巴（中国）有限公司,机器学习平台工程师,杭州,25-50K·16薪,1-3年,本科,负责机器学习平台建设。熟悉Python、Java、SQL；掌握分布式训练、模型部署、推理加速；了解Kubernetes、Docker。
+tencent_001,深圳市腾讯计算机系统有限公司,NLP算法工程师,深圳,35-65K·14薪,3-5年,硕士,负责自然语言处理算法。熟悉PyTorch、HuggingFace Transformers；掌握BERT、GPT、文本向量化、语义搜索；有知识图谱经验者优先。
+baidu_001,百度在线网络技术（北京）有限公司,推荐算法工程师,北京,30-60K·15薪,3-5年,硕士,负责推荐系统算法。熟悉Python、Spark、Hadoop；掌握深度学习、图神经网络、特征工程；有向量检索经验者优先。
+bytedance_001,北京字节跳动科技有限公司,数据挖掘工程师,北京,25-50K,1-3年,本科,负责数据挖掘与特征工程。熟悉Python、SQL、Pandas、NumPy；了解机器学习、异常检测、时序预测。
+iflytek_001,科大讯飞股份有限公司,语音识别算法工程师,合肥,20-40K·13薪,不限,硕士,负责语音识别算法研发。熟悉Python、PyTorch、Kaldi；掌握深度学习、RNN、LSTM、CNN；了解模型压缩与量化。
+sensetime_001,商汤科技,CV算法研究员,上海,年薪30-50万,不限,博士,负责计算机视觉前沿研究。熟悉PyTorch、CUDA、C++；掌握Transformer、自监督学习、对比学习、多模态。
+kuangshi_001,旷视科技,AI工程师,北京,面议,不限,本科,负责AI工程落地。熟悉Python、C++、Linux、Git；了解模型部署、推理服务、gRPC。

@@ -1,0 +1,32 @@
+# ============================================================
+# 技能抽取配置
+# ============================================================
+extractor:
+  name: siamese_uie            # siamese_uie | bert_ner | rule_baseline
+  model_id: damo/nlp_structbert_siamese-uie_chinese-base
+  model_revision: master
+  device: cpu                  # W1~W3 cpu；W4 benchmark 可切 cuda
+  batch_size: 8
+  max_seq_len: 512
+  conf_threshold: 0.5
+
+# schema：键名即零样本抽取能力上限，与 skill_taxonomy 分类对齐
+schema:
+  - 编程语言
+  - 深度学习框架
+  - 机器学习算法
+  - AI专有技术
+  - 大数据与数据处理
+  - 工程工具与平台
+
+postprocess:
+  lowercase: true
+  strip_version: true          # "Python 3.8" -> "Python"
+  taxonomy_path: data/kb/skill_taxonomy.yaml
+  dedup_sim_threshold: 0.85
+
+ner:                            # 第3周 BERT-NER（预留，模型名需探测）
+  model_id: Nucha_SkillNER_BERT
+  fallback_model: bert-base-chinese
+  labels: [B-SKILL, I-SKILL, O]
+  train_epochs: 3

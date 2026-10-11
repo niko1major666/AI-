@@ -1,0 +1,24 @@
+# ============================================================
+# 语义匹配配置
+# ============================================================
+matcher:
+  name: tfidf                  # tfidf | bge | hybrid
+  top_k: 5
+  must_weight: 2.0             # 硬性技能权重
+  nice_weight: 1.0             # 加分技能权重
+
+  tfidf:
+    analyzer: char_wb
+    ngram_range: [2, 4]
+    max_features: 20000
+
+  bge:
+    model_id: BAAI/bge-base-zh-v1.5
+    dim: 768
+    normalize: true
+    query_instruction: "为这个句子生成表示以用于检索相关文章："
+    batch_size: 32
+
+  hybrid:
+    dense_weight: 0.7
+    lexical_weight: 0.3

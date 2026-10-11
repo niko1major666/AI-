@@ -1,0 +1,37 @@
+# ============================================================
+# 数据源配置：路径均相对于「项目根目录」
+# 应对未知结构的 Kaggle/CSV：只需改 column_mapping 即可适配
+# ============================================================
+source:
+  type: local_csv                # local_csv | kaggle | playwright
+  path: data/raw/sample_jobs.csv
+  job_prefix: jd
+
+column_mapping:
+  job_id: job_id
+  job_id_aliases: [id, jobid]
+  company: company
+  company_aliases: [org, company_name, employer]
+  title: title
+  title_aliases: [job_title, position, job_name]
+  location: location
+  location_aliases: [city, work_location, region]
+  salary: salary
+  salary_aliases: [salary_range, pay, compensation]
+  experience: experience
+  experience_aliases: [exp, work_years, seniority]
+  education: education
+  education_aliases: [degree, degree_requirement]
+  jd_text: jd_text
+  jd_text_aliases: [description, job_description, requirements, responsibilities, jd]
+
+cleaning:
+  min_jd_chars: 30
+  normalize_company: true
+  strip_html: true
+
+output:
+  jobs_jsonl: data/processed/jobs.jsonl
+  jobs_parquet: data/processed/jobs.parquet
+  skills_csv: data/processed/skills_long.csv
+  stats_path: data/processed/build_stats.json

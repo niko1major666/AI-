@@ -1,0 +1,152 @@
+# ============================================================
+# 技能标准词表（taxonomy）
+# 用途：抽取结果归一、语义匹配评估、技能图谱、差距报告
+# id 规则：<类别ID>.<技能大写标识>；aliases 用于同义词展开（不含空格）
+# ============================================================
+version: 1
+
+categories:
+  - {id: PROG, name: 编程语言}
+  - {id: FRAMEWORK, name: 深度学习框架}
+  - {id: ML, name: 机器学习算法}
+  - {id: AITECH, name: AI专有技术}
+  - {id: BIGDATA, name: 大数据与数据处理}
+  - {id: ENGINEERING, name: 工程工具与平台}
+
+skills:
+  # ---- 编程语言 ----
+  - {id: PROG.PYTHON, name: Python, category: PROG, aliases: [python, py, python3], difficulty: 1}
+  - {id: PROG.CPP, name: C++, category: PROG, aliases: [cpp, cplusplus], difficulty: 2}
+  - {id: PROG.C, name: C语言, category: PROG, aliases: [c], difficulty: 2}
+  - {id: PROG.JAVA, name: Java, category: PROG, aliases: [java], difficulty: 2}
+  - {id: PROG.GO, name: Go, category: PROG, aliases: [golang], difficulty: 2}
+  - {id: PROG.SQL, name: SQL, category: PROG, aliases: [sql], difficulty: 1}
+  - {id: PROG.SHELL, name: Shell, category: PROG, aliases: [shell, bash, 脚本], difficulty: 1}
+  - {id: PROG.R, name: R语言, category: PROG, aliases: [r], difficulty: 2}
+  - {id: PROG.SCALA, name: Scala, category: PROG, aliases: [scala], difficulty: 3}
+  - {id: PROG.JS, name: JavaScript, category: PROG, aliases: [javascript, js, typescript, ts], difficulty: 2}
+  - {id: PROG.MATLAB, name: MATLAB, category: PROG, aliases: [matlab], difficulty: 2}
+  - {id: PROG.RUST, name: Rust, category: PROG, aliases: [rust], difficulty: 3}
+
+  # ---- 深度学习框架 ----
+  - {id: FRAMEWORK.PYTORCH, name: PyTorch, category: FRAMEWORK, aliases: [pytorch, torch], difficulty: 2}
+  - {id: FRAMEWORK.TENSORFLOW, name: TensorFlow, category: FRAMEWORK, aliases: [tensorflow, tf], difficulty: 2}
+  - {id: FRAMEWORK.KERAS, name: Keras, category: FRAMEWORK, aliases: [keras], difficulty: 1}
+  - {id: FRAMEWORK.PADDLE, name: PaddlePaddle, category: FRAMEWORK, aliases: [paddlepaddle, paddle, 飞桨], difficulty: 2}
+  - {id: FRAMEWORK.MINDSPORE, name: MindSpore, category: FRAMEWORK, aliases: [mindspore], difficulty: 2}
+  - {id: FRAMEWORK.JAX, name: JAX, category: FRAMEWORK, aliases: [jax], difficulty: 3}
+  - {id: FRAMEWORK.HF, name: "HuggingFace Transformers", category: FRAMEWORK, aliases: [huggingface, transformers库, hf], difficulty: 2}
+  - {id: FRAMEWORK.DEEPSPEED, name: DeepSpeed, category: FRAMEWORK, aliases: [deepspeed], difficulty: 3}
+  - {id: FRAMEWORK.MEGATRON, name: Megatron, category: FRAMEWORK, aliases: [megatron, megatron-lm], difficulty: 4}
+  - {id: FRAMEWORK.VLLM, name: vLLM, category: FRAMEWORK, aliases: [vllm], difficulty: 3}
+  - {id: FRAMEWORK.TENSORRT, name: TensorRT, category: FRAMEWORK, aliases: [tensorrt], difficulty: 3}
+  - {id: FRAMEWORK.ONNX, name: ONNX, category: FRAMEWORK, aliases: [onnx], difficulty: 2}
+  - {id: FRAMEWORK.LANGCHAIN, name: LangChain, category: FRAMEWORK, aliases: [langchain], difficulty: 2}
+  - {id: FRAMEWORK.LLAMAINDEX, name: LlamaIndex, category: FRAMEWORK, aliases: [llamaindex], difficulty: 2}
+  # ---- 机器学习算法 ----
+  - {id: ML.CORE, name: 机器学习, category: ML, aliases: [ml], difficulty: 2}
+  - {id: ML.DL, name: 深度学习, category: ML, aliases: [dl, 深度神经网络], difficulty: 2}
+  - {id: ML.NN, name: 神经网络, category: ML, aliases: [nn], difficulty: 2}
+  - {id: ML.CNN, name: CNN, category: ML, aliases: [cnn, 卷积神经网络, 卷积], difficulty: 2}
+  - {id: ML.RNN, name: RNN, category: ML, aliases: [rnn, 循环神经网络], difficulty: 2}
+  - {id: ML.LSTM, name: LSTM, category: ML, aliases: [lstm], difficulty: 2}
+  - {id: ML.TRANSFORMER, name: Transformer, category: ML, aliases: [transformer], difficulty: 3}
+  - {id: ML.ATTENTION, name: 注意力机制, category: ML, aliases: [attention, 自注意力], difficulty: 3}
+  - {id: ML.GAN, name: GAN, category: ML, aliases: [gan, 生成对抗网络], difficulty: 3}
+  - {id: ML.RL, name: 强化学习, category: ML, aliases: [rl, reinforcement-learning], difficulty: 4}
+  - {id: ML.TRANSFER, name: 迁移学习, category: ML, aliases: [transfer-learning], difficulty: 3}
+  - {id: ML.SELFSUP, name: 自监督学习, category: ML, aliases: [self-supervised], difficulty: 3}
+  - {id: ML.CONTRAST, name: 对比学习, category: ML, aliases: [contrastive-learning], difficulty: 3}
+  - {id: ML.MULTIMODAL, name: 多模态, category: ML, aliases: [multimodal], difficulty: 4}
+  - {id: ML.GNN, name: 图神经网络, category: ML, aliases: [gnn, graph-neural-network], difficulty: 3}
+  - {id: ML.REC, name: 推荐系统, category: ML, aliases: [recommendation, 推荐算法], difficulty: 2}
+  - {id: ML.NLP, name: NLP, category: ML, aliases: [nlp, 自然语言处理], difficulty: 2}
+  - {id: ML.CV, name: 计算机视觉, category: ML, aliases: [cv, computer-vision], difficulty: 2}
+  - {id: ML.ASR, name: 语音识别, category: ML, aliases: [asr, speech-recognition], difficulty: 3}
+  - {id: ML.OD, name: 目标检测, category: ML, aliases: [object-detection], difficulty: 3}
+  - {id: ML.SEG, name: 图像分割, category: ML, aliases: [segmentation], difficulty: 3}
+  - {id: ML.TS, name: 时序预测, category: ML, aliases: [time-series], difficulty: 3}
+  - {id: ML.ANOMALY, name: 异常检测, category: ML, aliases: [anomaly-detection], difficulty: 3}
+  - {id: ML.FED, name: 联邦学习, category: ML, aliases: [federated-learning], difficulty: 4}
+  - {id: ML.DISTILL, name: 知识蒸馏, category: ML, aliases: [distillation], difficulty: 3}
+  - {id: ML.COMPRESS, name: 模型压缩, category: ML, aliases: [compression], difficulty: 3}
+  - {id: ML.QUANT, name: 量化, category: ML, aliases: [quantization], difficulty: 3}
+  - {id: ML.HPT, name: 超参数调优, category: ML, aliases: [hyperparameter-tuning, 调参], difficulty: 2}
+  # ---- AI专有技术 ----
+  - {id: AITECH.DISTRIBUTED, name: 分布式训练, category: AITECH, aliases: [distributed-training, 多卡训练], difficulty: 4}
+  - {id: AITECH.LLM, name: 大模型, category: AITECH, aliases: [llm, large-language-model, 大语言模型], difficulty: 3}
+  - {id: AITECH.RAG, name: RAG, category: AITECH, aliases: [rag, 检索增强, 检索增强生成], difficulty: 3}
+  - {id: AITECH.VECTORDB, name: 向量数据库, category: AITECH, aliases: [vector-db, vectordb, 向量检索, 向量搜索], difficulty: 3}
+  - {id: AITECH.FINETUNE, name: 微调, category: AITECH, aliases: [fine-tuning, finetune, sft, 指令微调], difficulty: 3}
+  - {id: AITECH.LORA, name: LoRA, category: AITECH, aliases: [lora, 低秩适配], difficulty: 3}
+  - {id: AITECH.PROMPT, name: Prompt工程, category: AITECH, aliases: [prompt-engineering, prompt, 提示词], difficulty: 2}
+  - {id: AITECH.AGENT, name: 智能体, category: AITECH, aliases: [agent, multi-agent, 多智能体], difficulty: 3}
+  - {id: AITECH.INFER_ACC, name: 推理加速, category: AITECH, aliases: [inference-acceleration, 推理优化], difficulty: 3}
+  - {id: AITECH.DEPLOY, name: 模型部署, category: AITECH, aliases: [model-deployment, 模型服务化], difficulty: 2}
+  - {id: AITECH.AIGC, name: AIGC, category: AITECH, aliases: [aigc, 生成式], difficulty: 3}
+  - {id: AITECH.T2I, name: 文生图, category: AITECH, aliases: [text-to-image, 图像生成], difficulty: 3}
+  - {id: AITECH.KG, name: 知识图谱, category: AITECH, aliases: [knowledge-graph], difficulty: 3}
+  - {id: AITECH.ANNOTATE, name: 数据标注, category: AITECH, aliases: [data-annotation, 标注], difficulty: 1}
+  - {id: AITECH.RLHF, name: RLHF, category: AITECH, aliases: [rlhf, 人类反馈强化学习], difficulty: 4}
+  - {id: AITECH.ICL, name: 上下文学习, category: AITECH, aliases: [in-context-learning, icl], difficulty: 3}
+  - {id: AITECH.COT, name: 思维链, category: AITECH, aliases: [chain-of-thought, cot], difficulty: 3}
+  - {id: AITECH.MOE, name: MoE, category: AITECH, aliases: [moe, 混合专家], difficulty: 4}
+  - {id: AITECH.TOKENIZER, name: Tokenizer, category: AITECH, aliases: [tokenizer, 分词器], difficulty: 2}
+  - {id: AITECH.EMBEDDING, name: Embedding, category: AITECH, aliases: [embedding, 词向量, 向量化], difficulty: 2}
+  - {id: AITECH.SEMSEARCH, name: 语义搜索, category: AITECH, aliases: [semantic-search], difficulty: 2}
+  - {id: AITECH.TEXTVEC, name: 文本向量化, category: AITECH, aliases: [文本向量], difficulty: 2}
+  - {id: AITECH.DIALOG, name: 多轮对话, category: AITECH, aliases: [对话系统], difficulty: 2}
+  - {id: AITECH.SERVING, name: 推理服务, category: AITECH, aliases: [inference-serving], difficulty: 2}
+  - {id: AITECH.MONITOR, name: 模型监控, category: AITECH, aliases: [model-monitoring], difficulty: 3}
+  - {id: AITECH.AUG, name: 数据增强, category: AITECH, aliases: [augmentation], difficulty: 2}
+  - {id: AITECH.ZEROSHOT, name: 零样本学习, category: AITECH, aliases: [zero-shot], difficulty: 3}
+  - {id: AITECH.FEWSHOT, name: 少样本学习, category: AITECH, aliases: [few-shot], difficulty: 3}
+  # ---- 大数据与数据处理 ----
+  - {id: BIGDATA.SPARK, name: Spark, category: BIGDATA, aliases: [spark], difficulty: 2}
+  - {id: BIGDATA.HADOOP, name: Hadoop, category: BIGDATA, aliases: [hadoop], difficulty: 2}
+  - {id: BIGDATA.HIVE, name: Hive, category: BIGDATA, aliases: [hive], difficulty: 2}
+  - {id: BIGDATA.FLINK, name: Flink, category: BIGDATA, aliases: [flink], difficulty: 3}
+  - {id: BIGDATA.KAFKA, name: Kafka, category: BIGDATA, aliases: [kafka], difficulty: 3}
+  - {id: BIGDATA.DW, name: 数据仓库, category: BIGDATA, aliases: [data-warehouse], difficulty: 2}
+  - {id: BIGDATA.LAKE, name: 数据湖, category: BIGDATA, aliases: [data-lake], difficulty: 3}
+  - {id: BIGDATA.ETL, name: ETL, category: BIGDATA, aliases: [etl], difficulty: 2}
+  - {id: BIGDATA.SQLTUNE, name: SQL优化, category: BIGDATA, aliases: [sql-tuning], difficulty: 2}
+  - {id: BIGDATA.PANDAS, name: Pandas, category: BIGDATA, aliases: [pandas], difficulty: 1}
+  - {id: BIGDATA.NUMPY, name: NumPy, category: BIGDATA, aliases: [numpy], difficulty: 1}
+  - {id: BIGDATA.CLEAN, name: 数据清洗, category: BIGDATA, aliases: [data-cleaning], difficulty: 1}
+  - {id: BIGDATA.MINING, name: 数据挖掘, category: BIGDATA, aliases: [data-mining], difficulty: 2}
+  - {id: BIGDATA.FE, name: 特征工程, category: BIGDATA, aliases: [feature-engineering], difficulty: 2}
+  - {id: BIGDATA.FS, name: 特征选择, category: BIGDATA, aliases: [feature-selection], difficulty: 2}
+  - {id: BIGDATA.VIZ, name: 数据可视化, category: BIGDATA, aliases: [visualization, 可视化], difficulty: 1}
+  - {id: BIGDATA.AIRFLOW, name: Airflow, category: BIGDATA, aliases: [airflow], difficulty: 3}
+  - {id: BIGDATA.PIPELINE, name: 数据管道, category: BIGDATA, aliases: [data-pipeline, 数据管线], difficulty: 2}
+  - {id: BIGDATA.STREAM, name: 实时计算, category: BIGDATA, aliases: [流式计算], difficulty: 3}
+  - {id: BIGDATA.DBT, name: dbt, category: BIGDATA, aliases: [dbt], difficulty: 3}
+
+  # ---- 工程工具与平台 ----
+  - {id: ENGINEERING.LINUX, name: Linux, category: ENGINEERING, aliases: [linux], difficulty: 1}
+  - {id: ENGINEERING.DOCKER, name: Docker, category: ENGINEERING, aliases: [docker], difficulty: 2}
+  - {id: ENGINEERING.K8S, name: Kubernetes, category: ENGINEERING, aliases: [k8s, kubernetes], difficulty: 3}
+  - {id: ENGINEERING.GIT, name: Git, category: ENGINEERING, aliases: [git], difficulty: 1}
+  - {id: ENGINEERING.CICD, name: CI/CD, category: ENGINEERING, aliases: [cicd, 持续集成], difficulty: 2}
+  - {id: ENGINEERING.CLOUD, name: 云计算, category: ENGINEERING, aliases: [cloud-computing, 云原生], difficulty: 2}
+  - {id: ENGINEERING.AWS, name: AWS, category: ENGINEERING, aliases: [aws, 亚马逊云], difficulty: 3}
+  - {id: ENGINEERING.ALIYUN, name: 阿里云, category: ENGINEERING, aliases: [aliyun], difficulty: 2}
+  - {id: ENGINEERING.HUAWEICLOUD, name: 华为云, category: ENGINEERING, aliases: [huawei-cloud], difficulty: 2}
+  - {id: ENGINEERING.MLOPS, name: MLOps, category: ENGINEERING, aliases: [mlops], difficulty: 3}
+  - {id: ENGINEERING.MLFLOW, name: MLflow, category: ENGINEERING, aliases: [mlflow], difficulty: 2}
+  - {id: ENGINEERING.DVC, name: DVC, category: ENGINEERING, aliases: [dvc], difficulty: 3}
+  - {id: ENGINEERING.EXPTRACK, name: 实验管理, category: ENGINEERING, aliases: [experiment-tracking], difficulty: 2}
+  - {id: ENGINEERING.GRPC, name: gRPC, category: ENGINEERING, aliases: [grpc], difficulty: 2}
+  - {id: ENGINEERING.REST, name: "RESTful API", category: ENGINEERING, aliases: [restful, api开发], difficulty: 1}
+  - {id: ENGINEERING.MICROSVC, name: 微服务, category: ENGINEERING, aliases: [microservice], difficulty: 2}
+  - {id: ENGINEERING.UNITTEST, name: 单元测试, category: ENGINEERING, aliases: [unit-test, 测试], difficulty: 1}
+  - {id: ENGINEERING.HPC, name: 高性能计算, category: ENGINEERING, aliases: [hpc], difficulty: 4}
+  - {id: ENGINEERING.CUDA, name: CUDA, category: ENGINEERING, aliases: [cuda], difficulty: 4}
+  - {id: ENGINEERING.PARALLEL, name: 并行计算, category: ENGINEERING, aliases: [parallel-computing], difficulty: 3}
+  - {id: ENGINEERING.MEMOPT, name: 内存优化, category: ENGINEERING, aliases: [memory-optimization], difficulty: 3}
+  - {id: ENGINEERING.DISTSTORAGE, name: 分布式存储, category: ENGINEERING, aliases: [distributed-storage], difficulty: 3}
+  - {id: ENGINEERING.REDIS, name: Redis, category: ENGINEERING, aliases: [redis], difficulty: 2}
+  - {id: ENGINEERING.MYSQL, name: MySQL, category: ENGINEERING, aliases: [mysql], difficulty: 1}
+  - {id: ENGINEERING.ES, name: Elasticsearch, category: ENGINEERING, aliases: [es, elasticsearch], difficulty: 2}
+  - {id: ENGINEERING.GRAPHDB, name: 图数据库, category: ENGINEERING, aliases: [graph-database], difficulty: 3}

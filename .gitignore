@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 虚拟环境
+.venv/
+
+# 环境变量
+.env
+
+# 模型与缓存（重资产，随项目删除即释放，不占系统盘）
+models/
+uv_cache/
+
+# 原始/生成数据（仅 seed 样例入库）
+data/raw/*
+!data/raw/sample_jobs.csv
+data/processed/
+data/gold/*.tmp
+
+# 系统
+.DS_Store
+Thumbs.db
+*.log

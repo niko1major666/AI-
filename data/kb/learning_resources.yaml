@@ -1,0 +1,54 @@
+# ============================================================
+# 技能 -> 学习资源库（用于差距报告的学习建议，按优先级排序）
+# ============================================================
+version: 1
+
+resources:
+  - skill_id: PROG.PYTHON
+    items:
+      - {type: course, title: "Python 官方教程", url: "https://docs.python.org/zh-cn/3/tutorial/"}
+      - {type: book, title: "流畅的 Python", url: ""}
+
+  - skill_id: FRAMEWORK.PYTORCH
+    items:
+      - {type: course, title: "PyTorch 官方教程", url: "https://pytorch.org/tutorials/"}
+      - {type: book, title: "动手学深度学习（PyTorch 版）", url: "https://zh.d2l.ai/"}
+
+  - skill_id: ML.DL
+    items:
+      - {type: course, title: "吴恩达深度学习专项", url: "https://www.coursera.org/specializations/deep-learning"}
+      - {type: book, title: "动手学深度学习", url: "https://zh.d2l.ai/"}
+
+  - skill_id: ML.TRANSFORMER
+    items:
+      - {type: paper, title: "Attention Is All You Need", url: "https://arxiv.org/abs/1706.03762"}
+      - {type: blog, title: "The Illustrated Transformer", url: "https://jalammar.github.io/illustrated-transformer/"}
+
+  - skill_id: AITECH.DISTRIBUTED
+    items:
+      - {type: doc, title: "PyTorch DDP 文档", url: "https://pytorch.org/docs/stable/distributed.html"}
+      - {type: paper, title: "Megatron-LM", url: "https://arxiv.org/abs/1909.08053"}
+
+  - skill_id: AITECH.RAG
+    items:
+      - {type: course, title: "LangChain RAG 教程", url: "https://python.langchain.com/docs/tutorials/rag/"}
+
+  - skill_id: AITECH.VECTORDB
+    items:
+      - {type: doc, title: "Milvus 官方文档", url: "https://milvus.io/docs"}
+
+  - skill_id: BIGDATA.PANDAS
+    items:
+      - {type: course, title: "Pandas 官方文档", url: "https://pandas.pydata.org/docs/"}
+
+  - skill_id: ENGINEERING.DOCKER
+    items:
+      - {type: course, title: "Docker 官方入门", url: "https://docs.docker.com/get-started/"}
+
+  - skill_id: ENGINEERING.LINUX
+    items:
+      - {type: course, title: "Linux 就该这么学", url: ""}
+
+  - skill_id: ENGINEERING.GIT
+    items:
+      - {type: course, title: "Git 官方文档", url: "https://git-scm.com/doc"}

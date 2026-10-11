@@ -9,8 +9,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # (模块名, 期望说明, 期望主版本前缀)
 EXPECTED = [
     ("torch", ">=2.5,<3", "2"),
-    ("transformers", ">=4.57,<5", "4"),
-    ("tokenizers", ">=0.22,<=0.23.0", "0.2"),
+    ("transformers", ">=4.48,<5", "4"),
+    ("tokenizers", ">=0.21,<0.22", "0.2"),
     ("sentence_transformers", ">=5.1,<6", "5"),
     ("modelscope", ">=1.40", "1"),
     ("datasets", ">=4.0,<=4.8.4", "4"),

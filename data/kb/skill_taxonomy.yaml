@@ -44,8 +44,8 @@ skills:
   - {id: FRAMEWORK.LANGCHAIN, name: LangChain, category: FRAMEWORK, aliases: [langchain], difficulty: 2}
   - {id: FRAMEWORK.LLAMAINDEX, name: LlamaIndex, category: FRAMEWORK, aliases: [llamaindex], difficulty: 2}
   # ---- 机器学习算法 ----
-  - {id: ML.CORE, name: 机器学习, category: ML, aliases: [ml], difficulty: 2}
-  - {id: ML.DL, name: 深度学习, category: ML, aliases: [dl, 深度神经网络], difficulty: 2}
+  - {id: ML.CORE, name: 机器学习, category: ML, aliases: [ml, machine-learning], difficulty: 2}
+  - {id: ML.DL, name: 深度学习, category: ML, aliases: [dl, 深度神经网络, deep-learning], difficulty: 2}
   - {id: ML.NN, name: 神经网络, category: ML, aliases: [nn], difficulty: 2}
   - {id: ML.CNN, name: CNN, category: ML, aliases: [cnn, 卷积神经网络, 卷积], difficulty: 2}
   - {id: ML.RNN, name: RNN, category: ML, aliases: [rnn, 循环神经网络], difficulty: 2}
@@ -59,8 +59,8 @@ skills:
   - {id: ML.CONTRAST, name: 对比学习, category: ML, aliases: [contrastive-learning], difficulty: 3}
   - {id: ML.MULTIMODAL, name: 多模态, category: ML, aliases: [multimodal], difficulty: 4}
   - {id: ML.GNN, name: 图神经网络, category: ML, aliases: [gnn, graph-neural-network], difficulty: 3}
-  - {id: ML.REC, name: 推荐系统, category: ML, aliases: [recommendation, 推荐算法], difficulty: 2}
-  - {id: ML.NLP, name: NLP, category: ML, aliases: [nlp, 自然语言处理], difficulty: 2}
+  - {id: ML.REC, name: 推荐系统, category: ML, aliases: [recommendation, 推荐算法, recommendation-system], difficulty: 2}
+  - {id: ML.NLP, name: NLP, category: ML, aliases: [nlp, 自然语言处理, natural-language-processing], difficulty: 2}
   - {id: ML.CV, name: 计算机视觉, category: ML, aliases: [cv, computer-vision], difficulty: 2}
   - {id: ML.ASR, name: 语音识别, category: ML, aliases: [asr, speech-recognition], difficulty: 3}
   - {id: ML.OD, name: 目标检测, category: ML, aliases: [object-detection], difficulty: 3}
@@ -83,7 +83,7 @@ skills:
   - {id: AITECH.AGENT, name: 智能体, category: AITECH, aliases: [agent, multi-agent, 多智能体], difficulty: 3}
   - {id: AITECH.INFER_ACC, name: 推理加速, category: AITECH, aliases: [inference-acceleration, 推理优化], difficulty: 3}
   - {id: AITECH.DEPLOY, name: 模型部署, category: AITECH, aliases: [model-deployment, 模型服务化], difficulty: 2}
-  - {id: AITECH.AIGC, name: AIGC, category: AITECH, aliases: [aigc, 生成式], difficulty: 3}
+  - {id: AITECH.AIGC, name: AIGC, category: AITECH, aliases: [aigc, 生成式, generative-ai], difficulty: 3}
   - {id: AITECH.T2I, name: 文生图, category: AITECH, aliases: [text-to-image, 图像生成], difficulty: 3}
   - {id: AITECH.KG, name: 知识图谱, category: AITECH, aliases: [knowledge-graph], difficulty: 3}
   - {id: AITECH.ANNOTATE, name: 数据标注, category: AITECH, aliases: [data-annotation, 标注], difficulty: 1}

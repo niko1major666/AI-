@@ -116,7 +116,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 
 ## 八、量化指标（简历用）
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**448 条 / 69 家**（数据源 zalizedata/tech-job-postings-salary-dataset，真实科技岗位）
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）

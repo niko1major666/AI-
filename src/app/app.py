@@ -11,6 +11,26 @@ ROOT = Path(__file__).resolve().parents[2]
 
 st.set_page_config(page_title="AI 岗位技能差距分析", layout="wide")
 
+_PRIORITY_COLOR = {"P0": "#e74c3c", "P1": "#e67e22", "P2": "#3498db"}
+
+
+def _priority_badge(p: str) -> str:
+    color = _PRIORITY_COLOR.get(p, "#888888")
+    return (f'<span style="background:{color};color:white;padding:3px 10px;'
+            f'border-radius:4px;font-size:0.85em;font-weight:600;">{p}</span>')
+
+
+def _inject_css():
+    st.markdown("""
+    <style>
+    .block-container {padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px;}
+    h1, h2, h3, h4 {color: #1f3a5f;}
+    [data-testid="stMetricValue"] {color: #1f6feb; font-weight: 700;}
+    .stButton > button {background-color: #1f6feb; color: white; border-radius: 8px; border: none;}
+    .stButton > button:hover {background-color: #1756c0;}
+    </style>
+    """, unsafe_allow_html=True)
+
 
 @st.cache_resource
 def load_core():
@@ -195,7 +215,8 @@ def page_gap(taxonomy, analyzer, rows):
         st.metric("匹配度", f"{rep.match_score}%")
         st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项")
         for m in rep.missing:
-            with st.expander(f"[{m.priority}] {m.name}　(score={m.priority_score})"):
+            with st.expander(f"{m.name}（score={m.priority_score}）"):
+                st.markdown(_priority_badge(m.priority) + f" **{m.name}**", unsafe_allow_html=True)
                 st.write(m.why)
                 if m.transfer_hint:
                     st.info("道桥迁移：" + m.transfer_hint)
@@ -204,11 +225,13 @@ def page_gap(taxonomy, analyzer, rows):
 
 
 def main():
+    _inject_css()
     taxonomy, rule, analyzer = load_core()
     rows = extract_corpus()
-    page = st.sidebar.radio("页面", ["技能图谱", "简历匹配", "差距报告"])
+    st.sidebar.markdown("## 🎯 AI 岗位技能差距分析")
+    st.sidebar.caption("面向非科班求职者的技能诊断与学习规划")
     st.sidebar.markdown("---")
-    st.sidebar.caption("面向非科班求职者的 AI 岗位技能差距诊断")
+    page = st.sidebar.radio("页面", ["技能图谱", "简历匹配", "差距报告"])
     if page == "技能图谱":
         page_graph(taxonomy, rows)
     elif page == "简历匹配":

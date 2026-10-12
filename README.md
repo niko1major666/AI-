@@ -83,6 +83,14 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 .\.venv\Scripts\python.exe -m streamlit run src/app/app.py
 ```
 
+### Docker 方式（可选）
+
+模型权重通过 volume 复用宿主（不打进镜像，避免镜像过大）：
+
+```powershell
+docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
+```
+
 ## 六、环境说明（本机实测）
 
 - 项目盘 **D:**（141 GB 空闲）；`HF_HOME / MODELSCOPE_CACHE / UV_CACHE_DIR` 全部指向项目内 `models/`，删除项目即彻底释放
@@ -134,6 +142,16 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 > 结论：短技能名匹配任务上两者 Recall@5 相当（都接近满分），但 BGE 排序精度更高
 > （MRR +0.011、Hit@1 +0.025）；BGE 的真正优势在长句/口语化表述的语义匹配（子句级匹配），
 > 这也是差距报告中"简历自由文本 → 技能"场景应优先用 BGE 的原因。
+
+### 已产出：单次推理延迟（CPU，单条 JD 文本 / 单条 query）
+
+| 阶段 | 方法 | mean | p50 | p95 |
+|---|---|---|---|---|
+| 抽取 | 规则基线 | 0.75ms | 0.72ms | 0.90ms |
+| 抽取 | BERT-NER | 35.65ms | 34.34ms | 40.13ms |
+| 抽取 | SiameseUIE | 75.39ms | 74.37ms | 77.38ms |
+| 匹配 | TF-IDF | 0.75ms | 0.69ms | 1.19ms |
+| 匹配 | BGE | 17.81ms | 17.21ms | 21.00ms |
 
 ## 九、尚未核实（诚实标注）
 

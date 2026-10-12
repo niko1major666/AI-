@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    image: ai-skill-gap:latest
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models      # 复用宿主已下载的模型权重
+      - ./data:/app/data          # 复用结构化数据与金标准
+    environment:
+      - HF_ENDPOINT=https://hf-mirror.com
+      - HF_HOME=/app/models/hf_cache
+      - MODELSCOPE_CACHE=/app/models/ms_cache
+    restart: unless-stopped

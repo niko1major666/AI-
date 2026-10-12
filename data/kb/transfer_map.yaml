@@ -1,6 +1,6 @@
 # ============================================================
 # 差异化核心：道桥背景 -> AI 岗位可迁移能力映射
-# 用于差距报告中的「道桥背景技能转化建议」
+# keywords 用于在简历文本中识别用户的道桥背景技能
 # ============================================================
 version: 1
 
@@ -8,14 +8,16 @@ transfers:
   - id: T1
     source_skill: 结构力学 / 有限元分析（FEM）
     source_desc: 桥梁结构受力计算，ANSYS/ABAQUS 有限元建模，刚度矩阵组装与迭代求解
+    keywords: [有限元, FEM, 结构力学, ANSYS, ABAQUS, 刚度矩阵]
     target_skills: [ML.NN, ML.DL, AITECH.DISTRIBUTED]
     rationale: 有限元本质是「连续体离散化 + 大规模线性方程组数值求解」，与神经网络反向传播、张量分布式计算高度同构
     evidence: 课程中完成过单元刚度矩阵组装与线性方程组迭代求解
     action: 用 PyTorch 手写一个简单 FEM 求解器 + 一个 MLP，对照「离散化 -> 数值求解」的映射
 
   - id: T2
-    source_skill: 桥梁健康监测 / 传感器信号处理
-    source_desc: 索力/挠度/应变/振动监测数据采集与分析
+    source_skill: 桥梁检测 / 健康监测 / 道路勘测
+    source_desc: 桥梁检测、道路勘测、运营维护、传感器信号采集与分析
+    keywords: [桥梁检测, 桥梁监测, 健康监测, 运营维护, 道路勘测, 传感器, 结构监测]
     target_skills: [ML.TS, ML.ANOMALY, ML.CV]
     rationale: 结构监测是典型时序信号，病害检测是图像任务，直接对应 1D-CNN/异常检测/图像分割
     evidence: 有过传感器数据采集与信号分析实验
@@ -24,14 +26,16 @@ transfers:
   - id: T3
     source_skill: CAD / Revit / BIM 参数化建模
     source_desc: 道路桥梁三维建模、图纸绘制与出图
+    keywords: [AutoCAD, CAD, Revit, BIM, sketchup, 建模, 制图, 成图]
     target_skills: [BIGDATA.PIPELINE, AITECH.ANNOTATE, ENGINEERING.DOCKER]
     rationale: 参数化建模 = 结构化数据管线思维；图纸标注 = 数据标注经验；版本管理 = 工程协作
     evidence: 完成过 BIM 建模课程设计
     action: 把 BIM 建模流程抽象成一个数据管线项目，练习 Docker 打包与版本管理
 
   - id: T4
-    source_skill: 实验设计 / 数据分析 / Origin·Matlab 绘图
-    source_desc: 材料实验、结构实验的数据处理、回归拟合与图表报告
+    source_skill: 实验设计 / 数据分析 / 地质勘察
+    source_desc: 实验数据定性/定量分析、回归拟合、地质勘察与报告撰写
+    keywords: [数据分析, 实验数据, 定性分析, 定量分析, 地质勘察, 地质样本, 勘察报告, 资料整理, Origin, Matlab]
     target_skills: [BIGDATA.PANDAS, BIGDATA.NUMPY, ML.HPT, BIGDATA.VIZ]
     rationale: 实验对照组设计与超参数搜索同构，数据拟合/可视化与模型评估报告同源
     evidence: 完成过实验数据处理与报告撰写
@@ -40,7 +44,9 @@ transfers:
   - id: T5
     source_skill: 工程经济 / 概预算 / 项目管理
     source_desc: 工程造价、进度计划与资源调度
+    keywords: [概预算, 工程经济, 项目管理, 工程造价, 招投标]
     target_skills: [ML.CORE, BIGDATA.MINING, ENGINEERING.CICD]
     rationale: 资源调度与优化问题是运筹/ML 的经典入口，项目管理经验迁移到 ML 项目排期与交付
     evidence: 有课程设计或实习中的项目排期经验
     action: 用线性规划/贪心算法做一个小型资源调度优化，体会「目标函数+约束」建模
+

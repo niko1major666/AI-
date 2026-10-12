@@ -50,3 +50,18 @@ def test_transfer_hint_and_resources():
     assert rep.missing_total == 1
     assert rep.missing[0].transfer_hint != ""          # 分布式训练在道桥迁移映射中
     assert len(rep.missing[0].resources) > 0           # 有学习资源
+
+
+def test_detect_background():
+    tm = yaml.safe_load((ROOT / "data" / "kb" / "transfer_map.yaml").read_text(encoding="utf-8"))
+    analyzer = SkillGapAnalyzer(_tax(), transfer_map=tm)
+    text = "熟练使用AutoCAD、sketchup等建模软件；掌握BIM技术；开展桥梁检测与道路勘测；"
+    text += "进行定性分析和实验数据分析；完成地质勘察报告撰写"
+    bg = analyzer.detect_background(text)
+    sources = {b["source_skill"] for b in bg}
+    assert any("CAD" in s or "BIM" in s for s in sources)          # T3
+    assert any("桥梁" in s for s in sources)                        # T2
+    assert any("数据分析" in s or "地质" in s for s in sources)     # T4
+    for b in bg:
+        assert b["targets"]                                        # 有目标技能
+        assert b["keywords"]                                       # 有关键词

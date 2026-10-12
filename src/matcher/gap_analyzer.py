@@ -1,6 +1,7 @@
 """技能差距诊断：匹配度打分 + 缺失技能 + 优先级 + 学习建议 + 道桥迁移。"""
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -47,6 +48,7 @@ class SkillGapAnalyzer:
         self.nice_weight = nice_weight
         self.matcher = matcher
         self._transfer = self._index_transfer(transfer_map)
+        self._transfer_keywords = self._index_transfer_keywords(transfer_map)
         self._resources = self._index_resources(resources)
 
     # ---- 索引 ----
@@ -63,6 +65,47 @@ class SkillGapAnalyzer:
     def _index_resources(resources) -> dict:
         return {r["skill_id"]: r.get("items", [])
                 for r in (resources or {}).get("resources", [])}
+
+    @staticmethod
+    def _index_transfer_keywords(transfer_map) -> list:
+        out = []
+        for t in (transfer_map or {}).get("transfers", []):
+            for kw in t.get("keywords", []):
+                out.append((str(kw).lower(), t))
+        out.sort(key=lambda x: -len(x[0]))
+        return out
+
+    @staticmethod
+    def _kw_in_text(kw: str, lower: str) -> bool:
+        """英文关键词用词边界，避免 'cad' 误匹配 'academy' 或 'autocad' 冗余。"""
+        if kw.isascii():
+            return re.search(r"(?<![a-zA-Z0-9])" + re.escape(kw) + r"(?![a-zA-Z0-9])", lower) is not None
+        return kw in lower
+
+    def detect_background(self, text: str) -> list[dict]:
+        """识别简历中的道桥背景技能，返回 AI 迁移建议列表。"""
+        lower = (text or "").lower()
+        matched: dict = {}
+        for kw, entry in self._transfer_keywords:
+            if self._kw_in_text(kw, lower):
+                m = matched.setdefault(entry["id"], {"entry": entry, "keywords": []})
+                if kw not in m["keywords"]:
+                    m["keywords"].append(kw)
+        result = []
+        for m in matched.values():
+            e = m["entry"]
+            targets = [
+                (self.taxonomy.by_id(sid).name if self.taxonomy.by_id(sid) else sid)
+                for sid in e.get("target_skills", [])
+            ]
+            result.append({
+                "source_skill": e.get("source_skill", ""),
+                "keywords": m["keywords"],
+                "targets": targets,
+                "rationale": e.get("rationale", ""),
+                "action": e.get("action", ""),
+            })
+        return result
 
     # ---- 用户技能 -> 词表 ----
     def resolve_user_skill(self, text: str):

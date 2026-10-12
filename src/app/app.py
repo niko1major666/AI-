@@ -118,7 +118,7 @@ def _cooccurrence_html(taxonomy, rows):
     for a, b in edges:
         net.add_edge(a, b)
     return net.generate_html()
-def page_resume(taxonomy, rule):
+def page_resume(taxonomy, rule, analyzer):
     st.header("简历匹配")
     uploaded = st.file_uploader("上传简历附件（支持 PDF / DOCX / TXT）",
                                 type=["pdf", "docx", "txt", "md"])
@@ -138,20 +138,31 @@ def page_resume(taxonomy, rule):
 
     if st.button("提取技能"):
         spans = rule.extract_spans("user", text)
-        if not spans:
-            st.warning("未识别到技能，请确认文件是文字版（而非扫描图片）")
-            return
         st.session_state["user_skills"] = [s.skill_text for s in spans]
         st.session_state["user_skill_ids"] = [s.skill_id for s in spans]
 
-        by_cat = {}
-        for s in spans:
-            sk = taxonomy.by_id(s.skill_id)
-            name = sk.name if sk else s.skill_text
-            by_cat.setdefault(s.category, []).append(name)
-        for cat, items in sorted(by_cat.items()):
-            st.markdown(f"**{cat}**：{'、'.join(items)}")
-        st.caption(f"共识别 {len(spans)} 个技能，已存入会话，可前往「差距报告」使用")
+        st.subheader("识别到的 AI 技能")
+        if spans:
+            by_cat = {}
+            for s in spans:
+                sk = taxonomy.by_id(s.skill_id)
+                name = sk.name if sk else s.skill_text
+                by_cat.setdefault(s.category, []).append(name)
+            for cat, items in sorted(by_cat.items()):
+                st.markdown(f"**{cat}**：{'、'.join(items)}")
+        else:
+            st.info("未识别到编程/算法类技能（道桥等工科背景通常如此，很正常）")
+
+        st.subheader("道桥背景 → AI 技能迁移建议")
+        bg = analyzer.detect_background(text)
+        if bg:
+            for b in bg:
+                with st.expander(f"{b['source_skill']}  →  {'、'.join(b['targets'])}"):
+                    st.caption(f"匹配关键词：{'、'.join(b['keywords'])}")
+                    st.write(b["rationale"])
+                    st.write("行动建议：" + b["action"])
+        else:
+            st.caption("未匹配到道桥背景关键词")
 
 
 def page_gap(taxonomy, analyzer, rows):
@@ -201,7 +212,7 @@ def main():
     if page == "技能图谱":
         page_graph(taxonomy, rows)
     elif page == "简历匹配":
-        page_resume(taxonomy, rule)
+        page_resume(taxonomy, rule, analyzer)
     else:
         page_gap(taxonomy, analyzer, rows)
 

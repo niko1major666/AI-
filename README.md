@@ -72,6 +72,15 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 # 3) 跑测试
 .\.venv\Scripts\python.exe -m pytest tests -v
+
+# 4) 技能抽取 demo（词表规则基线 + SiameseUIE 零样本）
+.\.venv\Scripts\python.exe -m src.extractor.siamese_uie --demo
+
+# 5) 差距诊断 demo（匹配度 + 缺失技能 + 道桥迁移 + 学习资源）
+.\.venv\Scripts\python.exe -m src.matcher.gap_analyzer
+
+# 6) 前端（技能图谱 / 简历匹配 / 差距报告）
+.\.venv\Scripts\python.exe -m streamlit run src/app/app.py
 ```
 
 ## 六、环境说明（本机实测）
@@ -90,9 +99,9 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 | 周 | 交付 | 验收 |
 |---|---|---|
-| W0 | 环境+骨架+契约+数据模块 | ✅ 已完成：14 测试通过，CLI 出 jobs.jsonl |
-| W1 | SiameseUIE 抽取，出结构化 skills CSV | `python -m src.extractor.siamese_uie --demo` |
-| W2 | TF-IDF 匹配 + Streamlit MVP | `streamlit run src/app/app.py` |
+| W0 | 环境+骨架+契约+数据模块 | ✅ 14 测试通过，CLI 出 jobs.jsonl |
+| W1 | SiameseUIE 抽取 + 词表规则基线 | ✅ 29 测试通过，demo 端到端跑通 |
+| W2 | TF-IDF 匹配 + 差距诊断 + Streamlit MVP | ✅ 36 测试通过，三页面 AppTest 通过 |
 | W3 | BERT-NER 替换，F1 对比 | `python -m src.extractor.evaluate --compare` |
 | W4 | BGE 匹配，Recall@5 对比 | `python -m src.matcher.evaluate --compare` |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |

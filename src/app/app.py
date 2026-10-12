@@ -120,14 +120,27 @@ def _cooccurrence_html(taxonomy, rows):
     return net.generate_html()
 def page_resume(taxonomy, rule):
     st.header("简历匹配")
-    resume = st.text_area(
-        "粘贴简历 / 技能文本", height=180,
-        placeholder="例如：熟悉 Python、Pandas、NumPy；做过桥梁健康监测的数据分析；会用 CAD / BIM…")
+    uploaded = st.file_uploader("上传简历附件（支持 PDF / DOCX / TXT）",
+                                type=["pdf", "docx", "txt", "md"])
+    if uploaded is None:
+        st.info("上传你的简历文件，系统会解析文本并提取技能")
+        return
+
+    try:
+        from src.data.file_parser import parse_bytes
+        text = parse_bytes(uploaded.name, uploaded.getvalue())
+    except Exception as e:  # noqa: BLE001
+        st.error(f"文件解析失败：{e}")
+        return
+
+    with st.expander("查看解析出的文本", expanded=False):
+        st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
+
     if st.button("提取技能"):
-        if not resume.strip():
-            st.warning("请输入简历内容")
+        spans = rule.extract_spans("user", text)
+        if not spans:
+            st.warning("未识别到技能，请确认文件是文字版（而非扫描图片）")
             return
-        spans = rule.extract_spans("user", resume)
         st.session_state["user_skills"] = [s.skill_text for s in spans]
         st.session_state["user_skill_ids"] = [s.skill_id for s in spans]
 

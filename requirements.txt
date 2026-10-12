@@ -33,5 +33,9 @@ jieba>=0.42
 streamlit>=1.32
 pyvis>=0.3
 
+# ---- 文件解析（简历附件上传）----
+pypdf>=4.0
+python-docx>=1.1
+
 # ---- dev ----
 pytest>=8.0

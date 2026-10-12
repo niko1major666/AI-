@@ -1,0 +1,10 @@
+{"text": "掌握gRPC接口开发", "spans": [{"start": 2, "end": 6, "skill": "gRPC"}]}
+{"text": "熟悉RESTful API设计", "spans": [{"start": 2, "end": 13, "skill": "RESTful API"}]}
+{"text": "了解微服务架构", "spans": [{"start": 2, "end": 5, "skill": "微服务"}]}
+{"text": "掌握单元测试与CI/CD", "spans": [{"start": 2, "end": 6, "skill": "单元测试"}, {"start": 7, "end": 12, "skill": "CI/CD"}]}
+{"text": "熟悉AWS云计算平台", "spans": [{"start": 2, "end": 5, "skill": "AWS"}]}
+{"text": "掌握Redis缓存", "spans": [{"start": 2, "end": 7, "skill": "Redis"}]}
+{"text": "了解Elasticsearch搜索", "spans": [{"start": 2, "end": 15, "skill": "Elasticsearch"}]}
+{"text": "熟悉MySQL数据库", "spans": [{"start": 2, "end": 7, "skill": "MySQL"}]}
+{"text": "掌握知识图谱构建", "spans": [{"start": 2, "end": 6, "skill": "知识图谱"}]}
+{"text": "了解多模态学习", "spans": [{"start": 2, "end": 5, "skill": "多模态"}]}

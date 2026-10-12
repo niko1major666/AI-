@@ -1,0 +1,30 @@
+{"text": "熟悉Python编程语言", "spans": [{"start": 2, "end": 8, "skill": "Python"}]}
+{"text": "掌握PyTorch和TensorFlow深度学习框架", "spans": [{"start": 2, "end": 9, "skill": "PyTorch"}, {"start": 10, "end": 20, "skill": "TensorFlow"}]}
+{"text": "了解Transformer与注意力机制", "spans": [{"start": 2, "end": 13, "skill": "Transformer"}, {"start": 14, "end": 19, "skill": "注意力机制"}]}
+{"text": "有分布式训练经验者优先", "spans": [{"start": 1, "end": 6, "skill": "分布式训练"}]}
+{"text": "熟悉向量数据库如Milvus", "spans": [{"start": 2, "end": 7, "skill": "向量数据库"}]}
+{"text": "掌握RAG检索增强生成技术", "spans": [{"start": 2, "end": 5, "skill": "RAG"}]}
+{"text": "了解LoRA低秩适配微调", "spans": [{"start": 2, "end": 6, "skill": "LoRA"}, {"start": 10, "end": 12, "skill": "微调"}]}
+{"text": "熟悉大模型预训练与微调", "spans": [{"start": 2, "end": 5, "skill": "大模型"}, {"start": 9, "end": 11, "skill": "微调"}]}
+{"text": "掌握SQL数据库操作", "spans": [{"start": 2, "end": 5, "skill": "SQL"}]}
+{"text": "熟悉Linux操作系统和Git版本管理", "spans": [{"start": 2, "end": 7, "skill": "Linux"}, {"start": 12, "end": 15, "skill": "Git"}]}
+{"text": "掌握Docker容器化部署", "spans": [{"start": 2, "end": 8, "skill": "Docker"}]}
+{"text": "了解Kubernetes集群管理", "spans": [{"start": 2, "end": 12, "skill": "Kubernetes"}]}
+{"text": "熟悉Spark大数据处理", "spans": [{"start": 2, "end": 7, "skill": "Spark"}]}
+{"text": "掌握Pandas和NumPy数据处理", "spans": [{"start": 2, "end": 8, "skill": "Pandas"}, {"start": 9, "end": 14, "skill": "NumPy"}]}
+{"text": "了解机器学习与深度学习基础", "spans": [{"start": 2, "end": 6, "skill": "机器学习"}, {"start": 7, "end": 11, "skill": "深度学习"}]}
+{"text": "掌握CNN卷积神经网络", "spans": [{"start": 2, "end": 5, "skill": "CNN"}]}
+{"text": "了解RNN和LSTM序列模型", "spans": [{"start": 2, "end": 5, "skill": "RNN"}, {"start": 6, "end": 10, "skill": "LSTM"}]}
+{"text": "熟悉目标检测与图像分割", "spans": [{"start": 2, "end": 6, "skill": "目标检测"}, {"start": 7, "end": 11, "skill": "图像分割"}]}
+{"text": "掌握计算机视觉算法", "spans": [{"start": 2, "end": 7, "skill": "计算机视觉"}]}
+{"text": "了解自然语言处理NLP技术", "spans": [{"start": 8, "end": 11, "skill": "NLP"}]}
+{"text": "熟悉推荐系统算法", "spans": [{"start": 2, "end": 6, "skill": "推荐系统"}]}
+{"text": "掌握图神经网络GNN", "spans": [{"start": 2, "end": 7, "skill": "图神经网络"}]}
+{"text": "了解强化学习RL", "spans": [{"start": 2, "end": 6, "skill": "强化学习"}]}
+{"text": "熟悉模型部署与推理加速", "spans": [{"start": 2, "end": 6, "skill": "模型部署"}, {"start": 7, "end": 11, "skill": "推理加速"}]}
+{"text": "掌握模型量化与模型压缩", "spans": [{"start": 4, "end": 6, "skill": "量化"}, {"start": 7, "end": 11, "skill": "模型压缩"}]}
+{"text": "了解知识蒸馏技术", "spans": [{"start": 2, "end": 6, "skill": "知识蒸馏"}]}
+{"text": "熟悉特征工程与特征选择", "spans": [{"start": 2, "end": 6, "skill": "特征工程"}, {"start": 7, "end": 11, "skill": "特征选择"}]}
+{"text": "掌握数据清洗与数据挖掘", "spans": [{"start": 2, "end": 6, "skill": "数据清洗"}, {"start": 7, "end": 11, "skill": "数据挖掘"}]}
+{"text": "了解实时计算与数据管道", "spans": [{"start": 2, "end": 6, "skill": "实时计算"}, {"start": 7, "end": 11, "skill": "数据管道"}]}
+{"text": "熟悉CUDA并行计算", "spans": [{"start": 2, "end": 6, "skill": "CUDA"}, {"start": 6, "end": 10, "skill": "并行计算"}]}

@@ -102,7 +102,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 | W0 | 环境+骨架+契约+数据模块 | ✅ 14 测试通过，CLI 出 jobs.jsonl |
 | W1 | SiameseUIE 抽取 + 词表规则基线 | ✅ 29 测试通过，demo 端到端跑通 |
 | W2 | TF-IDF 匹配 + 差距诊断 + Streamlit MVP | ✅ 36 测试通过，三页面 AppTest 通过 |
-| W3 | BERT-NER 替换，F1 对比 | `python -m src.extractor.evaluate --compare` |
+| W3 | BERT-NER 替换，F1 对比 | ✅ 微调 bert-base-chinese，F1 0.636(exact)/0.909(overlap) vs SiameseUIE 0.000 |
 | W4 | BGE 匹配，Recall@5 对比 | `python -m src.matcher.evaluate --compare` |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
 
@@ -112,6 +112,17 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
+
+### 已产出：技能抽取 F1 对比（测试集 10 条，span 级）
+
+| 方法 | P | R | F1(exact) | F1(overlap) |
+|---|---|---|---|---|
+| 规则基线（词表字典） | 0.917 | 1.000 | 0.957 | 0.957 |
+| SiameseUIE（零样本） | 0.000 | 0.000 | 0.000 | 0.000 |
+| BERT-NER（微调 30 条） | 0.636 | 0.636 | 0.636 | 0.909 |
+
+> 结论：SiameseUIE 零样本对抽象技能类别召回为 0（已实测），微调 BERT-NER 显著提升（0→0.64/0.91）；
+> 词表规则基线对「词表内技能」最稳（0.96），但无法发现词表外新技能——两者互补，正是保留双路抽取的原因。
 
 ## 九、尚未核实（诚实标注）
 

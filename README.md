@@ -103,7 +103,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 | W1 | SiameseUIE 抽取 + 词表规则基线 | ✅ 29 测试通过，demo 端到端跑通 |
 | W2 | TF-IDF 匹配 + 差距诊断 + Streamlit MVP | ✅ 36 测试通过，三页面 AppTest 通过 |
 | W3 | BERT-NER 替换，F1 对比 | ✅ 微调 bert-base-chinese，F1 0.636(exact)/0.909(overlap) vs SiameseUIE 0.000 |
-| W4 | BGE 匹配，Recall@5 对比 | `python -m src.matcher.evaluate --compare` |
+| W4 | BGE 匹配，Recall@5 对比 | ✅ BGE vs TF-IDF：Recall@5 均 0.975，MRR/Hit@1 BGE 更优 |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
 
 ## 八、量化指标（简历用）
@@ -123,6 +123,17 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 > 结论：SiameseUIE 零样本对抽象技能类别召回为 0（已实测），微调 BERT-NER 显著提升（0→0.64/0.91）；
 > 词表规则基线对「词表内技能」最稳（0.96），但无法发现词表外新技能——两者互补，正是保留双路抽取的原因。
+
+### 已产出：语义匹配 Recall@5 对比（40 条口语表述→技能，语料 128 技能）
+
+| 方法 | Recall@5 | MRR | Hit@1 |
+|---|---|---|---|
+| TF-IDF（char 2-4 gram） | 0.975 | 0.933 | 0.900 |
+| BGE-base-zh-v1.5 | 0.975 | 0.944 | 0.925 |
+
+> 结论：短技能名匹配任务上两者 Recall@5 相当（都接近满分），但 BGE 排序精度更高
+> （MRR +0.011、Hit@1 +0.025）；BGE 的真正优势在长句/口语化表述的语义匹配（子句级匹配），
+> 这也是差距报告中"简历自由文本 → 技能"场景应优先用 BGE 的原因。
 
 ## 九、尚未核实（诚实标注）
 

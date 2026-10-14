@@ -153,8 +153,27 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 | 匹配 | TF-IDF | 0.75ms | 0.69ms | 1.19ms |
 | 匹配 | BGE | 17.81ms | 17.21ms | 21.00ms |
 
-## 九、尚未核实（诚实标注）
+## 九、已核实结论（诚实标注）
 
-1. Kaggle「AI Jobs Dataset 2026」是否真实存在及其字段——数据层已做 YAML 列映射适配，任意 JD CSV 即插即用
-2. `Nucha_SkillNER_BERT` 是否可获取——NER 模型名走配置，拿不到则退 `bert-base-chinese` 自标注微调
-3. SiameseUIE 在本机 transformers 4.57 下的实际推理表现——装完用 `--demo` 验证
+1. Kaggle「AI Jobs Dataset 2026」**不存在**——已改用 HuggingFace `zalizedata/tech-job-postings-salary-dataset`（448 条真实科技岗位 / 69 家公司）
+2. `Nucha_SkillNER_BERT` **不存在**——已按 fallback 用 `bert-base-chinese` 自标注微调（F1 0.636/0.909）
+3. SiameseUIE 零样本对抽象技能类别 **F1=0**（已实测）——故保留「规则基线 + BERT-NER」双路抽取
+
+## 十、架构与数据流
+
+```
+数据采集         技能抽取            语义匹配          差距诊断         前端展示
+raw CSV   ──▶  规则基线/UIE/NER  ──▶  TF-IDF/BGE  ──▶  打分+优先级  ──▶  Streamlit
+ │                │                   │                │                 │
+jobs.jsonl     skills_long        skill_id 匹配      GapReport        3 页面
+```
+
+关键链路：`build_dataset` → `extractor`(rule/bert_ner/siamese_uie) → `matcher`(tfidf/bge) → `gap_analyzer` → `app`
+
+## 十一、排障记录（踩坑与解法）
+
+1. **uv venv 无 pip** → ModelScope 加载模型报 `No module named pip`：补装 pip + 对齐模型 pin 的 `transformers==4.48.3`
+2. **ModelScope 不转发 trust_remote_code** → 官方 SiameseUIE 模型被安全拦截：幂等 monkeypatch `SiameseUiePipeline.__init__`
+3. **transformers 版本耦合** → 锁 `transformers<5`、`sentence-transformers<6`，防止 modelscope 崩
+4. **SiameseUIE 输出为嵌套 list** `{'output': [[...]]}` → 递归展开解析
+5. **Windows 无 symlink** → HF 缓存降级警告（无害），设 `HF_HUB_DISABLE_SYMLINKS_WARNING` 可静默

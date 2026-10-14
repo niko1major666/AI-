@@ -11,7 +11,7 @@ def _tax() -> Taxonomy:
 
 def test_load_counts():
     t = _tax()
-    assert len(t.all_skills()) == 128
+    assert len(t.all_skills()) == 147
     assert len(t.categories) == 6
 
 

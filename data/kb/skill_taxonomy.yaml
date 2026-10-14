@@ -128,7 +128,7 @@ skills:
   - {id: ENGINEERING.DOCKER, name: Docker, category: ENGINEERING, aliases: [docker], difficulty: 2}
   - {id: ENGINEERING.K8S, name: Kubernetes, category: ENGINEERING, aliases: [k8s, kubernetes], difficulty: 3}
   - {id: ENGINEERING.GIT, name: Git, category: ENGINEERING, aliases: [git], difficulty: 1}
-  - {id: ENGINEERING.CICD, name: CI/CD, category: ENGINEERING, aliases: [cicd, 持续集成], difficulty: 2}
+  - {id: ENGINEERING.CICD, name: CI/CD, category: ENGINEERING, aliases: [cicd, ci-cd, 持续集成], difficulty: 2}
   - {id: ENGINEERING.CLOUD, name: 云计算, category: ENGINEERING, aliases: [cloud-computing, 云原生], difficulty: 2}
   - {id: ENGINEERING.AWS, name: AWS, category: ENGINEERING, aliases: [aws, 亚马逊云], difficulty: 3}
   - {id: ENGINEERING.ALIYUN, name: 阿里云, category: ENGINEERING, aliases: [aliyun], difficulty: 2}
@@ -138,8 +138,8 @@ skills:
   - {id: ENGINEERING.DVC, name: DVC, category: ENGINEERING, aliases: [dvc], difficulty: 3}
   - {id: ENGINEERING.EXPTRACK, name: 实验管理, category: ENGINEERING, aliases: [experiment-tracking], difficulty: 2}
   - {id: ENGINEERING.GRPC, name: gRPC, category: ENGINEERING, aliases: [grpc], difficulty: 2}
-  - {id: ENGINEERING.REST, name: "RESTful API", category: ENGINEERING, aliases: [restful, api开发], difficulty: 1}
-  - {id: ENGINEERING.MICROSVC, name: 微服务, category: ENGINEERING, aliases: [microservice], difficulty: 2}
+  - {id: ENGINEERING.REST, name: "RESTful API", category: ENGINEERING, aliases: [restful, rest-api, api开发], difficulty: 1}
+  - {id: ENGINEERING.MICROSVC, name: 微服务, category: ENGINEERING, aliases: [microservice, microservices], difficulty: 2}
   - {id: ENGINEERING.UNITTEST, name: 单元测试, category: ENGINEERING, aliases: [unit-test, 测试], difficulty: 1}
   - {id: ENGINEERING.HPC, name: 高性能计算, category: ENGINEERING, aliases: [hpc], difficulty: 4}
   - {id: ENGINEERING.CUDA, name: CUDA, category: ENGINEERING, aliases: [cuda], difficulty: 4}
@@ -150,3 +150,24 @@ skills:
   - {id: ENGINEERING.MYSQL, name: MySQL, category: ENGINEERING, aliases: [mysql], difficulty: 1}
   - {id: ENGINEERING.ES, name: Elasticsearch, category: ENGINEERING, aliases: [es, elasticsearch], difficulty: 2}
   - {id: ENGINEERING.GRAPHDB, name: 图数据库, category: ENGINEERING, aliases: [graph-database], difficulty: 3}
+
+  # ---- 扩充：真实数据高频科技技能（2026-10 补充）----
+  - {id: PROG.CSHARP, name: "C#", category: PROG, aliases: [csharp], difficulty: 2}
+  - {id: FRAMEWORK.SKLEARN, name: scikit-learn, category: FRAMEWORK, aliases: [sklearn], difficulty: 2}
+  - {id: BIGDATA.DATASCIENCE, name: 数据科学, category: BIGDATA, aliases: [data-science], difficulty: 2}
+  - {id: BIGDATA.DATAENG, name: 数据工程, category: BIGDATA, aliases: [data-engineering], difficulty: 2}
+  - {id: BIGDATA.DATABRICKS, name: Databricks, category: BIGDATA, aliases: [databricks], difficulty: 3}
+  - {id: BIGDATA.SNOWFLAKE, name: Snowflake, category: BIGDATA, aliases: [snowflake], difficulty: 3}
+  - {id: BIGDATA.BIGQUERY, name: BigQuery, category: BIGDATA, aliases: [bigquery], difficulty: 2}
+  - {id: BIGDATA.NOSQL, name: NoSQL, category: BIGDATA, aliases: [nosql], difficulty: 2}
+  - {id: ENGINEERING.DEVOPS, name: DevOps, category: ENGINEERING, aliases: [devops], difficulty: 3}
+  - {id: ENGINEERING.TERRAFORM, name: Terraform, category: ENGINEERING, aliases: [terraform], difficulty: 3}
+  - {id: ENGINEERING.AZURE, name: Azure, category: ENGINEERING, aliases: [azure], difficulty: 3}
+  - {id: ENGINEERING.GCP, name: GCP, category: ENGINEERING, aliases: [gcp, google-cloud], difficulty: 3}
+  - {id: ENGINEERING.SERVERLESS, name: Serverless, category: ENGINEERING, aliases: [serverless], difficulty: 3}
+  - {id: ENGINEERING.FASTAPI, name: FastAPI, category: ENGINEERING, aliases: [fastapi], difficulty: 2}
+  - {id: ENGINEERING.FLASK, name: Flask, category: ENGINEERING, aliases: [flask], difficulty: 1}
+  - {id: ENGINEERING.DJANGO, name: Django, category: ENGINEERING, aliases: [django], difficulty: 2}
+  - {id: ENGINEERING.REACT, name: React, category: ENGINEERING, aliases: [react, react.js], difficulty: 2}
+  - {id: ENGINEERING.VUE, name: Vue, category: ENGINEERING, aliases: [vue, vue.js], difficulty: 2}
+  - {id: ENGINEERING.NODEJS, name: Node.js, category: ENGINEERING, aliases: [node.js, nodejs], difficulty: 2}

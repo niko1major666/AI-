@@ -30,6 +30,29 @@ def _stars(n: int, total: int) -> str:
     return "★" * n + "☆" * (total - n)
 
 
+_PRIO_BG = {"P0": "#fdecea", "P1": "#fff4e5", "P2": "#eef4fb"}
+_PRIO_ACCENT = {"P0": "#e74c3c", "P1": "#e67e22", "P2": "#3498db"}
+
+
+def _gap_card(m) -> str:
+    """单个缺失技能的卡片 HTML（按 P 级着色，内容分行更分明）。"""
+    bg = _PRIO_BG.get(m.priority, "#f6f8fa")
+    accent = _PRIO_ACCENT.get(m.priority, "#888888")
+    badge = _priority_badge(m.priority)
+    return (
+        f'<div style="background:{bg}; border-left:4px solid {accent}; border-radius:8px;'
+        f'padding:10px 14px; margin:8px 0;">'
+        f'<div style="font-weight:600; color:#1f3a5f; font-size:1.02em;">{m.name} {badge}</div>'
+        f'<div style="margin-top:6px; color:#444; font-size:0.92em;">'
+        f'<span>重要度&nbsp;<b style="color:{accent};">{_stars(m.importance, 5)}</b></span>'
+        f'<span style="margin:0 10px; color:#ccc;">|</span>'
+        f'<span>学习难度&nbsp;<b>{_stars(m.difficulty, 4)}</b></span>'
+        f'</div>'
+        f'<div style="margin-top:5px; color:#777; font-size:0.88em;">{m.why}</div>'
+        f'</div>'
+    )
+
+
 def _inject_css():
     st.markdown("""
     <style>
@@ -302,19 +325,25 @@ def page_gap(taxonomy, analyzer, rows):
         st.subheader("🎯 优先补充建议")
         top = rep.missing[:3]
         if top:
-            st.markdown("**建议优先补充：** " + "、".join(f"**{m.name}**" for m in top))
+            names = "、".join(f"<b>{m.name}</b>" for m in top)
+            st.markdown(
+                f'<div style="background:#e8f4fd; border:1px solid #b6d9f2; border-radius:8px;'
+                f'padding:12px 16px; margin:8px 0;">'
+                f'<div style="font-weight:700; color:#1f6feb;">💡 建议优先补充</div>'
+                f'<div style="margin-top:4px; color:#333;">{names}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
 
         for emoji, label, items, desc in [
-            ("🔴", "P0 先学（硬性要求 / 高频）", p0, "目标岗位的硬性门槛或高频需求，最优先补齐"),
-            ("🟠", "P1 进阶（重要且常用）", p1, "多数岗位需要，补上后竞争力明显提升"),
-            ("🔵", "P2 可选（加分项）", p2, "有余力再补，作为差异化竞争力"),
+            ("🔴", "P0 先学", p0, "硬性门槛 / 高频需求，最优先补齐"),
+            ("🟠", "P1 进阶", p1, "重要且常用，补上后竞争力明显提升"),
+            ("🔵", "P2 可选", p2, "加分项，有余力再补"),
         ]:
             if items:
-                st.markdown(f"{emoji} **{label}**（{len(items)} 项）· {desc}")
+                st.markdown(f"#### {emoji} {label} · {desc}（{len(items)} 项）")
                 for m in items:
-                    st.markdown(
-                        f"- **{m.name}** · 重要度 {_stars(m.importance, 5)} · 难度 {_stars(m.difficulty, 4)} · {m.why}"
-                    )
+                    st.markdown(_gap_card(m), unsafe_allow_html=True)
 
         # ---- 完整缺失技能清单 ----
         st.subheader(f"📋 缺失技能清单（共 {rep.missing_total} 项）")

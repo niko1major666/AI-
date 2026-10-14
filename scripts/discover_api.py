@@ -1,4 +1,4 @@
-"""用 Playwright 打开招聘站，拦截并打印 JSON API 响应，用于发现真实接口。"""
+"""用 Playwright 打开招聘站，滚动触发懒加载，捕获岗位相关请求/响应。"""
 import asyncio
 import sys
 
@@ -9,25 +9,28 @@ async def main(url):
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         page = await browser.new_page()
-        captured = []
+        requests = []
+        responses = []
 
-        async def on_response(resp):
-            ct = resp.headers.get("content-type") or ""
-            if "json" in ct and ("api" in resp.url or "service" in resp.url):
-                try:
-                    captured.append((resp.url, await resp.json()))
-                except Exception:  # noqa: BLE001
-                    pass
+        page.on("request", lambda req: requests.append((req.method, req.url)))
+        page.on("response", lambda resp: responses.append(resp.url))
 
-        page.on("response", on_response)
         await page.goto(url, timeout=40000, wait_until="domcontentloaded")
-        await page.wait_for_timeout(10000)  # 等 SPA 加载并发起 API 请求
+        await page.wait_for_timeout(3000)
+        for _ in range(6):
+            await page.mouse.wheel(0, 2500)
+            await page.wait_for_timeout(1200)
 
-        print(f"捕获 {len(captured)} 个 JSON 响应")
-        for u, b in captured[:8]:
-            print("== URL:", u)
-            print(str(b)[:400])
-            print()
+        keys = ("job", "post", "position", "search", "list")
+        print("=== 岗位相关请求 ===")
+        for method, u in requests:
+            if any(k in u.lower() for k in keys):
+                print(f"  {method} {u}")
+
+        print("=== 岗位相关 JSON 响应 ===")
+        for u in responses:
+            if any(k in u.lower() for k in keys):
+                print(f"  {u}")
         await browser.close()
 
 

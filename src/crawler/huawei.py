@@ -70,6 +70,8 @@ class HuaweiCrawler:
                     "experience": "",
                     "education": "",
                     "jd_text": jd_text,
+                    "department": "",
+                    "publish_time": "",
                 })
                 if len(rows) >= limit:
                     return rows

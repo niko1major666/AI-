@@ -4,6 +4,8 @@ from __future__ import annotations
 import pandas as pd
 from playwright.sync_api import sync_playwright
 
+from src.crawler.util import fmt_publish_time
+
 AI_KEYWORDS = ["AI", "算法", "大模型", "机器学习", "深度学习", "自动驾驶", "数据",
                "软件", "芯片", "智能", "语音", "图像", "机器人", "自然语言处理"]
 
@@ -58,6 +60,10 @@ def crawl(keywords=AI_KEYWORDS, scroll_times: int = 15, max_posts: int = 500) ->
                     if len(jd_text) < 20:
                         continue
                     city = (p.get("city_info") or {}).get("name") or ""
+                    jf = p.get("job_function") or {}
+                    dept = jf.get("name") if isinstance(jf, dict) else str(jf or "")
+                    if isinstance(dept, dict):
+                        dept = dept.get("zh_cn") or dept.get("i18n") or ""
                     rows.append({
                         "job_id": pid,
                         "company": "小米",
@@ -67,6 +73,8 @@ def crawl(keywords=AI_KEYWORDS, scroll_times: int = 15, max_posts: int = 500) ->
                         "experience": "",
                         "education": "",
                         "jd_text": jd_text,
+                        "department": dept or "",
+                        "publish_time": fmt_publish_time(p.get("publish_time")),
                     })
                     cnt += 1
                     if len(rows) >= max_posts:

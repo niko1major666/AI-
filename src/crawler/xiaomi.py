@@ -68,6 +68,8 @@ class XiaomiCrawler:
                     "experience": "",
                     "education": "",
                     "jd_text": jd_text,
+                    "department": p.get("levelOneDeptName") or "",
+                    "publish_time": p.get("publishTime") or "",
                 })
                 if len(rows) >= limit:
                     return rows

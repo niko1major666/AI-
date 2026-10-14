@@ -40,6 +40,8 @@ def crawl() -> list[dict]:
             "experience": "",
             "education": "",
             "jd_text": text,
+            "department": "",
+            "publish_time": "",
         })
     return rows
 

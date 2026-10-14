@@ -1,7 +1,9 @@
 """Streamlit 前端：技能图谱 / 简历匹配 / 差距报告。"""
 from __future__ import annotations
 
+import difflib
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -68,6 +70,7 @@ def extract_corpus():
         rows.append({
             "job_id": j["job_id"], "title": j.get("title", ""),
             "company": j.get("company", ""), "location": j.get("location", ""),
+            "department": j.get("department", ""), "publish_time": j.get("publish_time", ""),
             "skills": [s.skill_id for s in spans],
         })
     return rows
@@ -89,11 +92,59 @@ def _skill_name(taxonomy, sid):
     return sk.name if sk else sid
 
 
+def _match_job(r, search):
+    """多关键词(AND) + 模糊匹配：匹配标题(含翻译)/地点，支持英文拼写容错。"""
+    if not search.strip():
+        return True
+    title = _translate_title(r["title"]).lower()
+    title_raw = str(r["title"]).lower()
+    loc = (r.get("location") or "").lower()
+    kws = [k for k in re.split(r"[\s,，、]+", search.strip().lower()) if k]
+    # 标题/地点拆词，供拼写容错的模糊匹配
+    words = re.findall(r"[a-z0-9]+", f"{title} {title_raw} {loc}")
+    for kw in kws:
+        if kw in title or kw in title_raw or kw in loc:
+            continue
+        if difflib.get_close_matches(kw, words, n=1, cutoff=0.7):
+            continue
+        return False
+    return True
+
+
+def _fmt_time(pt):
+    """发布时间统一成 YYYY-MM-DD。"""
+    s = str(pt).strip()
+    if not s:
+        return ""
+    m = re.match(r"(\d{4})年(\d{1,2})月(\d{1,2})日", s)
+    if m:
+        return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+    return s[:10]
+
+
+def _job_label(r):
+    """岗位下拉显示标签：标题 · 地点 · 部门 · 发布时间。"""
+    parts = [_translate_title(r["title"]), r.get("location") or ""]
+    dep = r.get("department") or ""
+    if dep:
+        parts.append(dep)
+    pt = _fmt_time(r.get("publish_time") or "")
+    if pt:
+        parts.append(pt)
+    return " · ".join([p for p in parts if p])
+
+
 def page_graph(taxonomy, rows):
     st.header("技能图谱")
     if not rows:
         st.warning("暂无数据，请先运行 `python -m src.data.build_dataset`")
         return
+
+    # 公司筛选
+    companies = ["全部"] + sorted({r["company"] for r in rows})
+    company = st.selectbox("🏢 筛选公司", companies)
+    if company != "全部":
+        rows = [r for r in rows if r["company"] == company]
 
     demand = compute_demand(rows)
     c1, c2, c3 = st.columns(3)
@@ -201,21 +252,16 @@ def page_gap(taxonomy, analyzer, rows):
 
     # 2) 搜索岗位（该公司内按标题/地点关键词过滤）
     company_jobs = [r for r in rows if r["company"] == company]
-    search = st.text_input("🔍 搜索岗位（按标题/地点关键词，可留空）", "")
+    search = st.text_input("🔍 搜索岗位（支持多关键词空格分隔 + 模糊匹配，可留空）", "")
     if search.strip():
-        kw = search.strip().lower()
-        company_jobs = [r for r in company_jobs
-                        if kw in _translate_title(r["title"]).lower()
-                        or kw in r["title"].lower()
-                        or kw in (r.get("location") or "").lower()]
+        company_jobs = [r for r in company_jobs if _match_job(r, search)]
 
     if not company_jobs:
         st.warning("该公司没有匹配的岗位，请换关键词或换公司")
         return
 
     # 3) 再选该公司内的具体岗位
-    options = {f"{_translate_title(r['title'])} · {r['location']} ({r['job_id']})": r
-               for r in company_jobs}
+    options = {_job_label(r): r for r in company_jobs}
     label = st.selectbox("📋 选择岗位", list(options))
     target = options[label]
 

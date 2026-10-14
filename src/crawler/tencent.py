@@ -84,6 +84,8 @@ class TencentCrawler:
                     "experience": p.get("RequireWorkYearsName") or "",
                     "education": "",
                     "jd_text": jd_text,
+                    "department": p.get("BGName") or p.get("ProductName") or "",
+                    "publish_time": p.get("LastUpdateTime") or "",
                 })
                 time.sleep(self.delay)
                 if len(rows) >= limit:

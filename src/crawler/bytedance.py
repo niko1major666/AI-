@@ -8,6 +8,8 @@ from __future__ import annotations
 import pandas as pd
 from playwright.sync_api import sync_playwright
 
+from src.crawler.util import fmt_publish_time
+
 AI_KEYWORDS = ["AI", "算法", "大模型", "机器学习", "深度学习", "自然语言处理",
                "计算机视觉", "数据挖掘", "推荐", "强化学习", "语音识别", "NLP", "CV",
                "LLM", "AIGC", "多模态", "知识图谱", "数据科学", "数据分析", "数据工程",
@@ -59,6 +61,7 @@ def crawl(keyword: str, scroll_times: int = 15, max_posts: int = 500) -> list[di
             if len(jd_text) < 20:
                 continue
             city = (p.get("city_info") or {}).get("name") or ""
+            dept = (p.get("job_category") or {}).get("name") or ""
             rows.append({
                 "job_id": pid,
                 "company": "字节跳动",
@@ -68,6 +71,8 @@ def crawl(keyword: str, scroll_times: int = 15, max_posts: int = 500) -> list[di
                 "experience": "",
                 "education": "",
                 "jd_text": jd_text,
+                "department": dept,
+                "publish_time": fmt_publish_time(p.get("publish_time")),
             })
             if len(rows) >= max_posts:
                 return rows

@@ -9,7 +9,7 @@ from typing import Iterable
 import pandas as pd
 
 CANONICAL = ["job_id", "company", "title", "location", "salary",
-             "experience", "education", "jd_text"]
+             "experience", "education", "jd_text", "department", "publish_time"]
 
 
 def resolve_column(mapping: dict, base: str, columns: Iterable[str]):

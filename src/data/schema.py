@@ -23,6 +23,8 @@ class JobPosting:
     jd_clean: str
     crawl_time: str
     text_hash: str
+    department: str = ""
+    publish_time: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)

@@ -17,7 +17,7 @@ import yaml
 from . import load_kaggle, normalize, schema
 
 CANON_COLS = ["job_id", "company", "title", "location", "salary",
-              "experience", "education", "jd_text"]
+              "experience", "education", "jd_text", "department", "publish_time"]
 
 
 def _root() -> Path:
@@ -110,6 +110,8 @@ def build(config_path, out_dir=None) -> dict:
             jd_clean=str(row.get("jd_clean", "") or ""),
             crawl_time=crawl_time,
             text_hash=str(row.get("text_hash", "") or ""),
+            department=str(row.get("department", "") or ""),
+            publish_time=str(row.get("publish_time", "") or ""),
         ).to_dict())
 
     out = _resolve(root, out_cfg["jobs_jsonl"]) if out_dir is None else Path(out_dir) / "jobs.jsonl"

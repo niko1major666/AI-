@@ -7,6 +7,8 @@ from pathlib import Path
 
 import streamlit as st
 
+from src.data.translate import translate_title as _translate_title
+
 ROOT = Path(__file__).resolve().parents[2]
 
 st.set_page_config(page_title="AI 岗位技能差距分析", layout="wide")
@@ -192,7 +194,7 @@ def page_gap(taxonomy, analyzer, rows):
         return
 
     demand = compute_demand(rows)
-    options = {f"{r['company']} · {r['title']} ({r['job_id']})": r for r in rows}
+    options = {f"{r['company']} · {_translate_title(r['title'])} ({r['job_id']})": r for r in rows}
     label = st.selectbox("目标岗位", list(options))
     target = options[label]
 

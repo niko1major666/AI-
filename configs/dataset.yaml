@@ -4,8 +4,8 @@
 # ============================================================
 source:
   type: local_csv                # local_csv | kaggle | playwright
-  path: data/raw/tech_jobs.csv
-  job_prefix: tj
+  path: data/raw/all_jobs.csv
+  job_prefix: jd
 
 column_mapping:
   job_id: job_id

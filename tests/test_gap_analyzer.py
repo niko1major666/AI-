@@ -65,3 +65,34 @@ def test_detect_background():
     for b in bg:
         assert b["targets"]                                        # 有目标技能
         assert b["keywords"]                                       # 有关键词
+
+
+def test_importance_weighted_priority():
+    analyzer = SkillGapAnalyzer(_tax())
+    jd = [
+        {"skill_id": "AITECH.LLM", "name": "大模型", "is_must": False},
+        {"skill_id": "PROG.SCALA", "name": "Scala", "is_must": False},
+    ]
+    demand = {"AITECH.LLM": 0.3, "PROG.SCALA": 0.3}
+    rep = analyzer.analyze([], jd, demand=demand)
+    by_id = {m.skill_id: m for m in rep.missing}
+
+    # 每个缺失项都带 importance 字段
+    assert by_id["AITECH.LLM"].importance == 5
+    assert by_id["PROG.SCALA"].importance == 1
+    # 同样需求占比下，重要度高的技能优先级分更高
+    assert by_id["AITECH.LLM"].priority_score > by_id["PROG.SCALA"].priority_score
+
+
+def test_priority_order_p0_first():
+    analyzer = SkillGapAnalyzer(_tax())
+    jd = [
+        {"skill_id": "PROG.SCALA", "name": "Scala", "is_must": False},
+        {"skill_id": "AITECH.LLM", "name": "大模型", "is_must": True},
+        {"skill_id": "AITECH.RAG", "name": "RAG", "is_must": False},
+    ]
+    demand = {"PROG.SCALA": 0.1, "AITECH.LLM": 0.2, "AITECH.RAG": 0.9}
+    rep = analyzer.analyze([], jd, demand=demand)
+    # P0（硬性缺失）恒排在缺失清单最前，即使需求占比低
+    assert rep.missing[0].priority == "P0"
+    assert rep.missing[0].skill_id == "AITECH.LLM"

@@ -24,6 +24,12 @@ def _priority_badge(p: str) -> str:
             f'border-radius:4px;font-size:0.85em;font-weight:600;">{p}</span>')
 
 
+def _stars(n: int, total: int) -> str:
+    """把数值渲染成 ★★★☆☆ 形式的星级。"""
+    n = max(0, min(int(n), total))
+    return "★" * n + "☆" * (total - n)
+
+
 def _inject_css():
     st.markdown("""
     <style>
@@ -283,10 +289,41 @@ def page_gap(taxonomy, analyzer, rows):
         rep = analyzer.analyze(user_skills, jd_skills, demand=demand)
         st.metric("匹配度", f"{rep.match_score}%")
         st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项")
+
+        if not rep.missing:
+            st.success("🎉 已覆盖目标岗位的全部技能，暂无差距")
+            return
+
+        p0 = [m for m in rep.missing if m.priority == "P0"]
+        p1 = [m for m in rep.missing if m.priority == "P1"]
+        p2 = [m for m in rep.missing if m.priority == "P2"]
+
+        # ---- 优先补充建议 ----
+        st.subheader("🎯 优先补充建议")
+        top = rep.missing[:3]
+        if top:
+            st.markdown("**建议优先补充：** " + "、".join(f"**{m.name}**" for m in top))
+
+        for emoji, label, items, desc in [
+            ("🔴", "P0 先学（硬性要求 / 高频）", p0, "目标岗位的硬性门槛或高频需求，最优先补齐"),
+            ("🟠", "P1 进阶（重要且常用）", p1, "多数岗位需要，补上后竞争力明显提升"),
+            ("🔵", "P2 可选（加分项）", p2, "有余力再补，作为差异化竞争力"),
+        ]:
+            if items:
+                st.markdown(f"{emoji} **{label}**（{len(items)} 项）· {desc}")
+                for m in items:
+                    st.markdown(
+                        f"- **{m.name}** · 重要度 {_stars(m.importance, 5)} · 难度 {_stars(m.difficulty, 4)} · {m.why}"
+                    )
+
+        # ---- 完整缺失技能清单 ----
+        st.subheader(f"📋 缺失技能清单（共 {rep.missing_total} 项）")
         for m in rep.missing:
-            with st.expander(f"{m.name}（score={m.priority_score}）"):
+            header = f"{m.name} · {m.priority} · 重要度{_stars(m.importance, 5)} 难度{_stars(m.difficulty, 4)}"
+            with st.expander(header):
                 st.markdown(_priority_badge(m.priority) + f" **{m.name}**", unsafe_allow_html=True)
                 st.write(m.why)
+                st.caption(f"行业重要度：{_stars(m.importance, 5)}（5 为最核心） ｜ 学习难度：{_stars(m.difficulty, 4)}（4 为最难）")
                 if m.transfer_hint:
                     st.info("道桥迁移：" + m.transfer_hint)
                 for r in m.resources:

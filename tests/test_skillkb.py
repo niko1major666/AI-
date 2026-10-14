@@ -43,3 +43,19 @@ def test_by_id():
     t = _tax()
     assert t.by_id("AITECH.RAG").name == "RAG"
     assert t.by_id("NOPE") is None
+
+
+def test_importance_field():
+    t = _tax()
+    # 热点技能重要度高
+    assert t.by_id("PROG.PYTHON").importance == 5
+    assert t.by_id("FRAMEWORK.PYTORCH").importance == 5
+    assert t.by_id("AITECH.LLM").importance == 5
+    assert t.by_id("AITECH.RAG").importance == 5
+    assert t.by_id("AITECH.AGENT").importance == 5
+    # 冷门技能重要度低
+    assert t.by_id("PROG.SCALA").importance == 1
+    assert t.by_id("AITECH.ANNOTATE").importance == 1
+    # 未显式覆盖的用默认值 3
+    assert t.by_id("ML.RL").importance == 3
+    assert t.by_id("BIGDATA.FLINK").importance == 3

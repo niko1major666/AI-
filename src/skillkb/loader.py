@@ -18,6 +18,7 @@ class Skill:
     category_name: str
     aliases: list = field(default_factory=list)
     difficulty: int = 3
+    importance: int = 3
 
 
 def _norm(s) -> str:
@@ -46,6 +47,7 @@ class Taxonomy:
                 category_name=cat_names.get(s["category"], s["category"]),
                 aliases=list(s.get("aliases", [])),
                 difficulty=int(s.get("difficulty", 3)),
+                importance=int(s.get("importance", 3)),
             )
             self.skills.append(sk)
             self._by_id[sk.id] = sk

@@ -16,6 +16,7 @@ class GapItem:
     category: str
     is_must: bool
     difficulty: int
+    importance: int
     priority: str          # P0 / P1 / P2
     priority_score: float
     why: str
@@ -159,11 +160,13 @@ class SkillGapAnalyzer:
                 category=sk.category if sk else "",
                 is_must=bool(s.get("is_must")),
                 difficulty=sk.difficulty if sk else 3,
+                importance=sk.importance if sk else 3,
                 priority=prio, priority_score=pscore, why=why,
                 transfer_hint=self._transfer.get(s["skill_id"], ""),
                 resources=self._resources.get(s["skill_id"], []),
             ))
-        missing.sort(key=lambda x: -x.priority_score)
+        _prio_order = {"P0": 0, "P1": 1, "P2": 2}
+        missing.sort(key=lambda x: (_prio_order[x.priority], -x.priority_score))
         return GapReport(
             match_score=match_score,
             matched_skill_ids=sorted(matched_ids),
@@ -177,15 +180,26 @@ class SkillGapAnalyzer:
         score = ratio * 100
         if s.get("is_must"):
             score += 40
-        if sk is not None and sk.difficulty <= 2:
-            score += 10
+        if sk is not None:
+            # 行业重要度越高越优先（高于基准 3 的每档 +8 分）
+            score += (sk.importance - 3) * 8
+            # 越容易上手性价比越高
+            if sk.difficulty <= 2:
+                score += 10
+            elif sk.difficulty >= 4:
+                score -= 5
         if s.get("is_must"):
             prio = "P0"
         elif ratio >= 0.3:
             prio = "P1"
         else:
             prio = "P2"
-        why = f"需求占比 {ratio:.0%}；{'硬性要求' if s.get('is_must') else '加分项'}"
+        if s.get("is_must"):
+            why = f"硬性要求，需求占比 {ratio:.0%}"
+        elif ratio >= 0.3:
+            why = f"高频需求（占比 {ratio:.0%}），多数岗位需要"
+        else:
+            why = f"加分项（占比 {ratio:.0%}），可后续补充"
         return prio, round(score, 1), why
 def _demo() -> int:
     import yaml

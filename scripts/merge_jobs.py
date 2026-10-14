@@ -5,7 +5,8 @@ import pandas as pd
 
 ROOT = Path("D:/ai-skill-gap")
 FILES = ["tech_jobs.csv", "tencent_ai_jobs.csv", "bytedance_ai_jobs.csv",
-         "huawei_ai_jobs.csv", "xiaomi_ai_jobs.csv", "deepseek_ai_jobs.csv"]
+         "huawei_ai_jobs.csv", "xiaomi_ai_jobs.csv", "xiaomi_campus_jobs.csv",
+         "deepseek_ai_jobs.csv"]
 
 
 def main():

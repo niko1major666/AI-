@@ -194,8 +194,29 @@ def page_gap(taxonomy, analyzer, rows):
         return
 
     demand = compute_demand(rows)
-    options = {f"{r['company']} · {_translate_title(r['title'])} ({r['job_id']})": r for r in rows}
-    label = st.selectbox("目标岗位", list(options))
+
+    # 1) 先选公司
+    companies = sorted({r["company"] for r in rows})
+    company = st.selectbox("🏢 选择公司", companies)
+
+    # 2) 搜索岗位（该公司内按标题/地点关键词过滤）
+    company_jobs = [r for r in rows if r["company"] == company]
+    search = st.text_input("🔍 搜索岗位（按标题/地点关键词，可留空）", "")
+    if search.strip():
+        kw = search.strip().lower()
+        company_jobs = [r for r in company_jobs
+                        if kw in _translate_title(r["title"]).lower()
+                        or kw in r["title"].lower()
+                        or kw in (r.get("location") or "").lower()]
+
+    if not company_jobs:
+        st.warning("该公司没有匹配的岗位，请换关键词或换公司")
+        return
+
+    # 3) 再选该公司内的具体岗位
+    options = {f"{_translate_title(r['title'])} · {r['location']} ({r['job_id']})": r
+               for r in company_jobs}
+    label = st.selectbox("📋 选择岗位", list(options))
     target = options[label]
 
     jd_skills = []

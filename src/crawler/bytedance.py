@@ -8,10 +8,13 @@ from __future__ import annotations
 import pandas as pd
 from playwright.sync_api import sync_playwright
 
-AI_KEYWORDS = ["AI", "算法", "大模型", "机器学习"]
+AI_KEYWORDS = ["AI", "算法", "大模型", "机器学习", "深度学习", "自然语言处理",
+               "计算机视觉", "数据挖掘", "推荐", "强化学习", "语音识别", "NLP", "CV",
+               "LLM", "AIGC", "多模态", "知识图谱", "数据科学", "数据分析", "数据工程",
+               "推理", "训练", "Agent", "机器人", "搜索", "广告", "风控", "智能"]
 
 
-def crawl(keyword: str, scroll_times: int = 60, max_posts: int = 300) -> list[dict]:
+def crawl(keyword: str, scroll_times: int = 15, max_posts: int = 500) -> list[dict]:
     captured = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
@@ -29,9 +32,16 @@ def crawl(keyword: str, scroll_times: int = 60, max_posts: int = 300) -> list[di
                   wait_until="domcontentloaded", timeout=40000)
         page.wait_for_timeout(3000)
         for _ in range(scroll_times):
-            # 用 JS 滚动到底部，触发虚拟列表懒加载
-            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            page.wait_for_timeout(1200)
+            # 滚动字节的自定义滚动容器（.isInVisualWebsiteUIFeat），触发懒加载
+            page.evaluate("""
+            () => {
+              const el = document.querySelector('.isInVisualWebsiteUIFeat')
+                      || document.querySelector('main')
+                      || document.scrollingElement;
+              if (el) el.scrollTop = el.scrollHeight;
+            }
+            """)
+            page.wait_for_timeout(1500)
         browser.close()
 
     rows = []

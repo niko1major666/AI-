@@ -125,7 +125,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 | 小米（社招） | hr.xiaomi.com 公开 GET | requests + 多关键词 | 600 | ✅ levelOneDeptName / publishTime |
 | 小米（校招） | 飞书招聘 SaaS `_signature` + 虚拟列表 | Playwright 拦截 + 搜索框交互 | 110 | ✅ job_function / publish_time |
 | DeepSeek | Moka 平台（详情接口加密 necromancer） | Playwright DOM 抓列表 | 34 | ❌ 仅列表 |
-| 华为 | career.huawei.com 公开 GET | requests + 多关键词 | 2 | ❌ 门户岗位极少 |
+| 华为 | career.huawei.com 公开 GET + 51job 尝试 | requests + Playwright | 2 | ❌ 门户已枯竭，第三方 AI 岗极少 |
 | 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 448 | ❌ |
 
 ### 关键技术难点
@@ -133,7 +133,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 1. **`_signature` 签名**（字节 / 小米校招）：岗位接口 POST 带前端 JS 生成的 `_signature` 签名，直接构造请求成本高，改为 Playwright 让页面自行发请求并拦截响应（`page.on("response")`）拿到真实 JSON。
 2. **虚拟列表懒加载**（字节 / 小米校招）：岗位列表只渲染可视区，需滚动自定义滚动容器触发分页 XHR，多关键词遍历以突破单次结果上限。
 3. **详情接口加密**（DeepSeek · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
-4. **门户岗位稀缺**（华为）：社招 2 条 / 校招 0 条，AI 岗位主要挂在第三方平台，后续可选 BOSS直聘补充。
+4. **门户岗位稀缺**（华为）：官网门户社招 2 条 / 校招 0 条已枯竭；51job 等第三方平台投放的多为非 AI 岗（9 城市仅 3 条且无完整 JD），BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限。
 
 ### 复现采集
 

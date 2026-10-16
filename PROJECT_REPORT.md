@@ -36,7 +36,7 @@ jobs.jsonl      skills_long         skill_id 匹配       GapReport         3 �
 | 小米（社招） | requests 公开 GET + 多关键词 | 600 | — |
 | 小米（校招） | Playwright 拦截 + 搜索框交互 | 110 | `_signature` 签名、虚拟列表 |
 | DeepSeek | Playwright DOM 抓列表 | 34 | 详情接口 `necromancer` 加密 |
-| 华为 | requests 公开 GET | 2 | 门户岗位极少 |
+| 华为 | requests 公开 GET + 51job 尝试 | 2 | 门户已枯竭，第三方 AI 岗极少 |
 | 英文科技岗位 | HuggingFace 数据集 | 448 | — |
 
 ## 五、关键量化指标
@@ -91,7 +91,7 @@ jobs.jsonl      skills_long         skill_id 匹配       GapReport         3 �
 
 1. Kaggle「AI Jobs Dataset 2026」不存在 → 改用 HuggingFace 真实科技岗位数据集（448 条/69 公司）
 2. SiameseUIE 零样本对抽象技能 **F1=0**（实测）→ 未作夸大，如实记录
-3. 华为门户岗位极少（社招 2 / 校招 0），DeepSeek 详情接口加密未逆向 → 数据有偏，需第三方平台补充
+3. 华为数据受限：官网门户已枯竭（社招 2 / 校招 0），51job 等第三方平台投放的多为非 AI 岗（9 城市仅 3 条且无完整 JD），BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限，故华为样本偏少
 4. BERT-NER 仅 30 条微调样本，F1 0.636 有提升空间
 5. 行业重要度（importance）基于公开调查 + 行业共识人工标定，非精确统计
 

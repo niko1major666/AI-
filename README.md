@@ -47,15 +47,15 @@ ai-skill-gap/
 │   ├── raw/            原始 JD（seed 样例 sample_jobs.csv 已入库）
 │   ├── processed/      清洗后结构化数据（jobs.jsonl / 统计）
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
-│   └── kb/             skill_taxonomy(128技能) / transfer_map(道桥迁移) / learning_resources
+│   └── kb/             skill_taxonomy(147技能·含难度+重要度) / transfer_map(道桥迁移) / learning_resources
 ├── src/
 │   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
-│   ├── extractor/      SiameseUIE / BERT-NER
+│   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析
-│   ├── crawler/        Playwright（可选）
-│   └── app/            Streamlit
-├── scripts/            setup_env.ps1 / check_env.py
-├── tests/              pytest（14 用例已通过）
+│   ├── crawler/        6 大厂爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/华为）
+│   └── app/            Streamlit 三页面
+├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / add_importance
+├── tests/              pytest（56 用例已通过）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md
@@ -114,9 +114,45 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 | W4 | BGE 匹配，Recall@5 对比 | ✅ BGE vs TF-IDF：Recall@5 均 0.975，MRR/Hit@1 BGE 更优 |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
 
-## 八、量化指标（简历用）
+## 八、数据采集与爬虫
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**1799 条 / 74 家**（腾讯500 + 字节260 + 小米710(社招600+校招110) + DeepSeek34 + 华为2 + 英文科技岗位，去重后）
+### 数据源总览（1799 条 / 74 家公司）
+
+| 数据源 | 平台 / 接口 | 技术方案 | 条数 | 部门/发布时间 |
+|---|---|---|---|---|
+| 腾讯 | careers.tencent.com 公开 JSON | requests + 限速 | 500 | ✅ BGName / LastUpdateTime |
+| 字节跳动 | jobs.bytedance.com `_signature` 签名接口 | Playwright 拦截 + 滚动懒加载 | 261 | ✅ job_category / publish_time |
+| 小米（社招） | hr.xiaomi.com 公开 GET | requests + 多关键词 | 600 | ✅ levelOneDeptName / publishTime |
+| 小米（校招） | 飞书招聘 SaaS `_signature` + 虚拟列表 | Playwright 拦截 + 搜索框交互 | 110 | ✅ job_function / publish_time |
+| DeepSeek | Moka 平台（详情接口加密 necromancer） | Playwright DOM 抓列表 | 34 | ❌ 仅列表 |
+| 华为 | career.huawei.com 公开 GET | requests + 多关键词 | 2 | ❌ 门户岗位极少 |
+| 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 448 | ❌ |
+
+### 关键技术难点
+
+1. **`_signature` 签名**（字节 / 小米校招）：岗位接口 POST 带前端 JS 生成的 `_signature` 签名，直接构造请求成本高，改为 Playwright 让页面自行发请求并拦截响应（`page.on("response")`）拿到真实 JSON。
+2. **虚拟列表懒加载**（字节 / 小米校招）：岗位列表只渲染可视区，需滚动自定义滚动容器触发分页 XHR，多关键词遍历以突破单次结果上限。
+3. **详情接口加密**（DeepSeek · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
+4. **门户岗位稀缺**（华为）：社招 2 条 / 校招 0 条，AI 岗位主要挂在第三方平台，后续可选 BOSS直聘补充。
+
+### 复现采集
+
+```powershell
+# 一键顺序重爬 6 个数据源（约 20 分钟，含 Playwright 交互）
+.\.venv\Scripts\python.exe scripts/recrawl_all.py
+
+# 七源合并 -> data/raw/all_jobs.csv
+.\.venv\Scripts\python.exe scripts/merge_jobs.py
+
+# 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
+.\.venv\Scripts\python.exe -m src.data.build_dataset --stats
+```
+
+> 合规：仅抓取官网公开岗位，请求带限速；数据仅供个人学习研究。
+
+## 九、量化指标（简历用）
+
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**1799 条 / 74 家**（腾讯500 + 字节261 + 小米710(社招600+校招110) + DeepSeek34 + 华为2 + 英文科技岗位448，去重后；其中 1344 条含部门+发布时间）
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
@@ -153,13 +189,13 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 | 匹配 | TF-IDF | 0.75ms | 0.69ms | 1.19ms |
 | 匹配 | BGE | 17.81ms | 17.21ms | 21.00ms |
 
-## 九、已核实结论（诚实标注）
+## 十、已核实结论（诚实标注）
 
 1. Kaggle「AI Jobs Dataset 2026」**不存在**——已改用 HuggingFace `zalizedata/tech-job-postings-salary-dataset`（448 条真实科技岗位 / 69 家公司）
 2. `Nucha_SkillNER_BERT` **不存在**——已按 fallback 用 `bert-base-chinese` 自标注微调（F1 0.636/0.909）
 3. SiameseUIE 零样本对抽象技能类别 **F1=0**（已实测）——故保留「规则基线 + BERT-NER」双路抽取
 
-## 十、架构与数据流
+## 十一、架构与数据流
 
 ```
 数据采集         技能抽取            语义匹配          差距诊断         前端展示
@@ -170,7 +206,7 @@ jobs.jsonl     skills_long        skill_id 匹配      GapReport        3 页面
 
 关键链路：`build_dataset` → `extractor`(rule/bert_ner/siamese_uie) → `matcher`(tfidf/bge) → `gap_analyzer` → `app`
 
-## 十一、排障记录（踩坑与解法）
+## 十二、排障记录（踩坑与解法）
 
 1. **uv venv 无 pip** → ModelScope 加载模型报 `No module named pip`：补装 pip + 对齐模型 pin 的 `transformers==4.48.3`
 2. **ModelScope 不转发 trust_remote_code** → 官方 SiameseUIE 模型被安全拦截：幂等 monkeypatch `SiameseUiePipeline.__init__`

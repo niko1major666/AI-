@@ -1,0 +1,400 @@
+{"text": " kubernetes, llm, machine-learning, python, typescri", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "learning, python, typescript", "spans": [{"start": 18, "end": 28, "skill": "typescript"}]}
+{"text": "ineering. Skills: kubernetes, llm, machine-lea", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "machine-learning, python, typescript", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ills: kubernetes, llm, machine-learning", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "customer-success, data-science, llm, nlp, python", "spans": [{"start": 18, "end": 30, "skill": "data-science"}]}
+{"text": "cience, llm, nlp, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ata-science, llm, nlp, python", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "ss, data-science, llm, nlp, python", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": " Success. Skills: javascript, llm, nlp, projec", "spans": [{"start": 18, "end": 28, "skill": "javascript"}]}
+{"text": "oject-management, python, qa-testing, sql", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "Superhuman (Agent) Architect. Depar", "spans": [{"start": 12, "end": 17, "skill": "Agent"}]}
+{"text": "thon, qa-testing, sql", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": " javascript, llm, nlp, project-manageme", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "ills: javascript, llm, nlp, project-man", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "s: communication, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "chnology. Skills: machine-learning, nlp, project-man", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "oject-management, python, recruiting, secu", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "machine-learning, nlp, project-manageme", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": ". Skills: looker, machine-learning, nlp, node.js, py", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": ", ruby, security, typescript, ui-ux", "spans": [{"start": 18, "end": 28, "skill": "typescript"}]}
+{"text": "ne-learning, nlp, node.js, python, react, r", "spans": [{"start": 18, "end": 25, "skill": "node.js"}]}
+{"text": "ng, nlp, node.js, python, react, recruitin", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": " node.js, python, react, recruiting, ruby", "spans": [{"start": 18, "end": 23, "skill": "react"}]}
+{"text": "machine-learning, nlp, node.js, python,", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": " dbt, gcp, kafka, machine-learning, nlp, python, rec", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "ls: ansible, aws, data-engineering, databricks, dbt,", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "data-engineering, databricks, dbt, gcp, kafka,", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "dshift, security, snowflake, terraform, ui-ux", "spans": [{"start": 18, "end": 27, "skill": "snowflake"}]}
+{"text": "urity, snowflake, terraform, ui-ux", "spans": [{"start": 18, "end": 27, "skill": "terraform"}]}
+{"text": "ne-learning, nlp, python, recruiting, reds", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "bricks, dbt, gcp, kafka, machine-learning", "spans": [{"start": 18, "end": 23, "skill": "kafka"}]}
+{"text": "machine-learning, nlp, python, recruiti", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "ring, databricks, dbt, gcp, kafka, mach", "spans": [{"start": 18, "end": 21, "skill": "dbt"}]}
+{"text": " Skills: ansible, aws, data-engineering", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": " databricks, dbt, gcp, kafka, machine-l", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": " crm, javascript, machine-learning, nlp, product-man", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "mmunication, crm, javascript, machine-learning", "spans": [{"start": 18, "end": 28, "skill": "javascript"}]}
+{"text": "thon, recruiting, rest-api, security, ui-ux", "spans": [{"start": 18, "end": 26, "skill": "rest-api"}]}
+{"text": "oject-management, python, recruiting, rest", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "chnology. Skills: ci-cd, communication, c", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "machine-learning, nlp, product-manageme", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "dbt, llm, looker, machine-learning, nlp, product-man", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "sforce, security, snowflake, ui-ux", "spans": [{"start": 18, "end": 27, "skill": "snowflake"}]}
+{"text": "oduct-management, python, recruiting, sale", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "machine-learning, nlp, product-manageme", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "mer-success, dbt, llm, looker, machine-", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "customer-success, dbt, llm, looker, mac", "spans": [{"start": 18, "end": 21, "skill": "dbt"}]}
+{"text": "ops, docker, gcp, javascript, kubernetes, pyth", "spans": [{"start": 18, "end": 28, "skill": "javascript"}]}
+{"text": " gcp, javascript, kubernetes, python, qa-testi", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ript, kubernetes, python, qa-testing, reac", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "s, ci-cd, devops, docker, gcp, javascript,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "ills: aws, ci-cd, devops, docker, gcp, jav", "spans": [{"start": 18, "end": 24, "skill": "devops"}]}
+{"text": "ons. Skills: aws, ci-cd, devops, docker, ", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "thon, qa-testing, react, robotics", "spans": [{"start": 18, "end": 23, "skill": "react"}]}
+{"text": "erations. Skills: aws, ci-cd, devops, d", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": ", devops, docker, gcp, javascript, kube", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "s: communication, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "+, communication, data-engineering, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "ineering, python, pytorch, robotics", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "data-engineering, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ligence . Skills: c++, communication, d", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": " aws, azure, gcp, kubernetes, python, robotics", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": " gcp, kubernetes, python, robotics, securi", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ogy. Skills: aws, azure, gcp, kubernetes,", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "chnology. Skills: aws, azure, gcp, kube", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "ills: aws, azure, gcp, kubernetes, pyth", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "zure, ci-cd, gcp, kubernetes, linux, python, r", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ubernetes, linux, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "gement Engineer - Linux. Department: Info", "spans": [{"start": 18, "end": 23, "skill": "Linux"}]}
+{"text": "ible, aws, azure, ci-cd, gcp, kubernetes,", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ls: ansible, aws, azure, ci-cd, gcp, kube", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": " Skills: ansible, aws, azure, ci-cd, gc", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "ws, azure, ci-cd, gcp, kubernetes, linu", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "mmunication, gcp, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ills: aws, azure, ci-cd, communication, g", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ogy. Skills: aws, azure, ci-cd, communica", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "chnology. Skills: aws, azure, ci-cd, co", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "d, communication, gcp, python, robotics", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "-cd, devops, gcp, kubernetes, python, robotics", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "botics, security, terraform", "spans": [{"start": 18, "end": 27, "skill": "terraform"}]}
+{"text": " gcp, kubernetes, python, robotics, securi", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ws, azure, ci-cd, devops, gcp, kubernetes,", "spans": [{"start": 18, "end": 24, "skill": "devops"}]}
+{"text": "ills: aws, azure, ci-cd, devops, gcp, kub", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ogy. Skills: aws, azure, ci-cd, devops, g", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "chnology. Skills: aws, azure, ci-cd, de", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "e, ci-cd, devops, gcp, kubernetes, pyth", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "s: communication, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "d, embedded, gcp, kubernetes, linux, python, r", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ubernetes, linux, python, robotics, rust, ", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": " gcp, kubernetes, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": " aws, azure, c++, ci-cd, embedded, gcp, k", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ng . Skills: aws, azure, c++, ci-cd, embe", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "python, robotics, rust, security", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "ills: aws, azure, c++, ci-cd, embedded,", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "neering . Skills: aws, azure, c++, ci-c", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": " ci-cd, embedded, gcp, kubernetes, linu", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "oject-management, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "neering . Skills: c++, embedded, git, p", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "s: c++, embedded, git, project-manageme", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "+, communication, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "neering . Skills: c++, communication, p", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "ng, data-science, machine-learning, python, robotics", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "s: communication, data-engineering, data-science, ma", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "data-engineering, data-science, machine-learning", "spans": [{"start": 18, "end": 30, "skill": "data-science"}]}
+{"text": "machine-learning, python, robotics, spark,", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "python, robotics, spark, sql, statistics", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": " robotics, spark, sql, statistics", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "Skills: aws, c++, data-engineering, gcp, python, rob", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "engineering, gcp, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ng . Skills: aws, c++, data-engineering", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "neering . Skills: aws, c++, data-engine", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "data-engineering, gcp, python, robotics", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "ce . Skills: c++, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ligence . Skills: c++, python, robotics", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "ep-learning, llm, machine-learning, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "ligence . Skills: data-engineering, deep-learning, l", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "data-engineering, deep-learning, llm, machine-lea", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "ytorch, robotics, tensorflow", "spans": [{"start": 18, "end": 28, "skill": "tensorflow"}]}
+{"text": "learning, python, pytorch, robotics, tensor", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "g, deep-learning, llm, machine-learning", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "cation, embedded, python, robotics, ui-ux", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ep-learning, etl, machine-learning, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "odel Lab. Skills: data-engineering, deep-learning, e", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "data-engineering, deep-learning, etl, machine-lea", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "learning, python, pytorch, robotics", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "g, deep-learning, etl, machine-learning", "spans": [{"start": 18, "end": 21, "skill": "etl"}]}
+{"text": "c++, java, linux, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "kills: c++, java, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "ng . Skills: c++, java, linux, python, r", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "neering . Skills: c++, java, linux, pyt", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "ills: c++, ci-cd, data-engineering, docker, embedded", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "dded, git, linux, python, robotics, sql", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "data-engineering, docker, embedded, git, l", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "r, embedded, git, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "ons. Skills: c++, ci-cd, data-engineering", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "erations. Skills: c++, ci-cd, data-engi", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "python, robotics, sql", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "docker, embedded, git, linux, python, r", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "ops, docker, gcp, kubernetes, linux, python, q", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ubernetes, linux, python, qa-testing, robo", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "nication, devops, docker, gcp, kubernetes,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "d, communication, devops, docker, gcp, kub", "spans": [{"start": 18, "end": 24, "skill": "devops"}]}
+{"text": " gcp, kubernetes, linux, python, qa-testi", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "r Build Engineer, CI/CD Efficiency. Depar", "spans": [{"start": 18, "end": 23, "skill": "CI/CD"}]}
+{"text": "ng . Skills: aws, azure, ci-cd, communica", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "neering . Skills: aws, azure, ci-cd, co", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": ", devops, docker, gcp, kubernetes, linu", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "r, embedded, gcp, kubernetes, python, robotics", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": " gcp, kubernetes, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "e, ci-cd, devops, docker, embedded, gcp, k", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "ws, azure, ci-cd, devops, docker, embedded", "spans": [{"start": 18, "end": 24, "skill": "devops"}]}
+{"text": "ills: aws, azure, ci-cd, devops, docker, ", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ng . Skills: aws, azure, ci-cd, devops, d", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "neering . Skills: aws, azure, ci-cd, de", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "docker, embedded, gcp, kubernetes, pyth", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": ": c#, c++, ci-cd, python, robotics, unity", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": " Skills: c#, c++, ci-cd, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ing . Skills: c#, c++, ci-cd, python, r", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "neering . Skills: c#, c++, ci-cd, pyth", "spans": [{"start": 18, "end": 20, "skill": "c#"}]}
+{"text": "n, deep-learning, machine-learning, nlp, python, rob", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "ligence . Skills: computer-vision, deep-learning, m", "spans": [{"start": 18, "end": 33, "skill": "computer-vision"}]}
+{"text": " computer-vision, deep-learning, machine-learning", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "ne-learning, nlp, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "machine-learning, nlp, python, robotics", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": " . Skills: ci-cd, data-engineering, devops, linux, p", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "g, devops, linux, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "data-engineering, devops, linux, python, r", "spans": [{"start": 18, "end": 24, "skill": "devops"}]}
+{"text": "ineering, devops, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "neering . Skills: ci-cd, data-engineering", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "phql, grpc, java, machine-learning, python, typescri", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "learning, python, typescript", "spans": [{"start": 18, "end": 28, "skill": "typescript"}]}
+{"text": "machine-learning, python, typescript", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "n, graphql, grpc, java, machine-learning", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "ication, graphql, grpc, java, machine-le", "spans": [{"start": 18, "end": 22, "skill": "grpc"}]}
+{"text": "ting, statistics, typescript, ui-ux", "spans": [{"start": 18, "end": 28, "skill": "typescript"}]}
+{"text": "oduct-management, python, recruiting, stat", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "s: communication, llm, product-manageme", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "s: communication, data-engineering, figma, html-css,", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": ", html-css, java, javascript, llm, product-man", "spans": [{"start": 18, "end": 28, "skill": "javascript"}]}
+{"text": "oduct-management, python, react, redis, sq", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "t, python, react, redis, sql", "spans": [{"start": 18, "end": 23, "skill": "redis"}]}
+{"text": "nagement, python, react, redis, sql", "spans": [{"start": 18, "end": 23, "skill": "react"}]}
+{"text": " figma, html-css, java, javascript, llm,", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "on, react, redis, sql", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "java, javascript, llm, product-manageme", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "ring, databricks, machine-learning, nosql, python, p", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "w, communication, data-engineering, databricks, mach", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "tics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 28, "skill": "tensorflow"}]}
+{"text": "data-engineering, databricks, machine-learning", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "g, nosql, python, pytorch, robotics, spark,", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "INEERING. Skills: airflow, communication, d", "spans": [{"start": 18, "end": 25, "skill": "airflow"}]}
+{"text": "-learning, nosql, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ytorch, robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "machine-learning, nosql, python, pytorch,", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": " robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "ring, databricks, machine-learning, nosql, python, p", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "w, communication, data-engineering, databricks, mach", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "tics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 28, "skill": "tensorflow"}]}
+{"text": "data-engineering, databricks, machine-learning", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "g, nosql, python, pytorch, robotics, spark,", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "INEERING. Skills: airflow, communication, d", "spans": [{"start": 18, "end": 25, "skill": "airflow"}]}
+{"text": "-learning, nosql, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ytorch, robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "machine-learning, nosql, python, pytorch,", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": " robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": " embedded, linux, python, robotics, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "cation, embedded, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "python, robotics, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "G. Skills: ci-cd, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "INEERING. Skills: ci-cd, python", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ls: android, llm, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "gineer (On-device Agent Orchestration 개발)", "spans": [{"start": 18, "end": 23, "skill": "Agent"}]}
+{"text": " Skills: android, llm, python", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "Skills: embedded, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "dded, git, linux, python, qa-testing", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "d, communication, docker, embedded, git, l", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "r, embedded, git, linux, python, qa-testi", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "INEERING. Skills: ci-cd, communication, d", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "docker, embedded, git, linux, python, q", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": " kubernetes, llm, machine-learning, python, pytorch", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "INEERING. Skills: kubernetes, llm, machine-lea", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "learning, python, pytorch", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "LLM Engineer (Optimiz", "spans": [{"start": 0, "end": 3, "skill": "LLM"}]}
+{"text": "ls: airflow, llm, machine-learning, nlp, python, spa", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "INEERING. Skills: airflow, llm, machine-lea", "spans": [{"start": 18, "end": 25, "skill": "airflow"}]}
+{"text": "ne-learning, nlp, python, spark", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ing, nlp, python, spark", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "machine-learning, nlp, python, spark", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "LLM Engineer (Data Ge", "spans": [{"start": 0, "end": 3, "skill": "LLM"}]}
+{"text": " embedded, linux, python, qa-testing", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "[집중채용] Senior DevOps Engineer (CI/CD P", "spans": [{"start": 14, "end": 20, "skill": "DevOps"}]}
+{"text": "devops, embedded, linux, python, qa-testi", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": " DevOps Engineer (CI/CD Pipeline). Depart", "spans": [{"start": 18, "end": 23, "skill": "CI/CD"}]}
+{"text": "-cd, docker, git, kubernetes, python", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": " git, kubernetes, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "G. Skills: ci-cd, docker, git, kubernetes,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "INEERING. Skills: ci-cd, docker, git, kub", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "s: ci-cd, docker, git, kubernetes, pyth", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "it, java, kotlin, kubernetes, linux, project-m", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "oject-management, python, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": ": android, ci-cd, docker, git, java, kotli", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "tlin, kubernetes, linux, project-manageme", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": " Skills: android, ci-cd, docker, git, jav", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "-cd, docker, git, java, kotlin, kubernet", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "nagement, python, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "d, ci-cd, docker, git, java, kotlin, ku", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "INEERING. Skills: python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "INEERING. Skills: deep-learning, docker, kubernet", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "learning, docker, kubernetes, llm, nlp, python", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "rnetes, llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "s: deep-learning, docker, kubernetes, llm,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": " kubernetes, llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "[집중채용] LLM Engineer (LLM Tra", "spans": [{"start": 7, "end": 10, "skill": "LLM"}]}
+{"text": "INEERING. Skills: deep-learning, docker, kubernet", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "learning, docker, kubernetes, llm, nlp, python", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "rnetes, llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "s: deep-learning, docker, kubernetes, llm,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": " kubernetes, llm, nlp, python, pytorch", "spans": [{"start": 18, "end": 21, "skill": "nlp"}]}
+{"text": "LLM Engineer (Reinfor", "spans": [{"start": 0, "end": 3, "skill": "LLM"}]}
+{"text": "ING. Skills: aws, elasticsearch, java, kafka, kot", "spans": [{"start": 18, "end": 31, "skill": "elasticsearch"}]}
+{"text": "a, kafka, kotlin, kubernetes, llm, nosql, pyth", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "etes, llm, nosql, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "Senior AI Agent Engineer (Intelli", "spans": [{"start": 10, "end": 15, "skill": "Agent"}]}
+{"text": "sticsearch, java, kafka, kotlin, kubernet", "spans": [{"start": 18, "end": 23, "skill": "kafka"}]}
+{"text": " kubernetes, llm, nosql, python", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": "s, elasticsearch, java, kafka, kotlin, k", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "tlin, kubernetes, llm, nosql, python", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "INEERING. Skills: aws, elasticsearch, j", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "ING. Skills: aws, elasticsearch, java, kotlin, ku", "spans": [{"start": 18, "end": 31, "skill": "elasticsearch"}]}
+{"text": "ch, java, kotlin, kubernetes, nosql, pandas, p", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "s, nosql, pandas, python, spark", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ubernetes, nosql, pandas, python, spark", "spans": [{"start": 18, "end": 24, "skill": "pandas"}]}
+{"text": ", pandas, python, spark", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "tlin, kubernetes, nosql, pandas, python, ", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": "s, elasticsearch, java, kotlin, kubernet", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "INEERING. Skills: aws, elasticsearch, j", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "ING. Skills: aws, elasticsearch, java, kotlin, ku", "spans": [{"start": 18, "end": 31, "skill": "elasticsearch"}]}
+{"text": "ch, java, kotlin, kubernetes, nosql, python", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ubernetes, nosql, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "tlin, kubernetes, nosql, python", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": "s, elasticsearch, java, kotlin, kubernet", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "INEERING. Skills: aws, elasticsearch, j", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "a, kafka, kotlin, kubernetes, python, scala, s", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "ING. Skills: aws, databricks, docker, git, jav", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "tlin, kubernetes, python, scala, spark, sq", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": " aws, databricks, docker, git, java, kafka", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "bernetes, python, scala, spark, sql", "spans": [{"start": 18, "end": 23, "skill": "scala"}]}
+{"text": "s, python, scala, spark, sql", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "ocker, git, java, kafka, kotlin, kubernet", "spans": [{"start": 18, "end": 23, "skill": "kafka"}]}
+{"text": "cks, docker, git, java, kafka, kotlin, k", "spans": [{"start": 18, "end": 22, "skill": "java"}]}
+{"text": "on, scala, spark, sql", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "tabricks, docker, git, java, kafka, kot", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "INEERING. Skills: aws, databricks, dock", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "git, grpc, linux, python, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "[집중채용] SDV Agent Engineer(Connecte", "spans": [{"start": 11, "end": 16, "skill": "Agent"}]}
+{"text": ": c++, git, grpc, linux, python, rust", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "c, linux, python, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "Skills: c++, git, grpc, linux, python, r", "spans": [{"start": 18, "end": 22, "skill": "grpc"}]}
+{"text": "INEERING. Skills: c++, git, grpc, linux", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "ING. Skills: c++, git, grpc, linux, pyt", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "ubernetes, linux, machine-learning, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "s, communication, deep-learning, docker, gcp, kub", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": " python, pytorch, tensorflow, terraform", "spans": [{"start": 18, "end": 28, "skill": "tensorflow"}]}
+{"text": "ing, docker, gcp, kubernetes, linux, machine-l", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "orch, tensorflow, terraform", "spans": [{"start": 18, "end": 27, "skill": "terraform"}]}
+{"text": "learning, python, pytorch, tensorflow, terr", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch, tensorf", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "n, deep-learning, docker, gcp, kubernetes,", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": " gcp, kubernetes, linux, machine-learning", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "INEERING. Skills: aws, communication, d", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "learning, docker, gcp, kubernetes, linu", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "G. Skills: linux, python, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "INEERING. Skills: linux, python, rust", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "s: linux, python, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "INEERING. Skills: machine-learning, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "learning, python, pytorch, robotics", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "loop Simulation & RL). Department: ENG", "spans": [{"start": 18, "end": 20, "skill": "RL"}]}
+{"text": " embedded, linux, machine-learning, python, robotics", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "INEERING. Skills: computer-vision, deep-learning, e", "spans": [{"start": 18, "end": 33, "skill": "computer-vision"}]}
+{"text": " computer-vision, deep-learning, embedded, linux,", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "machine-learning, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "arning, embedded, linux, machine-learning", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "ills: aws, ci-cd, data-engineering, docker, git, grp", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "Senior Data Visualization Developer (Autono", "spans": [{"start": 12, "end": 25, "skill": "Visualization"}]}
+{"text": "st-api, robotics, typescript, ui-ux", "spans": [{"start": 18, "end": 28, "skill": "typescript"}]}
+{"text": "s, python, react, rest-api, robotics, typesc", "spans": [{"start": 18, "end": 26, "skill": "rest-api"}]}
+{"text": "t, grpc, next.js, node.js, python, react, r", "spans": [{"start": 18, "end": 25, "skill": "node.js"}]}
+{"text": "next.js, node.js, python, react, rest-api,", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "data-engineering, docker, git, grpc, next.", "spans": [{"start": 18, "end": 24, "skill": "docker"}]}
+{"text": "ING. Skills: aws, ci-cd, data-engineering", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": " node.js, python, react, rest-api, roboti", "spans": [{"start": 18, "end": 23, "skill": "react"}]}
+{"text": "ing, docker, git, grpc, next.js, node.js", "spans": [{"start": 18, "end": 22, "skill": "grpc"}]}
+{"text": "ineering, docker, git, grpc, next.js, n", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "INEERING. Skills: aws, ci-cd, data-engi", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "ING. Skills: c++, computer-vision, linux, python, r", "spans": [{"start": 18, "end": 33, "skill": "computer-vision"}]}
+{"text": "er-vision, linux, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": " computer-vision, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "INEERING. Skills: c++, computer-vision,", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "oject-management, python", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "afka, kubernetes, machine-learning, python, spark, t", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "w, communication, data-engineering, databricks, kafk", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "atabricks, kafka, kubernetes, machine-learning", "spans": [{"start": 18, "end": 28, "skill": "kubernetes"}]}
+{"text": "data-engineering, databricks, kafka, kubernete", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "g, python, spark, terraform", "spans": [{"start": 18, "end": 27, "skill": "terraform"}]}
+{"text": "INEERING. Skills: airflow, communication, d", "spans": [{"start": 18, "end": 25, "skill": "airflow"}]}
+{"text": "machine-learning, python, spark, terraform", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "learning, python, spark, terraform", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "ring, databricks, kafka, kubernetes, mach", "spans": [{"start": 18, "end": 23, "skill": "kafka"}]}
+{"text": "oject-management, python, qa-testing, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ills: aws, azure, ci-cd, llm, project-man", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "ING. Skills: aws, azure, ci-cd, llm, proj", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "thon, qa-testing, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "ws, azure, ci-cd, llm, project-manageme", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "INEERING. Skills: aws, azure, ci-cd, ll", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": " computer-vision, machine-learning, python, robotics", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "INEERING. Skills: computer-vision, machine-learning", "spans": [{"start": 18, "end": 33, "skill": "computer-vision"}]}
+{"text": "machine-learning, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "Skills: c++, llm, python, robotics", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "INEERING. Skills: c++, llm, python, rob", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "ING. Skills: c++, llm, python, robotics", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}
+{"text": "e, communication, data-science, gcp, git, linux,", "spans": [{"start": 18, "end": 30, "skill": "data-science"}]}
+{"text": " gcp, git, linux, python, robotics, sql", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "cience, gcp, git, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "ING. Skills: aws, azure, communication, d", "spans": [{"start": 18, "end": 23, "skill": "azure"}]}
+{"text": "python, robotics, sql", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": "ata-science, gcp, git, linux, python, r", "spans": [{"start": 18, "end": 21, "skill": "git"}]}
+{"text": "INEERING. Skills: aws, azure, communica", "spans": [{"start": 18, "end": 21, "skill": "aws"}]}
+{"text": "on, data-science, gcp, git, linux, pyth", "spans": [{"start": 18, "end": 21, "skill": "gcp"}]}
+{"text": "ring, databricks, machine-learning, nosql, python, p", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "w, communication, data-engineering, databricks, mach", "spans": [{"start": 18, "end": 34, "skill": "data-engineering"}]}
+{"text": "tics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 28, "skill": "tensorflow"}]}
+{"text": "data-engineering, databricks, machine-learning", "spans": [{"start": 18, "end": 28, "skill": "databricks"}]}
+{"text": "g, nosql, python, pytorch, robotics, spark,", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "INEERING. Skills: airflow, communication, d", "spans": [{"start": 18, "end": 25, "skill": "airflow"}]}
+{"text": "-learning, nosql, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "ytorch, robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 23, "skill": "spark"}]}
+{"text": "machine-learning, nosql, python, pytorch,", "spans": [{"start": 18, "end": 23, "skill": "nosql"}]}
+{"text": " robotics, spark, sql, tensorflow", "spans": [{"start": 18, "end": 21, "skill": "sql"}]}
+{"text": " embedded, linux, python, robotics, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "cation, embedded, linux, python, robotics", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "INEERING. Skills: ci-cd, communication, e", "spans": [{"start": 18, "end": 23, "skill": "ci-cd"}]}
+{"text": "python, robotics, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": "oid, grpc, linux, python, rust", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "s: android, grpc, linux, python, rust", "spans": [{"start": 18, "end": 23, "skill": "linux"}]}
+{"text": "c, linux, python, rust", "spans": [{"start": 18, "end": 22, "skill": "rust"}]}
+{"text": " Skills: android, grpc, linux, python, r", "spans": [{"start": 18, "end": 22, "skill": "grpc"}]}
+{"text": "ep-learning, llm, machine-learning, python, pytorch,", "spans": [{"start": 18, "end": 34, "skill": "machine-learning"}]}
+{"text": "ING. Skills: c++, computer-vision, deep-learning, l", "spans": [{"start": 18, "end": 33, "skill": "computer-vision"}]}
+{"text": " computer-vision, deep-learning, llm, machine-lea", "spans": [{"start": 18, "end": 31, "skill": "deep-learning"}]}
+{"text": "learning, python, pytorch, robotics", "spans": [{"start": 18, "end": 25, "skill": "pytorch"}]}
+{"text": "machine-learning, python, pytorch, robotic", "spans": [{"start": 18, "end": 24, "skill": "python"}]}
+{"text": "INEERING. Skills: c++, computer-vision,", "spans": [{"start": 18, "end": 21, "skill": "c++"}]}
+{"text": "n, deep-learning, llm, machine-learning", "spans": [{"start": 18, "end": 21, "skill": "llm"}]}

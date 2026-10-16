@@ -3,6 +3,7 @@
 用法：python scripts/train_ner.py [epochs]
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -12,6 +13,9 @@ from transformers import AutoModelForTokenClassification, AutoTokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+# 复用项目内缓存（避免联网下载）
+os.environ.setdefault("HF_HOME", str(ROOT / "models" / "hf_cache"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 LABELS = ["O", "B-SKILL", "I-SKILL"]
 LABEL2ID = {l: i for i, l in enumerate(LABELS)}
@@ -49,10 +53,19 @@ def align_labels(offsets, spans):
 def main():
     epochs = int(sys.argv[1]) if len(sys.argv) > 1 else 3
     train = load_gold(ROOT / "data" / "gold" / "jd_skills_gold_train.jsonl")
-    print(f"训练样本 {len(train)}，epochs={epochs}")
+    # 追加弱标注（规则基线自动标注的真实 JD）
+    weak_path = ROOT / "data" / "gold" / "weak_train.jsonl"
+    if weak_path.exists():
+        n_manual = len(train)
+        train += load_gold(weak_path)
+        print(f"训练样本 {len(train)}（人工 {n_manual} + 弱标注 {len(train) - n_manual}），epochs={epochs}")
+    else:
+        print(f"训练样本 {len(train)}，epochs={epochs}")
 
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese", use_fast=True)
-    model = AutoModelForTokenClassification.from_pretrained("bert-base-chinese", num_labels=len(LABELS))
+    # 从现有已训练模型继续微调（基础模型 bert-base-chinese 不在缓存，但 models/bert_ner 含完整权重）
+    base = str(ROOT / "models" / "bert_ner")
+    tokenizer = AutoTokenizer.from_pretrained(base, use_fast=True)
+    model = AutoModelForTokenClassification.from_pretrained(base, num_labels=len(LABELS))
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
     model.train()

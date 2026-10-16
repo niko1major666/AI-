@@ -47,14 +47,14 @@ ai-skill-gap/
 │   ├── raw/            原始 JD（seed 样例 sample_jobs.csv 已入库）
 │   ├── processed/      清洗后结构化数据（jobs.jsonl / 统计）
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
-│   └── kb/             skill_taxonomy(147技能·含难度+重要度) / transfer_map(道桥迁移) / learning_resources
+│   └── kb/             skill_taxonomy(147技能·难度+重要度[需求频率驱动]) / transfer_map(道桥迁移) / learning_resources
 ├── src/
 │   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析
 │   ├── crawler/        6 大厂爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/华为）
 │   └── app/            Streamlit 三页面
-├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / add_importance
+├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
 ├── tests/              pytest（56 用例已通过）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt

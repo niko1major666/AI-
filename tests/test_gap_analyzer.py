@@ -79,7 +79,7 @@ def test_importance_weighted_priority():
 
     # 每个缺失项都带 importance 字段
     assert by_id["AITECH.LLM"].importance == 5
-    assert by_id["PROG.SCALA"].importance == 1
+    assert by_id["PROG.SCALA"].importance == 2
     # 同样需求占比下，重要度高的技能优先级分更高
     assert by_id["AITECH.LLM"].priority_score > by_id["PROG.SCALA"].priority_score
 

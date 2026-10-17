@@ -107,27 +107,27 @@ def llm_parse_resume(text: str) -> dict | None:
 
 
 def parse_resume_full(text: str) -> ResumeProfile:
-    """正则 + LLM 合并解析：正则保证基础字段，LLM 补充姓名/工作经历等。"""
+    """正则 + LLM 合并解析：LLM 优先（更准确完整），正则兜底（无 key/失败时）。"""
     profile = parse_resume(text)
     llm = llm_parse_resume(text)
     if llm:
-        if not profile.name and llm.get("name"):
+        if llm.get("name"):
             profile.name = str(llm["name"])
-        if not profile.highest_degree and llm.get("highest_degree"):
+        if llm.get("email"):
+            profile.email = str(llm["email"])
+        if llm.get("phone"):
+            profile.phone = str(llm["phone"])
+        if llm.get("highest_degree"):
             profile.highest_degree = str(llm["highest_degree"])
-        if not profile.schools and llm.get("school"):
+        if llm.get("school"):
             profile.schools = [str(llm["school"])]
-        if not profile.majors and llm.get("major"):
+        if llm.get("major"):
             profile.majors = [str(llm["major"])]
-        if not profile.work_years and llm.get("work_years"):
+        if llm.get("work_years"):
             profile.work_years = str(llm["work_years"])
         exps = llm.get("experiences")
         if isinstance(exps, list):
             profile.experiences = exps
-        if not profile.email and llm.get("email"):
-            profile.email = str(llm["email"])
-        if not profile.phone and llm.get("phone"):
-            profile.phone = str(llm["phone"])
     return profile
 
 

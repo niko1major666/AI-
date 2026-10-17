@@ -238,6 +238,21 @@ def page_resume(taxonomy, rule, analyzer):
     with st.expander("查看解析出的文本", expanded=False):
         st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
 
+    # 结构化解析（邮箱/电话/学历/学校/专业/年限）
+    from src.data.resume_parser import ats_suggestions, parse_resume
+    profile = parse_resume(text)
+
+    st.subheader("📋 结构化信息解析")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("邮箱", profile.email or "未识别")
+    c2.metric("手机号", profile.phone or "未识别")
+    c3.metric("最高学历", profile.highest_degree or "未识别")
+    c4.metric("工作年限", (profile.work_years + " 年") if profile.work_years else "未识别")
+    if profile.schools:
+        st.caption("🏫 毕业院校：" + "、".join(profile.schools))
+    if profile.majors:
+        st.caption("🎓 所学专业：" + "、".join(profile.majors))
+
     if st.button("提取技能"):
         spans = rule.extract_spans("user", text)
         st.session_state["user_skills"] = [s.skill_text for s in spans]
@@ -265,6 +280,17 @@ def page_resume(taxonomy, rule, analyzer):
                     st.write("行动建议：" + b["action"])
         else:
             st.caption("未匹配到道桥背景关键词")
+
+        st.subheader("🎯 ATS 改进建议")
+        tips = ats_suggestions(profile, text, [s.skill_text for s in spans])
+        if tips:
+            for t in tips:
+                if t["level"] == "critical":
+                    st.error("⚠️ " + t["tip"])
+                else:
+                    st.info("💡 " + t["tip"])
+        else:
+            st.success("简历信息较完整，未发现明显 ATS 风险")
 
 
 def page_gap(taxonomy, analyzer, rows):

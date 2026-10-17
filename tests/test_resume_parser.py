@@ -1,4 +1,5 @@
-from src.data.resume_parser import ats_suggestions, parse_resume
+from src.data.resume_parser import (ats_suggestions, llm_parse_resume,
+                                    parse_resume, parse_resume_full)
 
 
 def test_parse_email_phone():
@@ -41,3 +42,21 @@ def test_ats_quantify_suggestion():
     texts = {t["tip"] for t in tips}
     assert any("量化" in t for t in texts)
     assert any("技能" in t for t in texts)
+
+
+def test_llm_no_key_returns_none(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    assert llm_parse_resume("张三 本科 清华大学") is None
+
+
+def test_parse_full_fallback_without_key(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    p = parse_resume_full("张三 13800138000 a@b.com 本科 吉林大学 道路桥梁与渡河工程")
+    # 正则兜底：基础字段仍能识别
+    assert p.email == "a@b.com"
+    assert p.phone == "13800138000"
+    assert p.highest_degree == "本科"
+    assert "吉林大学" in p.schools
+    # LLM 增强字段（姓名/经历）无 key 时为空
+    assert p.name == ""
+    assert p.experiences == []

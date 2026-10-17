@@ -238,20 +238,32 @@ def page_resume(taxonomy, rule, analyzer):
     with st.expander("查看解析出的文本", expanded=False):
         st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
 
-    # 结构化解析（邮箱/电话/学历/学校/专业/年限）
-    from src.data.resume_parser import ats_suggestions, parse_resume
-    profile = parse_resume(text)
+    # 结构化解析（正则 + DeepSeek LLM 增强，无 key 自动降级正则）
+    from src.data.resume_parser import ats_suggestions, parse_resume_full
+    profile = parse_resume_full(text)
 
     st.subheader("📋 结构化信息解析")
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("邮箱", profile.email or "未识别")
-    c2.metric("手机号", profile.phone or "未识别")
-    c3.metric("最高学历", profile.highest_degree or "未识别")
-    c4.metric("工作年限", (profile.work_years + " 年") if profile.work_years else "未识别")
+    c1.metric("姓名", profile.name or "未识别")
+    c2.metric("最高学历", profile.highest_degree or "未识别")
+    c3.metric("工作年限", (profile.work_years + " 年") if profile.work_years else "未识别")
+    c4.metric("邮箱", profile.email or "未识别")
+    if profile.phone:
+        st.caption("📱 手机号：" + profile.phone)
     if profile.schools:
         st.caption("🏫 毕业院校：" + "、".join(profile.schools))
     if profile.majors:
         st.caption("🎓 所学专业：" + "、".join(profile.majors))
+    if profile.experiences:
+        st.markdown("**💼 工作/项目经历：**")
+        for e in profile.experiences:
+            if isinstance(e, dict):
+                comp = e.get("company") or ""
+                title = e.get("title") or ""
+                dur = e.get("duration") or ""
+                line = " · ".join(x for x in [comp, title, dur] if x)
+                if line:
+                    st.markdown(f"- {line}")
 
     if st.button("提取技能"):
         spans = rule.extract_spans("user", text)

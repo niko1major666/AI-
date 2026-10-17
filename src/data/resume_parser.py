@@ -1,8 +1,12 @@
-"""简历结构化解析（中文简历启发式规则）+ ATS 视角改进建议。"""
+"""简历结构化解析（中文简历启发式规则 + DeepSeek LLM 增强）+ ATS 视角改进建议。"""
 from __future__ import annotations
 
+import json
+import os
 import re
 from dataclasses import asdict, dataclass, field
+
+import requests
 
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PHONE_RE = re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)")
@@ -21,11 +25,13 @@ _DEGREE_RANK = {"博士": 5, "硕士": 4, "研究生": 4, "本科": 3, "学士":
 class ResumeProfile:
     email: str = ""
     phone: str = ""
+    name: str = ""
     degrees: list = field(default_factory=list)
     highest_degree: str = ""
     schools: list = field(default_factory=list)
     majors: list = field(default_factory=list)
     work_years: str = ""
+    experiences: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -50,6 +56,79 @@ def parse_resume(text: str) -> ResumeProfile:
         majors=majors,
         work_years=ym.group(1) if ym else "",
     )
+
+
+_DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
+_DEEPSEEK_MODEL = "deepseek-chat"
+
+_LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提取结构化信息，严格输出一个 JSON 对象。
+
+字段（没有就填空值）：
+- name: 姓名（字符串）
+- email: 邮箱（字符串）
+- phone: 手机号（字符串）
+- highest_degree: 最高学历（博士/硕士/本科/大专/其他 之一）
+- school: 毕业院校（字符串）
+- major: 所学专业（字符串）
+- work_years: 工作年限数字（整数，没有则 0）
+- experiences: 工作/项目经历数组，每项含 company(组织)、title(角色)、duration(时间段)
+- skills: 技能字符串数组
+
+简历文本：
+{text}
+
+只输出 JSON 对象，不要 markdown 代码块或解释。"""
+
+
+def llm_parse_resume(text: str) -> dict | None:
+    """用 DeepSeek LLM 增强解析（姓名/工作经历等正则难做的字段）。无 key/失败返回 None。"""
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        return None
+    try:
+        resp = requests.post(
+            _DEEPSEEK_URL,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": _DEEPSEEK_MODEL,
+                "messages": [{"role": "user", "content": _LLM_PROMPT.format(text=text[:6000])}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0,
+                "max_tokens": 1500,
+            },
+            timeout=90,
+        )
+        resp.raise_for_status()
+        content = resp.json()["choices"][0]["message"]["content"].strip()
+        content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content, flags=re.M)
+        return json.loads(content)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def parse_resume_full(text: str) -> ResumeProfile:
+    """正则 + LLM 合并解析：正则保证基础字段，LLM 补充姓名/工作经历等。"""
+    profile = parse_resume(text)
+    llm = llm_parse_resume(text)
+    if llm:
+        if not profile.name and llm.get("name"):
+            profile.name = str(llm["name"])
+        if not profile.highest_degree and llm.get("highest_degree"):
+            profile.highest_degree = str(llm["highest_degree"])
+        if not profile.schools and llm.get("school"):
+            profile.schools = [str(llm["school"])]
+        if not profile.majors and llm.get("major"):
+            profile.majors = [str(llm["major"])]
+        if not profile.work_years and llm.get("work_years"):
+            profile.work_years = str(llm["work_years"])
+        exps = llm.get("experiences")
+        if isinstance(exps, list):
+            profile.experiences = exps
+        if not profile.email and llm.get("email"):
+            profile.email = str(llm["email"])
+        if not profile.phone and llm.get("phone"):
+            profile.phone = str(llm["phone"])
+    return profile
 
 
 def ats_suggestions(profile: ResumeProfile, text: str, user_skills: list[str]) -> list[dict]:

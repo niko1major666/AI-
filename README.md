@@ -5,6 +5,8 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-red.svg)](https://streamlit.io/)
 
+> 🚀 **在线体验（Streamlit Cloud）**：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+
 面向**非科班（尤其传统工科）求职者**的个人项目：分析目标 AI 岗位所需技能，与自身简历对比，
 输出技能差距报告与学习优先级。体现 **NLP 信息抽取 + 语义匹配 + 工程落地** 能力。
 
@@ -112,6 +114,8 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 ```
 
 ### 云端部署（Streamlit Community Cloud，免费）
+
+> 🌐 已部署上线：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 
 本项目已为云端部署优化：`requirements.txt` 只含运行所需轻量依赖（重模型在 `requirements-ml.txt`，云端不装），清洗后的数据 `data/processed/jobs.jsonl` 已纳入版本管理。
 

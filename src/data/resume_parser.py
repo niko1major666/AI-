@@ -80,9 +80,21 @@ _LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提
 只输出 JSON 对象，不要 markdown 代码块或解释。"""
 
 
+def _get_api_key() -> str:
+    """优先 Streamlit Cloud secrets，其次环境变量（本地）。"""
+    try:
+        import streamlit as st
+        key = st.secrets.get("DEEPSEEK_API_KEY")
+        if key:
+            return str(key)
+    except Exception:  # noqa: BLE001
+        pass
+    return os.environ.get("DEEPSEEK_API_KEY") or ""
+
+
 def llm_parse_resume(text: str) -> dict | None:
     """用 DeepSeek LLM 增强解析（姓名/工作经历等正则难做的字段）。无 key/失败返回 None。"""
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = _get_api_key()
     if not api_key:
         return None
     try:

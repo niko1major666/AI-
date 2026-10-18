@@ -91,6 +91,21 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 ```
 
+### 云端部署（Streamlit Community Cloud，免费）
+
+本项目已为云端部署优化：`requirements.txt` 只含运行所需轻量依赖（重模型在 `requirements-ml.txt`，云端不装），清洗后的数据 `data/processed/jobs.jsonl` 已纳入版本管理。
+
+1. 把仓库推送到 GitHub（public）
+2. 登录 https://share.streamlit.io → New app → 选择本仓库
+3. Main file path 填 `src/app/app.py`
+4. Settings → Secrets 填入（云端密钥，不经过 git）：
+   ```toml
+   DEEPSEEK_API_KEY = "你的DeepSeek密钥"
+   ```
+5. Deploy，即可获得公网访问链接
+
+> 本地开发如需 BERT-NER/BGE 训练评测：`pip install -r requirements.txt -r requirements-ml.txt`
+
 ## 六、环境说明（本机实测）
 
 - 项目盘 **D:**（141 GB 空闲）；`HF_HOME / MODELSCOPE_CACHE / UV_CACHE_DIR` 全部指向项目内 `models/`，删除项目即彻底释放

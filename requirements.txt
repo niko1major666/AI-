@@ -7,27 +7,12 @@
 # ---- base：数据 / 配置 ----
 pandas>=2.1,<3
 numpy>=1.24
-pyarrow>=15
 PyYAML>=5.4
 python-dotenv>=1.0
+requests>=2.28
 
-# ---- nlp：抽取 + 匹配（★ 关键锁，防止 modelscope 崩）----
-# 1) transformers 必须 <5：ModelScope 1.x 的 siamese_uie pipeline 是 4.x 时代代码
-# 2) sentence-transformers 必须 <6：6.x 强制 transformers>=5，与上一条冲突
-# 3) transformers 实际锁定 4.48.x：SiameseUIE 模型自带 requirements.txt 固定 ==4.48.3，
-#    与其保持一致可避免加载时触发 ModelScope 自动降级安装
-torch>=2.5,<3
-transformers>=4.48,<5
-tokenizers>=0.21,<0.22
-sentence-transformers>=5.1,<6
-huggingface-hub>=0.25,<1.0
-datasets>=4.0,<=4.8.4
-modelscope[framework]>=1.40
-accelerate>=0.30
-
-# 检索基线（TF-IDF 对照组）与中文分词
+# 检索基线（TF-IDF 对照组）
 scikit-learn>=1.3
-jieba>=0.42
 
 # ---- 前端 ----
 streamlit>=1.32

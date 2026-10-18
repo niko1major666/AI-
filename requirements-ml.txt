@@ -1,0 +1,20 @@
+# 重模型依赖（BERT-NER / BGE / SiameseUIE 训练与评测用，云端部署不需要）
+# 用法：本地开发时 pip install -r requirements.txt -r requirements-ml.txt
+
+# 数据格式
+pyarrow>=15
+
+# ---- nlp：抽取 + 匹配（★ 关键锁，防止 modelscope 崩）----
+# 1) transformers 必须 <5：ModelScope 1.x 的 siamese_uie pipeline 是 4.x 时代代码
+# 2) sentence-transformers 必须 <6：6.x 强制 transformers>=5，与上一条冲突
+torch>=2.5,<3
+transformers>=4.48,<5
+tokenizers>=0.21,<0.22
+sentence-transformers>=5.1,<6
+huggingface-hub>=0.25,<1.0
+datasets>=4.0,<=4.8.4
+modelscope[framework]>=1.40
+accelerate>=0.30
+
+# 中文分词
+jieba>=0.42

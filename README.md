@@ -1,5 +1,10 @@
 # AI 岗位技能差距分析系统（ai-skill-gap）
 
+[![CI](https://github.com/niko1major666/AI-/actions/workflows/ci.yml/badge.svg)](https://github.com/niko1major666/AI-/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-red.svg)](https://streamlit.io/)
+
 面向**非科班（尤其传统工科）求职者**的个人项目：分析目标 AI 岗位所需技能，与自身简历对比，
 输出技能差距报告与学习优先级。体现 **NLP 信息抽取 + 语义匹配 + 工程落地** 能力。
 

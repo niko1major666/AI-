@@ -4,14 +4,18 @@ from __future__ import annotations
 import difflib
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
 import streamlit as st
 
-from src.data.translate import translate_title as _translate_title
-
+# 云端部署兼容：把项目根目录加入 sys.path（Streamlit Cloud 的 cwd 可能不在 sys.path）
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.data.translate import translate_title as _translate_title
 
 st.set_page_config(page_title="AI 岗位技能差距分析", layout="wide")
 

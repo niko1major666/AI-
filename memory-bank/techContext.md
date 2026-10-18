@@ -15,6 +15,7 @@
 - 模型缓存：`models/hf_cache`（HF_HOME）、`models/ms_cache`（ModelScope）
 - 环境变量：`DEEPSEEK_API_KEY`（用户级，简历 LLM 解析）
 - 云端密钥：Streamlit Cloud Settings → Secrets 填 `DEEPSEEK_API_KEY`（模板 `.streamlit/secrets.toml`，真实 key 不入 git）
+- SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 
 ## 技术约束（★ 关键，防崩）
@@ -37,4 +38,5 @@
 - 匹配评测：`python scripts/eval_resume_match.py`（需 BGE 缓存）
 - 报告导出 Word：`python scripts/export_report_docx.py`
 - git 提交需内联身份：`git -c user.name='QWB20' -c user.email='qwb20@example.com' commit`
+- git 推送/拉取：SSH 免密（`git push` 直接可用，无需凭证）
 - 云端部署：推 GitHub → Streamlit Cloud 新建 app → Main file `src/app/app.py` → Secrets 填 `DEEPSEEK_API_KEY` → Deploy（详见 README「云端部署」）

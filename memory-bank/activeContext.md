@@ -1,20 +1,22 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- 刚完成「云端部署准备」：依赖精简分层、清洗数据入库、Streamlit secrets 支持、sys.path 兼容修复（本地 + Streamlit Community Cloud 均可运行）
+- 刚完成「云端部署 + SSH 推送」：依赖精简分层、清洗数据入库、Streamlit secrets、sys.path 兼容、SSH 免密推送到 GitHub（main 与远程一致）
 - 简历解析 DeepSeek LLM 增强已稳定（LLM 优先、正则兜底），API key 支持「Streamlit secrets 优先 + 环境变量兜底」
 
 ## 近期变更（按时间倒序）
-1. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
-2. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
-3. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
-4. 简历结构化解析（正则）+ ATS 改进建议
-5. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
-6. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
-7. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
-8. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
-9. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
-10. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
+1. SSH 配置 + 推送到 GitHub（ed25519 key + `~/.ssh/config` + 公钥，main 与远程一致）
+2. 拉取远程「Added Dev Container Folder」提交（`.devcontainer/devcontainer.json`）
+3. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
+4. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
+5. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
+6. 简历结构化解析（正则）+ ATS 改进建议
+7. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
+8. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
+9. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
+10. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
+11. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
+12. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
 
 ## 下一步（按价值排序）
 1. **LLM 生成式报告解读 + 学习计划**（最高价值，已有 DeepSeek key 可复用）

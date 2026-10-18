@@ -23,6 +23,7 @@ data/kb/         skill_taxonomy.yaml / transfer_map.yaml / learning_resources.ya
 data/gold/       评测金标准（F1 / Recall@5 / resume_sentence）
 data/processed/  jobs.jsonl（清洗后入库，云端部署直接读，无需重爬）
 scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_match / 等
+.devcontainer/   devcontainer.json（容器开发环境，远程提交新增）
 ```
 
 ## 关键技术决策

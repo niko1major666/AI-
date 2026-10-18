@@ -10,6 +10,7 @@
 - ✅ 工程：66 测试全通过、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
+- ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -29,7 +30,8 @@
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD 39a72f0），已通过 SSH 推送到 GitHub（main 与远程一致）
+- git 工作区干净（HEAD fe1c1b8），main 与远程一致，tag v1.0.0 已发布
+- CI 绿：GitHub Actions 66 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 
 ## 已知问题（诚实标注）
 1. BERT-NER 弱标注扩充未达预期：exact 0.636→0.545（略降）、overlap 持平，弱标注无法替代人工标注

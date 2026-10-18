@@ -56,6 +56,7 @@ ai-skill-gap/
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
 ├── tests/              pytest（56 用例已通过）
+├── docs/               images/（README 界面预览截图，3 张）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md
@@ -82,6 +83,20 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 # 6) 前端（技能图谱 / 简历匹配 / 差距报告）
 .\.venv\Scripts\python.exe -m streamlit run src/app/app.py
 ```
+
+### 界面预览（三页面）
+
+**技能图谱**：行业技能结构（JD / 技能 / 公司统计 + 高频技能 + 共现网络）
+
+![技能图谱](docs/images/skill_graph.png)
+
+**简历匹配**：上传简历 → 结构化解析（正则 + LLM）→ 技能提取 → ATS 建议
+
+![简历匹配](docs/images/resume_match.png)
+
+**差距报告**：选公司 → 搜岗位 → 选目标岗位 → 生成差距报告（缺失技能 + 优先补充建议）
+
+![差距报告](docs/images/gap_report.png)
 
 ### Docker 方式（可选）
 

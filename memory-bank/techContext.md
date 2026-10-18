@@ -14,6 +14,7 @@
 - 虚拟环境：`.venv\Scripts\python.exe`
 - 模型缓存：`models/hf_cache`（HF_HOME）、`models/ms_cache`（ModelScope）
 - 环境变量：`DEEPSEEK_API_KEY`（用户级，简历 LLM 解析）
+- 云端密钥：Streamlit Cloud Settings → Secrets 填 `DEEPSEEK_API_KEY`（模板 `.streamlit/secrets.toml`，真实 key 不入 git）
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 
 ## 技术约束（★ 关键，防崩）
@@ -24,7 +25,8 @@
 - **Windows**：无 symlink（HF 缓存降级警告无害）；PowerShell 环境
 
 ## 依赖要点
-- `requirements.txt` 完整清单；`scripts/check_env.py` 体检版本
+- 依赖分层：`requirements.txt`（轻量运行依赖，云端部署用）；`requirements-ml.txt`（重模型依赖 BERT-NER/BGE/SiameseUIE，本地 `pip install -r requirements.txt -r requirements-ml.txt`）
+- `scripts/check_env.py` 体检版本
 - PDF 解析：pypdf + pymupdf（渲染）+ rapidocr_onnxruntime（OCR 兜底）
 
 ## 工具使用模式
@@ -35,3 +37,4 @@
 - 匹配评测：`python scripts/eval_resume_match.py`（需 BGE 缓存）
 - 报告导出 Word：`python scripts/export_report_docx.py`
 - git 提交需内联身份：`git -c user.name='QWB20' -c user.email='qwb20@example.com' commit`
+- 云端部署：推 GitHub → Streamlit Cloud 新建 app → Main file `src/app/app.py` → Secrets 填 `DEEPSEEK_API_KEY` → Deploy（详见 README「云端部署」）

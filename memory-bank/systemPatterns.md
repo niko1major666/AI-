@@ -21,6 +21,7 @@ src/
 └── app/         app.py（Streamlit 三页面）
 data/kb/         skill_taxonomy.yaml / transfer_map.yaml / learning_resources.yaml
 data/gold/       评测金标准（F1 / Recall@5 / resume_sentence）
+data/processed/  jobs.jsonl（清洗后入库，云端部署直接读，无需重爬）
 scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_match / 等
 ```
 
@@ -29,6 +30,7 @@ scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_matc
 2. **双路语义匹配**：TF-IDF（char n-gram 基线）+ BGE-base-zh（语义 SOTA）。差距报告的「简历自由文本→技能」场景优先 BGE（口语化句子评测 2.25 倍于 TF-IDF）。
 3. **importance 数据驱动**：行业重要度 = 1878 条 JD 需求频率分档（≥10%→5 … <1%→1），替换人工标定；优先级算法叠加学习难度加权修正「频率≠价值」偏差。
 4. **LLM 增强 + 正则降级**：简历解析用 DeepSeek（`DEEPSEEK_API_KEY`），LLM 优先、正则兜底，无 key 不报错。
+5. **云端部署分层**：运行依赖（requirements.txt）与重模型依赖（requirements-ml.txt）拆分；清洗数据 `data/processed/jobs.jsonl` 入库；LLM key 走 Streamlit secrets 优先、环境变量兜底；app.py 启动时把项目根目录加入 sys.path。
 
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测

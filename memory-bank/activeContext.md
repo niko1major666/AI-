@@ -1,18 +1,20 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- 刚完成「简历解析接入 DeepSeek LLM 增强」：已验证 LLM 输出质量（姓名/完整专业名/工作经历准确），合并策略改为「LLM 优先、正则兜底」
-- DeepSeek API key 已持久化到用户级系统环境变量 `DEEPSEEK_API_KEY`
+- 刚完成「云端部署准备」：依赖精简分层、清洗数据入库、Streamlit secrets 支持、sys.path 兼容修复（本地 + Streamlit Community Cloud 均可运行）
+- 简历解析 DeepSeek LLM 增强已稳定（LLM 优先、正则兜底），API key 支持「Streamlit secrets 优先 + 环境变量兜底」
 
 ## 近期变更（按时间倒序）
-1. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
-2. 简历结构化解析（正则）+ ATS 改进建议
-3. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
-4. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
-5. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
-6. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
-7. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
-8. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
+1. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
+2. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
+3. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
+4. 简历结构化解析（正则）+ ATS 改进建议
+5. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
+6. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
+7. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
+8. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
+9. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
+10. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
 
 ## 下一步（按价值排序）
 1. **LLM 生成式报告解读 + 学习计划**（最高价值，已有 DeepSeek key 可复用）
@@ -21,6 +23,7 @@
 
 ## 活跃决策与考量
 - 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）
+- API key 获取：**Streamlit secrets 优先、环境变量兜底**（云端 + 本地两套环境兼容）
 - 行业重要度：**数据驱动**（JD 需求频率），而非人工标定
 - 匹配：差距报告「简历自由文本→技能」场景**优先用 BGE**（有评测实证）
 

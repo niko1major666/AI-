@@ -8,6 +8,7 @@
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
 - ✅ 工程：66 测试全通过、Docker、报告导出 Word、README + 项目报告
+- ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -25,8 +26,9 @@
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
+- 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（最近提交 800a89e）
+- git 工作区干净（HEAD 874af44，云端部署已同步进 Memory Bank）
 
 ## 已知问题（诚实标注）
 1. BERT-NER 弱标注扩充未达预期：exact 0.636→0.545（略降）、overlap 持平，弱标注无法替代人工标注
@@ -41,3 +43,4 @@
 3. importance 人工标定 → 数据驱动（JD 需求频率）
 4. 简历解析「正则优先」→「LLM 优先、正则兜底」（LLM 完整专业名更准确）
 5. 弱标注扩 BERT-NER 失败 → 结论：需人工标注更多样本
+6. 本地部署 → 支持云端：依赖分层（运行/重模型拆分）、清洗数据入库、secrets 优先、sys.path 兼容

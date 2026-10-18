@@ -27,7 +27,7 @@ def test_parse_unsupported():
 
 
 def test_parse_pdf():
-    pdf = _make_minimal_pdf("Hello PDF")
+    pdf = _make_minimal_pdf("Hello PDF text layer")
     assert "Hello PDF" in parse_bytes("a.pdf", pdf)
 
 

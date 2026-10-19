@@ -1,8 +1,8 @@
 # 进度（Progress）
 
 ## 什么能用（已完成）
-- ✅ 数据采集：1878 条真实 JD / 76 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax + 英文科技岗位），含部门/发布时间等字段
-- ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.545 / overlap 0.909），147 技能（难度+重要度）
+- ✅ 数据采集：3302 条真实 JD / 77 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手 + 英文科技岗位），含部门/发布时间等字段
+- ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），147 技能（难度+重要度）
 - ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源 + 道桥迁移
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
@@ -12,29 +12,31 @@
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
 - ✅ LLM 生成式报告解读 + 学习计划：report_interpreter（DeepSeek，LLM 优先/模板兜底），差距报告页新增「AI 解读 + 学习计划」区块
+- ✅ 快手爬虫：社招（逆向 sign HMAC-SHA256）+ 校招（POST 无 sign），共 1396 条完整 JD
+- ✅ DeepSeek 详情：33 条从列表升级为完整 JD（平均 1267 字）
+- ✅ BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训 30 条人工标注，exact 0.545→0.636
 
 ## 量化指标（当前）
 | 项 | 值 |
 |---|---|
-| 数据规模 | 1878 条 / 76 家公司 |
-| 技能抽取 F1 | 规则 0.957 / BERT-NER 0.545(exact) 0.909(overlap) |
+| 数据规模 | 3302 条 / 77 家公司 |
+| 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子） |
-| 测试 | 66 用例 |
+| 测试 | 68 用例 |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）
-2. 恢复 BERT-NER 旧模型（exact 0.636，需联网重下 bert-base-chinese；仅提升评测展示，不影响应用功能）
-3. 简历结构化解析的进一步优化（工作经历更细粒度）
+2. 简历结构化解析的进一步优化（工作经历更细粒度）
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD 9378c00），main 与远程一致，tag v1.0.0 已发布
+- git 工作区干净（HEAD c0a1924），main 与远程一致，tag v1.0.0 已发布
 - CI 绿：GitHub Actions 68 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 
 ## 已知问题（诚实标注）
-1. BERT-NER 弱标注扩充未达预期：exact 0.636→0.545（略降）、overlap 持平，弱标注无法替代人工标注
+1. BERT-NER 弱标注无法替代人工标注（已恢复旧模型 exact 0.636，弱标注版 0.545 已弃用）
 2. 华为 AI 岗位数据源受限：门户已枯竭（社招2/校招0），51job 第三方 AI 岗极少
 3. 阿里招聘分散在业务集团、智谱招聘渠道未公开，尚未打通
 4. DeepSeek（公司）详情接口 necromancer 加密未逆向，只抓列表

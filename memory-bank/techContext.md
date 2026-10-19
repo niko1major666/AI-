@@ -22,7 +22,7 @@
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）
-- **基础模型不在缓存**：`bert-base-chinese` 不在 `models/hf_cache`（只有 bge + 训练好的 models/bert_ner），离线训练需从 models/bert_ner 继续微调
+- **基础模型已在缓存**：`bert-base-chinese` 在 `models/hf_cache/models--bert-base-chinese/snapshots/`（restore_ner.py 直接读 snapshot 路径，避免 HF 联网）
 - **CPU 推理**：GPU（RTX 3050 4GB）可选，默认 CPU
 - **国内镜像**：`HF_ENDPOINT=https://hf-mirror.com`
 - **Windows**：无 symlink（HF 缓存降级警告无害）；PowerShell 环境
@@ -43,3 +43,5 @@
 - git 推送/拉取：SSH 免密（`git push` 直接可用，无需凭证）
 - 云端部署：推 GitHub → Streamlit Cloud 新建 app → Main file `src/app/app.py` → Secrets 填 `DEEPSEEK_API_KEY` → Deploy（详见 README「云端部署」）
 - 发 Release：GitHub Releases → Draft a new release → 打 tag（如 v1.1.0）→ 填更新说明（也可用 API `POST /repos/{owner}/{repo}/releases`）
+- 快手爬虫：`python -m src.crawler.kuaishou`（社招 sign 逆向 + 校招 POST，约 1445 条）
+- 恢复 BERT-NER：`python scripts/restore_ner.py 3`（从 bert-base-chinese 重训 30 条人工标注）

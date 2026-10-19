@@ -1,30 +1,32 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- 刚完成「LLM 生成式报告解读 + 学习计划」：report_interpreter（DeepSeek，LLM 优先/模板兜底），差距报告页新增 AI 解读区块
+- 刚完成「BERT-NER 旧模型恢复 + 数据补充」：restore_ner.py 恢复 exact 0.636；快手爬虫（社招+校招）sign 逆向，数据 1878→3302 条
 - 简历解析 DeepSeek LLM 增强已稳定（LLM 优先、正则兜底），API key 支持「Streamlit secrets 优先 + 环境变量兜底」
 
 ## 近期变更（按时间倒序）
-1. LLM 生成式报告解读 + 学习计划（report_interpreter，LLM 优先/模板兜底）+ 修复 _get_api_key 占位符 bug（环境变量优先 + 过滤占位符）
-2. GitHub 发行：Release v1.0.0 + GitHub Actions CI（66 测试绿）+ 徽章 + 在线体验链接 + 分享图/宣传文案
-3. README 三页面使用截图（docs/images/：技能图谱/简历匹配/差距报告）+ MIT License
-4. SSH 配置 + 推送到 GitHub（ed25519 key + `~/.ssh/config` + 公钥，main 与远程一致）
-5. 拉取远程「Added Dev Container Folder」提交（`.devcontainer/devcontainer.json`）
-6. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
-7. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
-8. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
-9. 简历结构化解析（正则）+ ATS 改进建议
-10. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
-11. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
-12. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
-13. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
-14. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
-15. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
+1. BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训，exact 0.545→0.636 / overlap 0.909
+2. 快手爬虫：社招（逆向 sign HMAC-SHA256）+ 校招（POST 无 sign），数据 1878→3302 条 / 77 家
+3. DeepSeek 详情补充：33 条列表升级为完整 JD（平均 1267 字）
+4. LLM 生成式报告解读 + 学习计划（report_interpreter，LLM 优先/模板兜底）+ 修复 _get_api_key 占位符 bug（环境变量优先 + 过滤占位符）
+5. GitHub 发行：Release v1.0.0 + GitHub Actions CI（66 测试绿）+ 徽章 + 在线体验链接 + 分享图/宣传文案
+6. README 三页面使用截图（docs/images/：技能图谱/简历匹配/差距报告）+ MIT License
+7. SSH 配置 + 推送到 GitHub（ed25519 key + `~/.ssh/config` + 公钥，main 与远程一致）
+8. 拉取远程「Added Dev Container Folder」提交（`.devcontainer/devcontainer.json`）
+9. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
+10. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
+11. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
+12. 简历结构化解析（正则）+ ATS 改进建议
+13. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
+14. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
+15. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
+16. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
+17. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
+18. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
 
 ## 下一步（按价值排序）
 1. 阿里/智谱数据补充（需继续探查招聘渠道）
-2. 恢复 BERT-NER 旧模型（exact 0.636，需联网重下 bert-base-chinese；仅提升评测展示，不影响应用功能）
-3. 简历结构化解析的进一步优化（工作经历更细粒度）
+2. 简历结构化解析的进一步优化（工作经历更细粒度）
 
 ## 活跃决策与考量
 - 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）

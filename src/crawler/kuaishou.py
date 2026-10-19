@@ -104,11 +104,47 @@ def crawl() -> list[dict]:
     return rows
 
 
+CAMPUS_URL = "https://campus.kuaishou.cn/recruit/campus/e/api/v1/open/positions/simple"
+
+
+def crawl_campus() -> list[dict]:
+    rows, seen = [], set()
+    for page in range(1, 10):
+        body = {"recruitSubProjectCodes": ["20271779425607"], "pageSize": 100, "pageNum": page}
+        r = requests.post(CAMPUS_URL, json=body, headers=HEADERS, timeout=30)
+        data = r.json()
+        lst = (data.get("result") or {}).get("list") or []
+        if not lst:
+            break
+        for p in lst:
+            jid = f"ksc_{p.get('id')}"
+            if jid in seen:
+                continue
+            seen.add(jid)
+            loc = "、".join(d.get("name", "") for d in (p.get("workLocationDicts") or []))
+            jd = "\n".join(x for x in [p.get("description") or "", p.get("positionDemand") or ""] if x)
+            rows.append({
+                "job_id": jid,
+                "company": "快手",
+                "title": p.get("name") or "",
+                "location": loc,
+                "salary": "",
+                "experience": "",
+                "education": "",
+                "jd_text": jd.strip(),
+                "department": p.get("departmentName") or "",
+                "publish_time": p.get("releaseTime") or "",
+            })
+        print(f"  校招第 {page} 页 +{len(lst)}，累计 {len(rows)}")
+        time.sleep(0.4)
+    return rows
+
+
 def main() -> None:
-    rows = crawl()
+    rows = crawl() + crawl_campus()
     pd.DataFrame(rows).to_csv(CSV, index=False, encoding="utf-8-sig")
     ai = [r for r in rows if any(k in (r["title"] + r["jd_text"]) for k in AI_KEYWORDS)]
-    print(f"快手共抓取 {len(rows)} 条（AI 相关约 {len(ai)} 条）→ {CSV}")
+    print(f"快手共抓取 {len(rows)} 条（社招+校招，AI 相关约 {len(ai)} 条）→ {CSV}")
 
 
 if __name__ == "__main__":

@@ -59,10 +59,10 @@ ai-skill-gap/
 │   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析
-│   ├── crawler/        6 大厂爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/华为）
+│   ├── crawler/        9 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（56 用例已通过）
+├── tests/              pytest（74 用例已通过）
 ├── docs/               images/（README 界面预览截图，3 张）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -97,7 +97,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 ![技能图谱](docs/images/skill_graph.png)
 
-**简历匹配**：上传简历 → 结构化解析（正则 + LLM）→ 技能提取 → ATS 建议
+**简历匹配**：上传简历 → 结构化解析（正则 + DeepSeek LLM，含工作经历细粒度：职责/量化成果/技术栈）→ 技能提取 → ATS 建议
 
 ![简历匹配](docs/images/resume_match.png)
 
@@ -155,7 +155,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 
 ## 八、数据采集与爬虫
 
-### 数据源总览（1799 条 / 74 家公司）
+### 数据源总览（3302 条 / 77 家公司，清洗去重后；原始 3641 条）
 
 | 数据源 | 平台 / 接口 | 技术方案 | 条数 | 部门/发布时间 |
 |---|---|---|---|---|
@@ -163,24 +163,32 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 | 字节跳动 | jobs.bytedance.com `_signature` 签名接口 | Playwright 拦截 + 滚动懒加载 | 261 | ✅ job_category / publish_time |
 | 小米（社招） | hr.xiaomi.com 公开 GET | requests + 多关键词 | 600 | ✅ levelOneDeptName / publishTime |
 | 小米（校招） | 飞书招聘 SaaS `_signature` + 虚拟列表 | Playwright 拦截 + 搜索框交互 | 110 | ✅ job_function / publish_time |
-| DeepSeek | Moka 平台（详情接口加密 necromancer） | Playwright DOM 抓列表 | 34 | ❌ 仅列表 |
+| DeepSeek | Moka 平台（详情接口加密 necromancer） | Playwright DOM 抓列表 | 33 | ❌ 仅列表 |
+| Kimi（月之暗面） | Moka 平台（详情接口加密） | Playwright DOM 抓列表 | 30 | ❌ 仅列表 |
+| MiniMax | 飞书招聘 SaaS `search/job/posts` | Playwright 拦截复用 | 60 | ✅ |
+| 快手（社招） | zhaopin.kuaishou.cn 公开接口 | requests + sign 逆向（HMAC-SHA256） | 1179 | ❌ 无发布时间 |
+| 快手（校招） | campus.kuaishou.cn 公开 POST | requests（无 sign） | 266 | ✅ departmentName / releaseTime |
 | 华为 | career.huawei.com 公开 GET + 51job 尝试 | requests + Playwright | 2 | ❌ 门户已枯竭，第三方 AI 岗极少 |
-| 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 448 | ❌ |
+| 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 600 | ❌ |
 
 ### 关键技术难点
 
-1. **`_signature` 签名**（字节 / 小米校招）：岗位接口 POST 带前端 JS 生成的 `_signature` 签名，直接构造请求成本高，改为 Playwright 让页面自行发请求并拦截响应（`page.on("response")`）拿到真实 JSON。
-2. **虚拟列表懒加载**（字节 / 小米校招）：岗位列表只渲染可视区，需滚动自定义滚动容器触发分页 XHR，多关键词遍历以突破单次结果上限。
-3. **详情接口加密**（DeepSeek · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
-4. **门户岗位稀缺**（华为）：官网门户社招 2 条 / 校招 0 条已枯竭；51job 等第三方平台投放的多为非 AI 岗（9 城市仅 3 条且无完整 JD），BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限。
+1. **`_signature` 签名**（字节 / 小米校招 / MiniMax）：岗位接口 POST 带前端 JS 生成的 `_signature` 签名，直接构造请求成本高，改为 Playwright 让页面自行发请求并拦截响应（`page.on("response")`）拿到真实 JSON。
+2. **sign 签名逆向**（快手社招）：`zhaopin.kuaishou.cn` 接口要求 `sign` + `signtimestamp` 请求头，`sign = HMAC-SHA256(secret, timestamp + canonicalize(query) + secret)`（secret 从前端 JS 逆向），规范化排序 query 参数后计算；校招接口无 sign，直接 POST。
+3. **虚拟列表懒加载**（字节 / 小米校招）：岗位列表只渲染可视区，需滚动自定义滚动容器触发分页 XHR，多关键词遍历以突破单次结果上限。
+4. **详情接口加密**（DeepSeek / Kimi · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
+5. **门户岗位稀缺**（华为）：官网门户社招 2 条 / 校招 0 条已枯竭；51job 等第三方平台投放的多为非 AI 岗，BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限。
 
 ### 复现采集
 
 ```powershell
-# 一键顺序重爬 6 个数据源（约 20 分钟，含 Playwright 交互）
+# 一键顺序重爬 8 个数据源（约 20+ 分钟，含 Playwright 交互）
 .\.venv\Scripts\python.exe scripts/recrawl_all.py
 
-# 七源合并 -> data/raw/all_jobs.csv
+# 快手（社招 sign 逆向 + 校招 POST，约 1445 条）
+.\.venv\Scripts\python.exe -m src.crawler.kuaishou
+
+# 十源合并 -> data/raw/all_jobs.csv
 .\.venv\Scripts\python.exe scripts/merge_jobs.py
 
 # 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
@@ -191,7 +199,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 
 ## 九、量化指标（简历用）
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**1799 条 / 74 家**（腾讯500 + 字节261 + 小米710(社招600+校招110) + DeepSeek34 + 华为2 + 英文科技岗位448，去重后；其中 1344 条含部门+发布时间）
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**3302 条 / 77 家**（原始 3641 条去重后；含快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
@@ -246,7 +254,7 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 
 ## 十、已核实结论（诚实标注）
 
-1. Kaggle「AI Jobs Dataset 2026」**不存在**——已改用 HuggingFace `zalizedata/tech-job-postings-salary-dataset`（448 条真实科技岗位 / 69 家公司）
+1. Kaggle「AI Jobs Dataset 2026」**不存在**——已改用 HuggingFace `zalizedata/tech-job-postings-salary-dataset`（600 条真实科技岗位）
 2. `Nucha_SkillNER_BERT` **不存在**——已按 fallback 用 `bert-base-chinese` 自标注微调（F1 0.636/0.909）
 3. SiameseUIE 零样本对抽象技能类别 **F1=0**（已实测）——故保留「规则基线 + BERT-NER」双路抽取
 

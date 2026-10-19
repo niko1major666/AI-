@@ -91,7 +91,7 @@ def load_jobs():
     p = ROOT / "data" / "processed" / "jobs.jsonl"
     if not p.exists():
         return []
-    return [json.loads(x) for x in p.read_text(encoding="utf-8").splitlines()]
+    return [json.loads(x) for x in p.read_text(encoding="utf-8").split("\n") if x.strip()]
 
 
 @st.cache_data

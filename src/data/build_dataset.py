@@ -118,7 +118,7 @@ def build(config_path, out_dir=None) -> dict:
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as f:
         for r in records:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+            f.write(json.dumps(r, ensure_ascii=False).replace("\u2028", "\\u2028").replace("\u2029", "\\u2029") + "\n")
 
     stats["cleaned_rows"] = len(records)
     stats["company_count"] = int(df["company_norm"].nunique())

@@ -261,26 +261,46 @@ def page_resume(taxonomy, rule, analyzer):
     if profile.experiences:
         st.markdown("**💼 工作/项目经历：**")
         for e in profile.experiences:
-            if isinstance(e, dict):
-                comp = e.get("company") or ""
-                title = e.get("title") or ""
-                dur = e.get("duration") or ""
-                line = " · ".join(x for x in [comp, title, dur] if x)
-                if line:
-                    st.markdown(f"- {line}")
+            if not isinstance(e, dict):
+                continue
+            comp = e.get("company") or ""
+            title = e.get("title") or ""
+            dur = e.get("duration") or ""
+            line = " · ".join(x for x in [comp, title, dur] if x)
+            if line:
+                st.markdown(f"- **{line}**")
+            desc = e.get("description") or ""
+            if desc:
+                st.markdown(f"  - 职责：{desc}")
+            techs = e.get("tech_stack") or []
+            if techs:
+                st.markdown(f"  - 技术栈：{'、'.join(techs)}")
+            achieves = e.get("achievements") or []
+            if achieves:
+                st.markdown("  - 成果：" + "；".join(achieves))
 
     if st.button("提取技能"):
         spans = rule.extract_spans("user", text)
-        st.session_state["user_skills"] = [s.skill_text for s in spans]
-        st.session_state["user_skill_ids"] = [s.skill_id for s in spans]
+        # 合并 LLM 解析出的技能（映射到标准词表，补充规则未覆盖的技能）
+        known_ids = {s.skill_id for s in spans}
+        extra_skills = []
+        for name in (profile.skills or []):
+            sk = taxonomy.resolve(name)
+            if sk and sk.id not in known_ids:
+                known_ids.add(sk.id)
+                extra_skills.append(sk)
+        st.session_state["user_skills"] = [s.skill_text for s in spans] + [s.name for s in extra_skills]
+        st.session_state["user_skill_ids"] = [s.skill_id for s in spans] + [s.id for s in extra_skills]
 
         st.subheader("识别到的 AI 技能")
-        if spans:
+        all_skills = [
+            (s.skill_id, s.category, (taxonomy.by_id(s.skill_id).name if taxonomy.by_id(s.skill_id) else s.skill_text))
+            for s in spans
+        ] + [(s.id, s.category, s.name) for s in extra_skills]
+        if all_skills:
             by_cat = {}
-            for s in spans:
-                sk = taxonomy.by_id(s.skill_id)
-                name = sk.name if sk else s.skill_text
-                by_cat.setdefault(s.category, []).append(name)
+            for _sid, cat, name in all_skills:
+                by_cat.setdefault(cat, []).append(name)
             for cat, items in sorted(by_cat.items()):
                 st.markdown(f"**{cat}**：{'、'.join(items)}")
         else:

@@ -11,6 +11,7 @@
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
+- ✅ LLM 生成式报告解读 + 学习计划：report_interpreter（DeepSeek，LLM 优先/模板兜底），差距报告页新增「AI 解读 + 学习计划」区块
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -21,17 +22,16 @@
 | 测试 | 66 用例 |
 
 ## 待构建（按价值）
-1. LLM 生成式报告解读 + 学习计划（最高价值，已有 DeepSeek key）
-2. 阿里/智谱数据补充（需探查招聘渠道）
-3. 恢复 BERT-NER 旧模型（exact 0.636，需联网重下 bert-base-chinese）
-4. 简历结构化解析的进一步优化（工作经历更细粒度）
+1. 阿里/智谱数据补充（需探查招聘渠道）
+2. 恢复 BERT-NER 旧模型（exact 0.636，需联网重下 bert-base-chinese；仅提升评测展示，不影响应用功能）
+3. 简历结构化解析的进一步优化（工作经历更细粒度）
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD fe1c1b8），main 与远程一致，tag v1.0.0 已发布
-- CI 绿：GitHub Actions 66 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- git 工作区干净（HEAD 9378c00），main 与远程一致，tag v1.0.0 已发布
+- CI 绿：GitHub Actions 68 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 
 ## 已知问题（诚实标注）
 1. BERT-NER 弱标注扩充未达预期：exact 0.636→0.545（略降）、overlap 持平，弱标注无法替代人工标注

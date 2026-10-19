@@ -42,6 +42,7 @@
 ## 学习与洞察
 - st.secrets 会读取本地 `.streamlit/secrets.toml` 占位符，覆盖环境变量 key → HTTP header latin-1 编码崩溃；key 获取应环境变量优先 + 过滤占位符
 - CI 只装轻量依赖（requirements.txt），测试需避免触发重依赖路径（如 PDF 文字 <10 字符会回退 OCR，需要 pymupdf，CI 未装）
+- 快手 JD 含 U+2028/2029（行/段分隔符）：json.dumps(ensure_ascii=False) 保留裸字符，splitlines() 读回误当换行符截断 JSON → build_dataset 写时显式转义 + load_jobs 改用 split("\n")
 - 弱标注无法替代人工标注的边界精度（NER 细粒度任务）
 - Moka 平台详情接口 necromancer 加密 → 用 Playwright DOM 抓渲染后明文
 - 飞书招聘统一接口 `search/job/posts` → 拦截复用

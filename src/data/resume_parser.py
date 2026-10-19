@@ -81,15 +81,29 @@ _LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提
 
 
 def _get_api_key() -> str:
-    """优先 Streamlit Cloud secrets，其次环境变量（本地）。"""
+    """获取 DeepSeek key：环境变量优先（本地），Streamlit secrets 兜底（云端）。过滤占位符/非 ASCII 值。"""
+    def _valid(k: str) -> bool:
+        if not k:
+            return False
+        if "在此填入" in k or "密钥" in k or "你的" in k:
+            return False
+        try:
+            k.encode("ascii")
+            return True
+        except UnicodeEncodeError:
+            return False
+
+    env = os.environ.get("DEEPSEEK_API_KEY") or ""
+    if _valid(env):
+        return env
     try:
         import streamlit as st
-        key = st.secrets.get("DEEPSEEK_API_KEY")
-        if key:
-            return str(key)
+        skey = st.secrets.get("DEEPSEEK_API_KEY")
+        if skey and _valid(str(skey)):
+            return str(skey)
     except Exception:  # noqa: BLE001
         pass
-    return os.environ.get("DEEPSEEK_API_KEY") or ""
+    return ""
 
 
 def llm_parse_resume(text: str) -> dict | None:

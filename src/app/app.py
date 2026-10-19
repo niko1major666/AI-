@@ -400,6 +400,24 @@ def page_gap(taxonomy, analyzer, rows):
                 for r in m.resources:
                     st.markdown(f"- [{r.get('title')}]({r.get('url')})")
 
+        # ---- AI 解读 + 学习计划 ----
+        st.subheader("🤖 AI 解读 + 学习计划")
+        with st.spinner("正在生成 AI 解读与学习计划…"):
+            from src.matcher.report_interpreter import interpret_report
+            interp = interpret_report(rep, target_job=label, user_skills=user_skills)
+        if interp.get("overview"):
+            st.markdown(interp["overview"])
+        for stage in interp.get("plan", []):
+            st.markdown(f"#### 📅 {stage.get('phase', '')}")
+            if stage.get("goal"):
+                st.markdown(f"**目标**：{stage['goal']}")
+            if stage.get("skills"):
+                st.markdown("**技能**：" + "、".join(f"`{s}`" for s in stage["skills"]))
+            for act in stage.get("actions", []):
+                st.markdown(f"- {act}")
+        if interp.get("tips"):
+            st.info(interp["tips"])
+
 
 def main():
     _inject_css()

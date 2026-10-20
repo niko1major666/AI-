@@ -244,6 +244,8 @@ def page_resume(taxonomy, rule, analyzer):
     # 结构化解析（正则 + DeepSeek LLM 增强，无 key 自动降级正则）
     from src.data.resume_parser import ats_suggestions, parse_resume_full
     profile = parse_resume_full(text)
+    # 与「差距报告」联动：把解析出的专业写入会话，报告页据此生成专业相关建议
+    st.session_state["user_majors"] = list(profile.majors or [])
 
     st.subheader("📋 结构化信息解析")
     c1, c2, c3, c4 = st.columns(4)
@@ -351,6 +353,7 @@ def page_gap(taxonomy, analyzer, rows):
                           "is_must": demand.get(sid, 0) >= 0.4})
 
     user_skills = st.session_state.get("user_skills", [])
+    user_majors = st.session_state.get("user_majors", [])
     user_input = st.text_input("或直接输入技能（逗号分隔，留空则用「简历匹配」结果）", "")
     if user_input:
         user_skills = [x.strip() for x in user_input.replace("，", ",").split(",") if x.strip()]
@@ -362,6 +365,8 @@ def page_gap(taxonomy, analyzer, rows):
         rep = analyzer.analyze(user_skills, jd_skills, demand=demand)
         st.metric("匹配度", f"{rep.match_score}%")
         st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项")
+        if user_majors:
+            st.caption(f"🎓 已结合简历解析出的专业：{'、'.join(user_majors)}")
 
         if not rep.missing:
             st.success("🎉 已覆盖目标岗位的全部技能，暂无差距")
@@ -385,13 +390,13 @@ def page_gap(taxonomy, analyzer, rows):
                 unsafe_allow_html=True,
             )
 
-        for emoji, label, items, desc in [
+        for emoji, group_label, items, desc in [
             ("🔴", "P0 先学", p0, "硬性门槛 / 高频需求，最优先补齐"),
             ("🟠", "P1 进阶", p1, "重要且常用，补上后竞争力明显提升"),
             ("🔵", "P2 可选", p2, "加分项，有余力再补"),
         ]:
             if items:
-                st.markdown(f"#### {emoji} {label} · {desc}（{len(items)} 项）")
+                st.markdown(f"#### {emoji} {group_label} · {desc}（{len(items)} 项）")
                 for m in items:
                     st.markdown(_gap_card(m), unsafe_allow_html=True)
 
@@ -410,7 +415,8 @@ def page_gap(taxonomy, analyzer, rows):
         st.subheader("🤖 AI 解读 + 学习计划")
         with st.spinner("正在生成 AI 解读与学习计划…"):
             from src.matcher.report_interpreter import interpret_report
-            interp = interpret_report(rep, target_job=label, user_skills=user_skills)
+            interp = interpret_report(rep, target_job=label, user_skills=user_skills,
+                                       user_majors=user_majors)
         if interp.get("overview"):
             st.markdown(interp["overview"])
         for stage in interp.get("plan", []):

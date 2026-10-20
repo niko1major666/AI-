@@ -9,28 +9,29 @@
 
 ## 近期变更（按时间倒序）
 
-1. 移除「道桥背景迁移」能力（用户反馈多为非道桥背景）：删除 `data/kb/transfer_map.yaml` + `scripts/demo_background.py`；`SkillGapAnalyzer` 去掉 `transfer_map` 参数、`detect_background()` 与 `GapItem.transfer_hint`；报告解读 prompt / 兜底模板 / 简历匹配页 / 差距报告页全部改为中性表述；同步清理 README、PROJECT_REPORT、memory-bank 与简历专业识别词表
-2. 小红书爬虫 + 重要度重算：探查 job.xiaohongshu.com（SPA）→ 定位 `websiterecruit/position/pageQueryPosition`（社招/校招同接口，`x-s` 签名未强制校验）→ requests 直连翻页，社招 864 + 校招 508，清洗后 1284 条完整 JD，数据 3302→4586 条 / 78 家；新增 `tests/test_xiaohongshu.py`（10 用例）；随后按 4586 条语料重跑 `recalc_importance.py`（147 技能：9 升 34 降，Top 大模型 36.2% / Python 36.0% / 智能体 22.3%），同步 `test_skillkb` / `test_gap_analyzer` 分档断言
-3. Streamlit 云端保活：`scripts/keepalive_app.py`（HTTP 探测 `/~/+/_stcore/health`，失败则 Playwright 真实打开唤醒）+ `.github/workflows/keep-streamlit-alive.yml`（每 6 小时 cron + 手动触发）+ 下载社区 `scripts/keepalive.sh`（已预置应用地址）+ `.gitattributes` 强制 `.sh` 用 LF + 7 个纯函数测试
-4. 简历解析优化：工作经历细粒度（职责/量化成果/技术栈）+ 修复 work_years 正则 bug（「2023 年毕业」不再误识别为 23 年经验）+ 利用 LLM skills 补充技能抽取 + ATS 建议增强（姓名/经历完整性/量化）
-5. BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训，exact 0.545→0.636 / overlap 0.909
-6. 快手爬虫：社招（逆向 sign HMAC-SHA256）+ 校招（POST 无 sign），数据 1878→3302 条 / 77 家
-7. DeepSeek 详情补充：33 条列表升级为完整 JD（平均 1267 字）
-8. LLM 生成式报告解读 + 学习计划（report_interpreter，LLM 优先/模板兜底）+ 修复 _get_api_key 占位符 bug（环境变量优先 + 过滤占位符）
-9. GitHub 发行：Release v1.0.0 + GitHub Actions CI（66 测试绿）+ 徽章 + 在线体验链接 + 分享图/宣传文案
-10. README 三页面使用截图（docs/images/：技能图谱/简历匹配/差距报告）+ MIT License
-11. SSH 配置 + 推送到 GitHub（ed25519 key + `~/.ssh/config` + 公钥，main 与远程一致）
-12. 拉取远程「Added Dev Container Folder」提交（`.devcontainer/devcontainer.json`）
-13. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
-14. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
-15. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
-16. 简历结构化解析（正则）+ ATS 改进建议
-17. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
-18. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
-19. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
-20. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
-21. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
-22. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
+1. 差距报告「AI 解读」改为简历专业驱动：`page_resume` 解析后写入 `st.session_state["user_majors"]`，`page_gap` 读取并透传 `interpret_report(user_majors=...)`；`report_interpreter` 新增 `_MAJOR_HINT_RULES`（计算机 / 数理统计 / 自动化电子 / 土木工程 / 经管 / 生医化 / 人文 7 类 + 通用兜底）按专业名生成迁移建议，无专业时 tips 为空且前端不展示；prompt 增加「用户专业」段并禁止编造；顺带修复差距页循环变量覆盖 `label` 导致 `target_job` 被传成「P2 可选」的 bug
+2. 移除「道桥背景迁移」能力（用户反馈多为非道桥背景）：删除 `data/kb/transfer_map.yaml` + `scripts/demo_background.py`；`SkillGapAnalyzer` 去掉 `transfer_map` 参数、`detect_background()` 与 `GapItem.transfer_hint`；报告解读 prompt / 兜底模板 / 简历匹配页 / 差距报告页全部改为中性表述；同步清理 README、PROJECT_REPORT、memory-bank 与简历专业识别词表
+3. 小红书爬虫 + 重要度重算：探查 job.xiaohongshu.com（SPA）→ 定位 `websiterecruit/position/pageQueryPosition`（社招/校招同接口，`x-s` 签名未强制校验）→ requests 直连翻页，社招 864 + 校招 508，清洗后 1284 条完整 JD，数据 3302→4586 条 / 78 家；新增 `tests/test_xiaohongshu.py`（10 用例）；随后按 4586 条语料重跑 `recalc_importance.py`（147 技能：9 升 34 降，Top 大模型 36.2% / Python 36.0% / 智能体 22.3%），同步 `test_skillkb` / `test_gap_analyzer` 分档断言
+4. Streamlit 云端保活：`scripts/keepalive_app.py`（HTTP 探测 `/~/+/_stcore/health`，失败则 Playwright 真实打开唤醒）+ `.github/workflows/keep-streamlit-alive.yml`（每 6 小时 cron + 手动触发）+ 下载社区 `scripts/keepalive.sh`（已预置应用地址）+ `.gitattributes` 强制 `.sh` 用 LF + 7 个纯函数测试
+5. 简历解析优化：工作经历细粒度（职责/量化成果/技术栈）+ 修复 work_years 正则 bug（「2023 年毕业」不再误识别为 23 年经验）+ 利用 LLM skills 补充技能抽取 + ATS 建议增强（姓名/经历完整性/量化）
+6. BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训，exact 0.545→0.636 / overlap 0.909
+7. 快手爬虫：社招（逆向 sign HMAC-SHA256）+ 校招（POST 无 sign），数据 1878→3302 条 / 77 家
+8. DeepSeek 详情补充：33 条列表升级为完整 JD（平均 1267 字）
+9. LLM 生成式报告解读 + 学习计划（report_interpreter，LLM 优先/模板兜底）+ 修复 _get_api_key 占位符 bug（环境变量优先 + 过滤占位符）
+10. GitHub 发行：Release v1.0.0 + GitHub Actions CI（66 测试绿）+ 徽章 + 在线体验链接 + 分享图/宣传文案
+11. README 三页面使用截图（docs/images/：技能图谱/简历匹配/差距报告）+ MIT License
+12. SSH 配置 + 推送到 GitHub（ed25519 key + `~/.ssh/config` + 公钥，main 与远程一致）
+13. 拉取远程「Added Dev Container Folder」提交（`.devcontainer/devcontainer.json`）
+14. 云端部署 sys.path 兼容修复（streamlit run 时项目根目录不在 sys.path）
+15. 云端部署准备（精简依赖 + 数据入库 + Streamlit secrets 支持）
+16. 简历解析 LLM 增强（DeepSeek，验证通过）+ 合并策略 LLM 优先
+17. 简历结构化解析（正则）+ ATS 改进建议
+18. BERT-NER 弱标注扩充实验（诚实负面结果：exact 0.545 / overlap 0.909）
+19. 匹配评测升级：口语化简历句子→技能（BGE 0.54 vs TF-IDF 0.24）
+20. 技能行业重要度数据化（基于 1878 条 JD 需求频率）
+21. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
+22. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
+23. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
 
 ## 下一步（按价值排序）
 1. 观察 keep-alive 定时任务（Actions 页面确认每 6 小时跑通，必要时用 `workflow_dispatch` 手动触发）

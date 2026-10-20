@@ -63,7 +63,7 @@ ai-skill-gap/
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
 ├── tests/              pytest（91 用例已通过）
-├── docs/               images/（README 界面预览截图，3 张）
+├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md

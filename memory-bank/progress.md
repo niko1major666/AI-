@@ -20,6 +20,7 @@
 - ✅ 小红书爬虫：`pageQueryPosition` 直连（无需签名）社招 864 + 校招 508，清洗后 1284 条完整 JD（含 jobType / publishTime），数据 3302→4586 条 / 78 家
 - ✅ 技能重要度重算（4586 条语料）：147 技能中 9 升 / 34 降 / 104 不变；新分布 1:73、2:22、3:29、4:12、5:11；Top 大模型 36.2%、Python 36.0%、智能体 22.3%；同步更新 `test_skillkb` / `test_gap_analyzer` 分档断言
 - ✅ 岗位标题过滤器：`src/data/job_filter.py`（黑名单：土木/建筑/施工/结构工程师等 34 词 + 白名单：AI/算法/数据等 31 词保护），`configs/dataset.yaml` 可开关与覆盖词表；构建时剔除 4 条非 AI 工程岗（4586→4582），重要度分档未变；新增 `tests/test_job_filter.py`（7 用例，含管线接入与禁用场景）
+- ✅ 发行流水线：`.github/workflows/release.yml`（push `v*` tag → `gh release create`，标题取 `docs/release-notes/<tag>.md` 首行），已发布 v1.2.0；`scripts/capture_screenshots.py` 可一键重截 README 预览图
 
 
 ## 量化指标（当前）
@@ -38,8 +39,8 @@
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD 866207e），main 与远程一致，tag v1.1.0 已发布（Release v1.1.0）
-- CI 绿：GitHub Actions 91 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- git 工作区干净（HEAD eb6ba48），main 与远程一致，tag v1.2.0 已发布（Release「v1.2.0 语料扩充与岗位过滤」）
+- CI 绿：GitHub Actions 102 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 - 保活：`.github/workflows/keep-streamlit-alive.yml` 每 6 小时探测（cron `0 */6 * * *`），失败自动转 Playwright 唤醒
 
 ## 已知问题（诚实标注）

@@ -1,6 +1,7 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
+- 已发布 **v1.2.0**：`git push` tag 触发 `.github/workflows/release.yml` 自动创建 GitHub Release（正文取 `docs/release-notes/<tag>.md` 首行作标题），说明文件 `docs/release-notes/v1.2.0.md`
 - 刚补齐「小红书招聘」数据源：`src/crawler/xiaohongshu.py` 社招 864 + 校招 508 → 清洗后 1284 条，总数据 4582 条 / 78 家
 - Streamlit 云端保活已上线：GitHub Actions 每 6 小时探测（`/~/+/_stcore/health` + Playwright 真实唤醒），本地可手动跑 `scripts/keepalive_app.py`
 - 已完成「简历解析优化」：工作经历细粒度（职责/量化成果/技术栈）、work_years 正则 bug 修复、LLM skills 利用、ATS 建议增强

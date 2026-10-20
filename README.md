@@ -59,10 +59,10 @@ ai-skill-gap/
 │   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析
-│   ├── crawler/        9 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/华为 + 英文科技岗位）
+│   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（81 用例已通过）
+├── tests/              pytest（91 用例已通过）
 ├── docs/               images/（README 界面预览截图，3 张）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -178,7 +178,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 ## 八、数据采集与爬虫
 
-### 数据源总览（3302 条 / 77 家公司，清洗去重后；原始 3641 条）
+### 数据源总览（4586 条 / 78 家公司，清洗去重后；原始 5013 条）
 
 | 数据源 | 平台 / 接口 | 技术方案 | 条数 | 部门/发布时间 |
 |---|---|---|---|---|
@@ -191,6 +191,8 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | MiniMax | 飞书招聘 SaaS `search/job/posts` | Playwright 拦截复用 | 60 | ✅ |
 | 快手（社招） | zhaopin.kuaishou.cn 公开接口 | requests + sign 逆向（HMAC-SHA256） | 1179 | ❌ 无发布时间 |
 | 快手（校招） | campus.kuaishou.cn 公开 POST | requests（无 sign） | 266 | ✅ departmentName / releaseTime |
+| 小红书（社招） | job.xiaohongshu.com `pageQueryPosition` | requests POST（无需签名） | 836 | ✅ jobType / publishTime |
+| 小红书（校招） | 同上，`recruitType=campus` | requests POST 翻页 | 448 | ✅ jobType / publishTime |
 | 华为 | career.huawei.com 公开 GET + 51job 尝试 | requests + Playwright | 2 | ❌ 门户已枯竭，第三方 AI 岗极少 |
 | 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 600 | ❌ |
 
@@ -201,6 +203,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 3. **虚拟列表懒加载**（字节 / 小米校招）：岗位列表只渲染可视区，需滚动自定义滚动容器触发分页 XHR，多关键词遍历以突破单次结果上限。
 4. **详情接口加密**（DeepSeek / Kimi · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
 5. **门户岗位稀缺**（华为）：官网门户社招 2 条 / 校招 0 条已枯竭；51job 等第三方平台投放的多为非 AI 岗，BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限。
+6. **SPA 签名头排查**（小红书）：站点会加载 `as.xiaohongshu.com` 安全 SDK 并给业务请求注入 `x-s` 签名头，但 `websiterecruit/position/pageQueryPosition` 实测**未强制校验**——直接 requests POST（`pageSize=100`）即可翻页拿到含 `duty` + `qualification` 的完整 JD，无需 Playwright。数据比列表页 DOM 更完整（社招 864 / 校招 508）。
 
 ### 复现采集
 
@@ -211,7 +214,10 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 # 快手（社招 sign 逆向 + 校招 POST，约 1445 条）
 .\.venv\Scripts\python.exe -m src.crawler.kuaishou
 
-# 十源合并 -> data/raw/all_jobs.csv
+# 小红书（社招 864 + 校招 508，requests 直连，约 1 分钟）
+.\.venv\Scripts\python.exe -m src.crawler.xiaohongshu
+
+# 十一源合并 -> data/raw/all_jobs.csv
 .\.venv\Scripts\python.exe scripts/merge_jobs.py
 
 # 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
@@ -222,7 +228,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 ## 九、量化指标（简历用）
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**3302 条 / 77 家**（原始 3641 条去重后；含快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4586 条 / 78 家**（原始 5013 条去重后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）

@@ -1,13 +1,13 @@
 # 进度（Progress）
 
 ## 什么能用（已完成）
-- ✅ 数据采集：3302 条真实 JD / 77 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手 + 英文科技岗位），含部门/发布时间等字段
+- ✅ 数据采集：4586 条真实 JD / 78 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书 + 英文科技岗位），含部门/发布时间等字段
 - ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），147 技能（难度+重要度）
 - ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源 + 道桥迁移
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
-- ✅ 工程：81 测试全通过（含保活脚本纯函数测试）、Docker、报告导出 Word、README + 项目报告
+- ✅ 工程：91 测试全通过（含保活脚本纯函数测试 + 小红书爬虫解析测试）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
@@ -17,14 +17,15 @@
 - ✅ BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训 30 条人工标注，exact 0.545→0.636
 - ✅ 简历解析优化：工作经历细粒度（职责/量化成果/技术栈）、work_years 正则 bug 修复、LLM skills 补充技能抽取、ATS 建议增强（姓名/经历完整性/量化）
 - ✅ 云端保活：GitHub Actions 每 6 小时探测（HTTP health + Playwright 真实唤醒），本地 `scripts/keepalive_app.py`，交互式 `scripts/keepalive.sh`，`.gitattributes` 保证 `.sh` 用 LF
+- ✅ 小红书爬虫：`pageQueryPosition` 直连（无需签名）社招 864 + 校招 508，清洗后 1284 条完整 JD（含 jobType / publishTime），数据 3302→4586 条 / 78 家
 
 ## 量化指标（当前）
 | 项 | 值 |
 |---|---|
-| 数据规模 | 3302 条 / 77 家公司 |
+| 数据规模 | 4586 条 / 78 家公司 |
 | 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子） |
-| 测试 | 81 用例 |
+| 测试 | 91 用例 |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）

@@ -62,7 +62,7 @@ ai-skill-gap/
 │   ├── crawler/        9 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（74 用例已通过）
+├── tests/              pytest（81 用例已通过）
 ├── docs/               images/（README 界面预览截图，3 张）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -129,6 +129,29 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 5. Deploy，即可获得公网访问链接
 
 > 本地开发如需 BERT-NER/BGE 训练评测：`pip install -r requirements.txt -r requirements-ml.txt`
+
+### 保持云端长期在线（Keep-Alive）
+
+Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sleep），下次访问需等待冷启动。本仓库内置保活方案：
+
+- **GitHub Actions 定时探测**：`.github/workflows/keep-streamlit-alive.yml`，每 6 小时运行一次。
+  先用 HTTP 探测（主页 + `/~/+/_stcore/health`）判断是否在线，失败时自动启动无头浏览器真实访问（建立 websocket）完成唤醒。
+- **本地手动保活**：
+
+  ```powershell
+  .\.venv\Scripts\python.exe scripts\keepalive_app.py            # 探测，必要时自动唤醒
+  .\.venv\Scripts\python.exe scripts\keepalive_app.py --browser  # 强制浏览器真实访问
+  ```
+
+- **交互式维护 workflow**（Linux / macOS / Git Bash）：
+
+  ```bash
+  bash scripts/keepalive.sh
+  ```
+
+- 应用地址可用环境变量覆盖：`STREAMLIT_APP_URL=https://xxx.streamlit.app/`
+
+> 注意：GitHub 仓库若连续 60 天无提交，定时任务会被自动停用，可在 Actions 页面用 `workflow_dispatch` 手动跑一次；也可叠加 UptimeRobot / cron-job.org 等外部监控作为双保险。
 
 ## 六、环境说明（本机实测）
 

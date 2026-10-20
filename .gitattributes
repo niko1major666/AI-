@@ -1,0 +1,2 @@
+# Shell 脚本始终以 LF 存储/检出（Windows 下 autocrlf=true 会破坏 shebang）
+*.sh text eol=lf

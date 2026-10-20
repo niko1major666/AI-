@@ -1,0 +1,40 @@
+name: Keep Streamlit Apps Alive
+
+on:
+  schedule:
+    # 每 6 小时（UTC）探测一次，避免 Streamlit Community Cloud 因闲置休眠
+    - cron: '0 */6 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  ping-apps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Probe app (HTTP)
+        id: probe
+        continue-on-error: true
+        env:
+          STREAMLIT_APP_URL: https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+        run: python scripts/keepalive_app.py --timeout 60
+
+      - name: Wake app with headless browser
+        if: steps.probe.outcome != 'success'
+        env:
+          STREAMLIT_APP_URL: https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+          python scripts/keepalive_app.py --browser --timeout 90 --retries 2

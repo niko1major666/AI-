@@ -29,8 +29,8 @@ header[data-testid="stHeader"] { background: transparent !important; }
 # page_key -> (侧栏导航文字, 输出文件名, 就绪选择器)
 PAGES = {
     "skill_graph": ("技能图谱", "skill_graph.png", '[data-testid="stVegaLiteChart"]'),
-    "resume_match": ("简历匹配", "resume_match.png", 'text=上传简历'),
-    "gap_report": ("差距报告", "gap_report.png", 'text=生成差距报告'),
+    "resume_match": ("简历匹配", "resume_match.png", '[data-testid="stFileUploader"]'),
+    "gap_report": ("差距报告", "gap_report.png", '[data-testid="stSelectbox"]'),
 }
 
 

@@ -36,8 +36,8 @@
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD 6275aa0），main 与远程一致，tag v1.1.0 已发布（Release v1.1.0）
-- CI 绿：GitHub Actions 81 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- git 工作区干净（HEAD 866207e），main 与远程一致，tag v1.1.0 已发布（Release v1.1.0）
+- CI 绿：GitHub Actions 91 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 - 保活：`.github/workflows/keep-streamlit-alive.yml` 每 6 小时探测（cron `0 */6 * * *`），失败自动转 Playwright 唤醒
 
 ## 已知问题（诚实标注）

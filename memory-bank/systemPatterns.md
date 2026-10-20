@@ -29,9 +29,10 @@ scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_matc
 ## 关键技术决策
 1. **双路技能抽取**：规则基线（词表字典，F1 0.957 对词表内极稳）+ 微调 BERT-NER（能学上下文）。SiameseUIE 零样本对抽象技能 F1=0 已被弃用。
 2. **双路语义匹配**：TF-IDF（char n-gram 基线）+ BGE-base-zh（语义 SOTA）。差距报告的「简历自由文本→技能」场景优先 BGE（口语化句子评测 2.25 倍于 TF-IDF）。
-3. **importance 数据驱动**：行业重要度 = 4586 条 JD 需求频率分档（≥10%→5 … <1%→1），替换人工标定；优先级算法叠加学习难度加权修正「频率≠价值」偏差。语料每次扩容后跑 `scripts/recalc_importance.py` 重算，并同步更新 `tests/test_skillkb.py` 中的分档断言。
+3. **importance 数据驱动**：行业重要度 = 4582 条 JD 需求频率分档（≥10%→5 … <1%→1），替换人工标定；优先级算法叠加学习难度加权修正「频率≠价值」偏差。语料每次扩容后跑 `scripts/recalc_importance.py` 重算，并同步更新 `tests/test_skillkb.py` 中的分档断言。
 4. **LLM 增强 + 正则降级**：简历解析用 DeepSeek（`DEEPSEEK_API_KEY`），LLM 优先、正则兜底，无 key 不报错。
 5. **云端部署分层**：运行依赖（requirements.txt）与重模型依赖（requirements-ml.txt）拆分；清洗数据 `data/processed/jobs.jsonl` 入库；LLM key 走 Streamlit secrets 优先、环境变量兜底；app.py 启动时把项目根目录加入 sys.path。
+6. **岗位标题过滤**：只按**标题**剔除土建/施工等非 AI 岗位（黑名单 + AI 白名单保护），不做正文过滤——正文里的「桥梁」多为「业务与技术之间的桥梁」比喻（25 条真实样本验证过），按正文删会误伤真岗位。实现 `src/data/job_filter.py`，开关与词表覆盖在 `configs/dataset.yaml` 的 `cleaning.title_filter`，剔除条数计入 `build_stats.json` 的 `dropped_offtopic`。
 
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测

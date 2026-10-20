@@ -47,7 +47,7 @@ def test_by_id():
 
 def test_importance_field():
     t = _tax()
-    # 高频技能重要度高（数据驱动：按 JD 需求占比，当前语料 4586 条 / 78 家）
+    # 高频技能重要度高（数据驱动：按 JD 需求占比，当前语料 4582 条 / 78 家）
     assert t.by_id("PROG.PYTHON").importance == 5
     assert t.by_id("FRAMEWORK.PYTORCH").importance == 5
     assert t.by_id("AITECH.LLM").importance == 5

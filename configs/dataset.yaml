@@ -29,6 +29,11 @@ cleaning:
   min_jd_chars: 30
   normalize_company: true
   strip_html: true
+  title_filter:
+    enabled: true        # 剔除土建/施工等与 AI 岗位无关的标题（只按标题判，不看 JD 正文）
+    # 留空则使用 src/data/job_filter.py 内置词表；可在此覆盖
+    exclude_keywords: []
+    keep_keywords: []
 
 output:
   jobs_jsonl: data/processed/jobs.jsonl

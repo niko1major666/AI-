@@ -56,7 +56,7 @@ ai-skill-gap/
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
 │   └── kb/             skill_taxonomy(147技能·难度+重要度[需求频率驱动]) / learning_resources
 ├── src/
-│   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
+│   ├── data/           schema / normalize / job_filter(★标题过滤) / load / build_dataset
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析
 │   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
@@ -75,7 +75,7 @@ ai-skill-gap/
 # 1) 建 Python 3.12 venv + 装依赖 + 体检（缓存全部落在项目内，不占系统盘）
 powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
-# 2) 构建结构化数据集
+# 2) 构建结构化数据集（含岗位标题过滤：剔除土木/施工等非 AI 岗位）
 .\.venv\Scripts\python.exe -m src.data.build_dataset --stats
 
 # 3) 跑测试
@@ -178,7 +178,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 ## 八、数据采集与爬虫
 
-### 数据源总览（4586 条 / 78 家公司，清洗去重后；原始 5013 条）
+### 数据源总览（4582 条 / 78 家公司，清洗去重后；原始 5013 条，标题过滤剔除 4 条非 AI 工程岗）
 
 | 数据源 | 平台 / 接口 | 技术方案 | 条数 | 部门/发布时间 |
 |---|---|---|---|---|
@@ -231,7 +231,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 ## 九、量化指标（简历用）
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4586 条 / 78 家**（原始 5013 条去重后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4582 条 / 78 家**（原始 5013 条 → 过短 7 条 + 非 AI 工程岗 4 条（标题过滤）+ 重复 420 条后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
 - 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 36.2%、Python 36.0%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 13.0%
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）

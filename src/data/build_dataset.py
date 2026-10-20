@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from . import load_kaggle, normalize, schema
+from . import job_filter, load_kaggle, normalize, schema
 
 CANON_COLS = ["job_id", "company", "title", "location", "salary",
               "experience", "education", "jd_text", "department", "publish_time"]
@@ -75,6 +75,20 @@ def build(config_path, out_dir=None) -> dict:
     before = len(df)
     df = df[df["jd_clean"].str.len() >= min_chars]
     stats["dropped_short"] = before - len(df)
+
+    # 岗位标题过滤：剔除土建/施工等与 AI 岗位无关的标题（只按标题判，不看正文）
+    tf = cleaning.get("title_filter") or {}
+    if tf.get("enabled", False):
+        exclude = tf.get("exclude_keywords") or None
+        keep = tf.get("keep_keywords") or None
+        mask = df["title"].map(lambda t: job_filter.is_offtopic_title(t, exclude, keep))
+        dropped_titles = df.loc[mask, "title"].astype(str).tolist()
+        df = df[~mask]
+        stats["dropped_offtopic"] = len(dropped_titles)
+        stats["offtopic_samples"] = dropped_titles[:10]
+    else:
+        stats["dropped_offtopic"] = 0
+        stats["offtopic_samples"] = []
 
     if cleaning.get("normalize_company", True):
         df["company_norm"] = df["company"].map(normalize.normalize_company)

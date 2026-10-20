@@ -10,10 +10,10 @@ def test_parse_email_phone():
 
 
 def test_parse_education_highest_degree():
-    p = parse_resume("硕士 本科 吉林大学 道路桥梁与渡河工程")
+    p = parse_resume("硕士 本科 吉林大学 土木工程")
     assert p.highest_degree == "硕士"
     assert "吉林大学" in p.schools
-    assert any("道路" in m for m in p.majors)
+    assert any("土木" in m for m in p.majors)
 
 
 def test_parse_work_years():
@@ -52,7 +52,7 @@ def test_llm_no_key_returns_none(monkeypatch):
 
 def test_parse_full_fallback_without_key(monkeypatch):
     monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
-    p = parse_resume_full("张三 13800138000 a@b.com 本科 吉林大学 道路桥梁与渡河工程")
+    p = parse_resume_full("张三 13800138000 a@b.com 本科 吉林大学 土木工程")
     # 正则兜底：基础字段仍能识别
     assert p.email == "a@b.com"
     assert p.phone == "13800138000"
@@ -93,7 +93,7 @@ def test_parse_full_uses_llm_skills_and_experiences(monkeypatch):
         "phone": "13800138000",
         "highest_degree": "硕士",
         "school": "吉林大学",
-        "major": "道路桥梁与渡河工程",
+        "major": "土木工程",
         "work_years": 3,
         "experiences": [
             {
@@ -108,7 +108,7 @@ def test_parse_full_uses_llm_skills_and_experiences(monkeypatch):
         "skills": ["Python", "PyTorch", "机器学习"],
     }
     monkeypatch.setattr("src.data.resume_parser.llm_parse_resume", lambda text: fake)
-    p = parse_resume_full("张三 硕士 吉林大学 道路桥梁与渡河工程")
+    p = parse_resume_full("张三 硕士 吉林大学 土木工程")
     assert p.name == "张三"
     assert p.work_years == "3"
     assert p.skills == ["Python", "PyTorch", "机器学习"]

@@ -1,7 +1,6 @@
-"""技能差距诊断：匹配度打分 + 缺失技能 + 优先级 + 学习建议 + 道桥迁移。"""
+"""技能差距诊断：匹配度打分 + 缺失技能 + 优先级 + 学习资源。"""
 from __future__ import annotations
 
-import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -20,7 +19,6 @@ class GapItem:
     priority: str          # P0 / P1 / P2
     priority_score: float
     why: str
-    transfer_hint: str = ""
     resources: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -42,71 +40,19 @@ class GapReport:
 
 
 class SkillGapAnalyzer:
-    def __init__(self, taxonomy: Taxonomy, transfer_map=None, resources=None,
+    def __init__(self, taxonomy: Taxonomy, resources=None,
                  matcher=None, must_weight: float = 2.0, nice_weight: float = 1.0):
         self.taxonomy = taxonomy
         self.must_weight = must_weight
         self.nice_weight = nice_weight
         self.matcher = matcher
-        self._transfer = self._index_transfer(transfer_map)
-        self._transfer_keywords = self._index_transfer_keywords(transfer_map)
         self._resources = self._index_resources(resources)
 
     # ---- 索引 ----
     @staticmethod
-    def _index_transfer(transfer_map) -> dict:
-        out = {}
-        for t in (transfer_map or {}).get("transfers", []):
-            hint = f"{t.get('rationale', '')} 建议：{t.get('action', '')}"
-            for sid in t.get("target_skills", []):
-                out[sid] = hint
-        return out
-
-    @staticmethod
     def _index_resources(resources) -> dict:
         return {r["skill_id"]: r.get("items", [])
                 for r in (resources or {}).get("resources", [])}
-
-    @staticmethod
-    def _index_transfer_keywords(transfer_map) -> list:
-        out = []
-        for t in (transfer_map or {}).get("transfers", []):
-            for kw in t.get("keywords", []):
-                out.append((str(kw).lower(), t))
-        out.sort(key=lambda x: -len(x[0]))
-        return out
-
-    @staticmethod
-    def _kw_in_text(kw: str, lower: str) -> bool:
-        """英文关键词用词边界，避免 'cad' 误匹配 'academy' 或 'autocad' 冗余。"""
-        if kw.isascii():
-            return re.search(r"(?<![a-zA-Z0-9])" + re.escape(kw) + r"(?![a-zA-Z0-9])", lower) is not None
-        return kw in lower
-
-    def detect_background(self, text: str) -> list[dict]:
-        """识别简历中的道桥背景技能，返回 AI 迁移建议列表。"""
-        lower = (text or "").lower()
-        matched: dict = {}
-        for kw, entry in self._transfer_keywords:
-            if self._kw_in_text(kw, lower):
-                m = matched.setdefault(entry["id"], {"entry": entry, "keywords": []})
-                if kw not in m["keywords"]:
-                    m["keywords"].append(kw)
-        result = []
-        for m in matched.values():
-            e = m["entry"]
-            targets = [
-                (self.taxonomy.by_id(sid).name if self.taxonomy.by_id(sid) else sid)
-                for sid in e.get("target_skills", [])
-            ]
-            result.append({
-                "source_skill": e.get("source_skill", ""),
-                "keywords": m["keywords"],
-                "targets": targets,
-                "rationale": e.get("rationale", ""),
-                "action": e.get("action", ""),
-            })
-        return result
 
     # ---- 用户技能 -> 词表 ----
     def resolve_user_skill(self, text: str):
@@ -162,7 +108,6 @@ class SkillGapAnalyzer:
                 difficulty=sk.difficulty if sk else 3,
                 importance=sk.importance if sk else 3,
                 priority=prio, priority_score=pscore, why=why,
-                transfer_hint=self._transfer.get(s["skill_id"], ""),
                 resources=self._resources.get(s["skill_id"], []),
             ))
         _prio_order = {"P0": 0, "P1": 1, "P2": 2}
@@ -208,12 +153,11 @@ def _demo() -> int:
 
     root = Path(__file__).resolve().parents[2]
     taxonomy = Taxonomy(str(root / "data" / "kb" / "skill_taxonomy.yaml"))
-    transfer = yaml.safe_load((root / "data" / "kb" / "transfer_map.yaml").read_text(encoding="utf-8"))
     resources = yaml.safe_load((root / "data" / "kb" / "learning_resources.yaml").read_text(encoding="utf-8"))
     matcher = TfidfMatcher().fit([s.name for s in taxonomy.all_skills()])
-    analyzer = SkillGapAnalyzer(taxonomy, transfer_map=transfer, resources=resources, matcher=matcher)
+    analyzer = SkillGapAnalyzer(taxonomy, resources=resources, matcher=matcher)
 
-    user_skills = ["Python", "Pandas", "桥梁结构有限元分析", "AutoCAD"]
+    user_skills = ["Python", "Pandas", "数据结构", "Linux"]
     jd_skills = [
         {"skill_id": "PROG.PYTHON", "name": "Python", "is_must": True},
         {"skill_id": "FRAMEWORK.PYTORCH", "name": "PyTorch", "is_must": True},
@@ -229,8 +173,6 @@ def _demo() -> int:
     print(f"匹配度 {rep.match_score}%  命中 {rep.matched_total}  缺失 {rep.missing_total}")
     for m in rep.missing:
         print(f"  [{m.priority}] {m.name:<12} score={m.priority_score}  {m.why}")
-        if m.transfer_hint:
-            print(f"        道桥迁移: {m.transfer_hint}")
         for r in m.resources[:2]:
             print(f"        资源: {r.get('title')}  {r.get('url')}")
     return 0

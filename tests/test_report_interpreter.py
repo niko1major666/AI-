@@ -6,10 +6,10 @@ def _make_report() -> GapReport:
     missing = [
         GapItem(skill_id="ML.TRANSFORMER", name="Transformer", category="机器学习",
                 is_must=True, difficulty=4, importance=5, priority="P0",
-                priority_score=90.0, why="硬性要求", transfer_hint="有限元同构", resources=[]),
+                priority_score=90.0, why="硬性要求", resources=[]),
         GapItem(skill_id="AITECH.RAG", name="RAG", category="AI技术",
                 is_must=False, difficulty=2, importance=4, priority="P1",
-                priority_score=50.0, why="高频需求", transfer_hint="", resources=[]),
+                priority_score=50.0, why="高频需求", resources=[]),
     ]
     return GapReport(match_score=40.0, matched_skill_ids=["PROG.PYTHON"],
                      matched_total=1, missing_total=2, missing=missing)

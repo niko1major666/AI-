@@ -80,9 +80,8 @@ def load_core():
     taxonomy = Taxonomy(str(ROOT / "data" / "kb" / "skill_taxonomy.yaml"))
     rule = RuleBaselineExtractor(taxonomy)
     matcher = TfidfMatcher().fit([s.name for s in taxonomy.all_skills()])
-    transfer = yaml.safe_load((ROOT / "data" / "kb" / "transfer_map.yaml").read_text(encoding="utf-8"))
     resources = yaml.safe_load((ROOT / "data" / "kb" / "learning_resources.yaml").read_text(encoding="utf-8"))
-    analyzer = SkillGapAnalyzer(taxonomy, transfer_map=transfer, resources=resources, matcher=matcher)
+    analyzer = SkillGapAnalyzer(taxonomy, resources=resources, matcher=matcher)
     return taxonomy, rule, analyzer
 
 
@@ -304,18 +303,7 @@ def page_resume(taxonomy, rule, analyzer):
             for cat, items in sorted(by_cat.items()):
                 st.markdown(f"**{cat}**：{'、'.join(items)}")
         else:
-            st.info("未识别到编程/算法类技能（道桥等工科背景通常如此，很正常）")
-
-        st.subheader("道桥背景 → AI 技能迁移建议")
-        bg = analyzer.detect_background(text)
-        if bg:
-            for b in bg:
-                with st.expander(f"{b['source_skill']}  →  {'、'.join(b['targets'])}"):
-                    st.caption(f"匹配关键词：{'、'.join(b['keywords'])}")
-                    st.write(b["rationale"])
-                    st.write("行动建议：" + b["action"])
-        else:
-            st.caption("未匹配到道桥背景关键词")
+            st.info("未识别到编程/算法类技能，可在简历中补充具体的项目与技术栈")
 
         st.subheader("🎯 ATS 改进建议")
         tips = ats_suggestions(profile, text, [s.skill_text for s in spans])
@@ -415,8 +403,6 @@ def page_gap(taxonomy, analyzer, rows):
                 st.markdown(_priority_badge(m.priority) + f" **{m.name}**", unsafe_allow_html=True)
                 st.write(m.why)
                 st.caption(f"行业重要度：{_stars(m.importance, 5)}（5 为最核心） ｜ 学习难度：{_stars(m.difficulty, 4)}（4 为最难）")
-                if m.transfer_hint:
-                    st.info("道桥迁移：" + m.transfer_hint)
                 for r in m.resources:
                     st.markdown(f"- [{r.get('title')}]({r.get('url')})")
 

@@ -19,7 +19,7 @@ src/
 ├── crawler/     tencent / bytedance / xiaomi / xiaomi_campus / deepseek / huawei /
 │                huawei_51job / kimi / minimax / util
 └── app/         app.py（Streamlit 三页面）
-data/kb/         skill_taxonomy.yaml / transfer_map.yaml / learning_resources.yaml
+data/kb/         skill_taxonomy.yaml / learning_resources.yaml
 data/gold/       评测金标准（F1 / Recall@5 / resume_sentence）
 data/processed/  jobs.jsonl（清洗后入库，云端部署直接读，无需重爬）
 scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_match / 等
@@ -42,7 +42,7 @@ scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_matc
 
 ## 组件关系
 - `Taxonomy`（skillkb/loader）是核心词表，被 extractor / matcher / gap_analyzer / app 共享
-- `SkillGapAnalyzer` 聚合 taxonomy + transfer_map + resources + matcher，产出 GapReport
+- `SkillGapAnalyzer` 聚合 taxonomy + resources + matcher，产出 GapReport
 - `app.py` 的 load_core() 一次性加载 taxonomy/rule/analyzer（@st.cache_resource）
 
 ## 爬虫模式（关键实现路径）

@@ -12,7 +12,7 @@ from src.matcher.gap_analyzer import GapReport
 _DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 _DEEPSEEK_MODEL = "deepseek-chat"
 
-_SYSTEM = "你是资深 AI 岗位求职导师，擅长为非科班转行者（尤其传统工科背景）制定可落地的学习计划。"
+_SYSTEM = "你是资深 AI 岗位求职导师，擅长为转行与非科班背景的求职者制定可落地的学习计划。"
 
 _PROMPT = """根据下面的技能差距分析结果，输出一份「报告解读 + 分阶段学习计划」。
 
@@ -37,12 +37,12 @@ _PROMPT = """根据下面的技能差距分析结果，输出一份「报告解�
   "plan": [
     {{"phase": "阶段名（如 第1-2周）", "goal": "阶段目标", "skills": ["技能1", "技能2"], "actions": ["具体行动1", "具体行动2"]}}
   ],
-  "tips": "一条额外建议（结合道桥工程背景的迁移优势，可空）"
+  "tips": "一条额外建议（可结合用户已有技能给出迁移思路，可空）"
 }}
 
 要求：
 - 学习计划分 2~4 个阶段，由易到难；优先补齐 P0（硬门槛），再 P1（高频），后 P2（加分项）。
-- 结合「行业重要度」和「学习难度」排序；充分利用用户已有的道桥工程背景做迁移。"""
+- 结合「行业重要度」和「学习难度」排序；如用户已有相关技能，可给出可迁移的切入路径。"""
 
 
 def _get_api_key() -> str:
@@ -75,8 +75,6 @@ def _missing_lines(report: GapReport) -> str:
     lines = []
     for m in report.missing[:15]:
         line = f"- {m.name}（{m.priority}，重要度 {m.importance}/5，难度 {m.difficulty}/4）：{m.why}"
-        if m.transfer_hint:
-            line += f"；道桥迁移：{m.transfer_hint}"
         lines.append(line)
     return "\n".join(lines) or "（无）"
 
@@ -102,8 +100,6 @@ def _fallback(report: GapReport, job: str) -> dict:
             act = f"学习 {m.name}"
             if m.resources:
                 act += f"（参考 {m.resources[0].get('title', '')}）"
-            if m.transfer_hint:
-                act += f"，结合道桥背景：{m.transfer_hint}"
             actions.append(act)
         plan.append({
             "phase": phase,
@@ -111,7 +107,7 @@ def _fallback(report: GapReport, job: str) -> dict:
             "skills": skills,
             "actions": actions,
         })
-    tips = "建议优先从与道桥工程最接近的领域（数值计算、数据分析、信号处理）切入，降低转行门槛。"
+    tips = "建议按 P0→P1→P2 的顺序推进，每补齐一项技能都配一个可展示的小项目，便于在简历与面试中验证。"
     return {"overview": overview, "plan": plan, "tips": tips}
 
 

@@ -7,17 +7,17 @@
 
 > 🚀 **在线体验（Streamlit Cloud）**：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 
-面向**非科班（尤其传统工科）求职者**的个人项目：分析目标 AI 岗位所需技能，与自身简历对比，
+面向**非科班与转行求职者**的个人项目：分析目标 AI 岗位所需技能，与自身简历对比，
 输出技能差距报告与学习优先级。体现 **NLP 信息抽取 + 语义匹配 + 工程落地** 能力。
 
-> 作者背景：吉林大学 道路桥梁与渡河工程 大四，投递 AI+ 岗位。本项目内置「道桥背景 → AI 技能」迁移映射，作为差异化亮点。
+> 作者背景：非科班大四学生，转投 AI+ 岗位。系统不预设用户的具体专业背景，任何专业均可直接使用。
 
 ## 一、功能
 
 1. 采集 AI 岗位 JD（Kaggle / 爬虫 / 本地 CSV，以华为等公司优先）
 2. 从 JD 抽取细粒度技能实体（`分布式训练`、`向量数据库`、`Transformer` 等专有技能）
 3. 用户输入简历文本/技能列表，与 JD 技能做语义匹配
-4. 输出匹配度打分 + 逐项对比 + 差距报告（缺失技能/优先级/学习资源 + 道桥迁移建议）
+4. 输出匹配度打分 + 逐项对比 + 差距报告（缺失技能/优先级/学习资源）
 5. Streamlit 三页面：技能图谱 / 简历匹配 / 差距报告
 
 ## 二、技术选型
@@ -54,7 +54,7 @@ ai-skill-gap/
 │   ├── raw/            原始 JD（seed 样例 sample_jobs.csv 已入库）
 │   ├── processed/      清洗后结构化数据（jobs.jsonl / 统计）
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
-│   └── kb/             skill_taxonomy(147技能·难度+重要度[需求频率驱动]) / transfer_map(道桥迁移) / learning_resources
+│   └── kb/             skill_taxonomy(147技能·难度+重要度[需求频率驱动]) / learning_resources
 ├── src/
 │   ├── data/           schema / normalize / load / build（★ 第一步已实现并测试）
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
@@ -84,7 +84,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 # 4) 技能抽取 demo（词表规则基线 + SiameseUIE 零样本）
 .\.venv\Scripts\python.exe -m src.extractor.siamese_uie --demo
 
-# 5) 差距诊断 demo（匹配度 + 缺失技能 + 道桥迁移 + 学习资源）
+# 5) 差距诊断 demo（匹配度 + 缺失技能 + 学习资源）
 .\.venv\Scripts\python.exe -m src.matcher.gap_analyzer
 
 # 6) 前端（技能图谱 / 简历匹配 / 差距报告）

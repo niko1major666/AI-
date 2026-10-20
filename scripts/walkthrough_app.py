@@ -20,7 +20,7 @@ print("  header:", [h.value for h in at.header])
 at.sidebar.radio[0].set_value("简历匹配")
 at.run()
 print("\n===== 页面2：简历匹配 =====")
-at.text_area[0].set_value("熟悉 Python、Pandas、NumPy；做过桥梁健康监测数据分析；会用 CAD、BIM")
+at.text_area[0].set_value("熟悉 Python、Pandas、NumPy；做过日志数据分析项目；了解 Linux 与 Git")
 at.button[0].click()
 at.run()
 for md in at.markdown:

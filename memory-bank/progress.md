@@ -7,7 +7,7 @@
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源 + 道桥迁移
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
-- ✅ 工程：66 测试全通过、Docker、报告导出 Word、README + 项目报告
+- ✅ 工程：81 测试全通过（含保活脚本纯函数测试）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
@@ -16,6 +16,7 @@
 - ✅ DeepSeek 详情：33 条从列表升级为完整 JD（平均 1267 字）
 - ✅ BERT-NER 旧模型恢复：restore_ner.py 从 bert-base-chinese 重训 30 条人工标注，exact 0.545→0.636
 - ✅ 简历解析优化：工作经历细粒度（职责/量化成果/技术栈）、work_years 正则 bug 修复、LLM skills 补充技能抽取、ATS 建议增强（姓名/经历完整性/量化）
+- ✅ 云端保活：GitHub Actions 每 6 小时探测（HTTP health + Playwright 真实唤醒），本地 `scripts/keepalive_app.py`，交互式 `scripts/keepalive.sh`，`.gitattributes` 保证 `.sh` 用 LF
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -23,7 +24,7 @@
 | 数据规模 | 3302 条 / 77 家公司 |
 | 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子） |
-| 测试 | 74 用例 |
+| 测试 | 81 用例 |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）
@@ -33,8 +34,9 @@
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
-- git 工作区干净（HEAD ed521c9），main 与远程一致，tag v1.1.0 已发布（Release v1.1.0）
-- CI 绿：GitHub Actions 74 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- git 工作区干净（HEAD 6275aa0），main 与远程一致，tag v1.1.0 已发布（Release v1.1.0）
+- CI 绿：GitHub Actions 81 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- 保活：`.github/workflows/keep-streamlit-alive.yml` 每 6 小时探测（cron `0 */6 * * *`），失败自动转 Playwright 唤醒
 
 ## 已知问题（诚实标注）
 1. BERT-NER 弱标注无法替代人工标注（已恢复旧模型 exact 0.636，弱标注版 0.545 已弃用）

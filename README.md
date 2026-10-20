@@ -222,6 +222,9 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 # 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
 .\.venv\Scripts\python.exe -m src.data.build_dataset --stats
+
+# 语料变化后重算 147 技能重要度（JD 需求占比分档 → importance 1~5）
+.\.venv\Scripts\python.exe scripts/recalc_importance.py
 ```
 
 > 合规：仅抓取官网公开岗位，请求带限速；数据仅供个人学习研究。
@@ -229,6 +232,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 ## 九、量化指标（简历用）
 
 - 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4586 条 / 78 家**（原始 5013 条去重后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
+- 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 36.2%、Python 36.0%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 13.0%
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）

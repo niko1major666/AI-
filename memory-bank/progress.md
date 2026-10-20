@@ -18,6 +18,7 @@
 - ✅ 简历解析优化：工作经历细粒度（职责/量化成果/技术栈）、work_years 正则 bug 修复、LLM skills 补充技能抽取、ATS 建议增强（姓名/经历完整性/量化）
 - ✅ 云端保活：GitHub Actions 每 6 小时探测（HTTP health + Playwright 真实唤醒），本地 `scripts/keepalive_app.py`，交互式 `scripts/keepalive.sh`，`.gitattributes` 保证 `.sh` 用 LF
 - ✅ 小红书爬虫：`pageQueryPosition` 直连（无需签名）社招 864 + 校招 508，清洗后 1284 条完整 JD（含 jobType / publishTime），数据 3302→4586 条 / 78 家
+- ✅ 技能重要度重算（4586 条语料）：147 技能中 9 升 / 34 降 / 104 不变；新分布 1:73、2:22、3:29、4:12、5:11；Top 大模型 36.2%、Python 36.0%、智能体 22.3%；同步更新 `test_skillkb` / `test_gap_analyzer` 分档断言
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -45,6 +46,7 @@
 3. 阿里招聘分散在业务集团、智谱招聘渠道未公开，尚未打通
 4. DeepSeek（公司）详情接口 necromancer 加密未逆向，只抓列表
 5. importance 频率≠价值（如「数据标注」高频低门槛），已用难度加权修正
+6. `ENGINEERING.UNITTEST` 的 aliases 含泛化词「测试」→ 11.4% 命中（importance 5），高于真实水平；收紧别名会改变规则基线 F1，故暂未改动，仅记录为口径噪声
 
 ## 决策演进（关键）
 1. SiameseUIE 零样本对抽象技能 F1=0 → 弃用，保留「规则基线 + BERT-NER」双路

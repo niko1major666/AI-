@@ -77,9 +77,9 @@ def test_importance_weighted_priority():
     rep = analyzer.analyze([], jd, demand=demand)
     by_id = {m.skill_id: m for m in rep.missing}
 
-    # 每个缺失项都带 importance 字段
+    # 每个缺失项都带 importance 字段（数据驱动：SCALA 占比 <1% → 1）
     assert by_id["AITECH.LLM"].importance == 5
-    assert by_id["PROG.SCALA"].importance == 2
+    assert by_id["PROG.SCALA"].importance == 1
     # 同样需求占比下，重要度高的技能优先级分更高
     assert by_id["AITECH.LLM"].priority_score > by_id["PROG.SCALA"].priority_score
 

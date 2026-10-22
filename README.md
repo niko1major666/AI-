@@ -134,8 +134,13 @@ docker compose up --build -d   # 构建并启动，访问 http://localhost:8501
 
 Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sleep），下次访问需等待冷启动。本仓库内置保活方案：
 
-- **GitHub Actions 定时探测**：`.github/workflows/keep-streamlit-alive.yml`，每 6 小时运行一次。
-  先用 HTTP 探测（主页 + `/~/+/_stcore/health`）判断是否在线，失败时自动启动无头浏览器真实访问（建立 websocket）完成唤醒。
+- **GitHub Actions 定时探测**：`.github/workflows/keep-streamlit-alive.yml`，每 6 小时运行一次（cron `17 */6 * * *`，避开整点高峰）。
+  先用 HTTP 探测 `https://<app>.streamlit.app/~/+/_stcore/health`：返回 **200 + 纯文本 `ok`** 视为就绪；休眠时该端点返回 **400 空 body**。
+  随后用 Playwright 真实打开页面建立 websocket 会话（重置闲置计时）；若落在休眠页则点「Yes, get this app back up!」并**轮询 health 直到重新返回 ok**（冷启动实测 2~5 分钟，期间页面可能整页白屏）。
+
+  > 注意：主页在「醒着」和「休眠」时返回的是同一份前端 HTML 壳（约 9.7 KB），`gone to sleep` 文案由 JS 渲染，
+  > 所以不能用 HTTP 返回的 HTML 判断状态，也不能用「页面文本长度 > N」当作唤醒完成的信号（休眠页本身就有近 200 字）。
+
 - **本地手动保活**：
 
   ```powershell

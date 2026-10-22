@@ -2,14 +2,21 @@ name: Keep Streamlit Apps Alive
 
 on:
   schedule:
-    # 每 6 小时（UTC）探测一次，避免 Streamlit Community Cloud 因闲置休眠
-    - cron: '0 */6 * * *'
+    # 每 6 小时一次；避开整点（GitHub schedule 在 :00 容易被延迟/丢弃）
+    - cron: '17 */6 * * *'
 
   workflow_dispatch:
 
+# 避免定时任务与手动触发同时唤醒同一个实例
+concurrency:
+  group: keep-streamlit-alive
+  cancel-in-progress: false
+
 jobs:
-  ping-apps:
+  keep-alive:
     runs-on: ubuntu-latest
+    # 冷启动实测约 2~5 分钟，加上装依赖，留足余量
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -20,21 +27,20 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install requests
-        run: pip install requests
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-chromium
 
-      - name: Probe app (HTTP)
-        id: probe
-        continue-on-error: true
-        env:
-          STREAMLIT_APP_URL: https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
-        run: python scripts/keepalive_app.py --timeout 60
-
-      - name: Wake app with headless browser
-        if: steps.probe.outcome != 'success'
-        env:
-          STREAMLIT_APP_URL: https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+      - name: Install dependencies
         run: |
-          pip install playwright
+          pip install requests playwright
           python -m playwright install --with-deps chromium
-          python scripts/keepalive_app.py --browser --timeout 90 --retries 2
+
+      # 脚本内部：health 探测（/~/+/_stcore/health 返回 ok 即就绪）
+      # → 用真实浏览器建立 websocket 会话 → 若在休眠页则点按钮并轮询 health 直到就绪
+      - name: Keep app awake
+        env:
+          STREAMLIT_APP_URL: https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+        run: python scripts/keepalive_app.py --timeout 300 --retries 2

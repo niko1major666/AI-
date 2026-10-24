@@ -35,6 +35,7 @@
 23. 新增 Kimi（Moka）+ MiniMax（飞书）爬虫
 24. 差距报告增加重要度/难度/优先补充建议，卡片式 UI
 25. 岗位下拉显示部门+发布时间、多关键词模糊搜索、技能图谱公司筛选
+26. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
 1. 观察 keep-alive 定时任务（Actions 页面确认每 6 小时跑通，必要时用 `workflow_dispatch` 手动触发）

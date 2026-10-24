@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from dataclasses import asdict, dataclass, field
 
 import requests
@@ -135,29 +136,37 @@ def _get_api_key() -> str:
 
 
 def llm_parse_resume(text: str) -> dict | None:
-    """用 DeepSeek LLM 增强解析（姓名/工作经历等正则难做的字段）。无 key/失败返回 None。"""
+    """用 DeepSeek LLM 增强解析（姓名/工作经历等正则难做的字段）。无 key/失败返回 None。
+
+    超时从 90s 收紧到 25s 并重试一次：原值在网络抖动时会把页面卡住一分半，
+    而解析失败已有正则兜底，宁可快速降级。
+    """
     api_key = _get_api_key()
     if not api_key:
         return None
-    try:
-        resp = requests.post(
-            _DEEPSEEK_URL,
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={
-                "model": _DEEPSEEK_MODEL,
-                "messages": [{"role": "user", "content": _LLM_PROMPT.format(text=text[:6000])}],
-                "response_format": {"type": "json_object"},
-                "temperature": 0,
-                "max_tokens": 1500,
-            },
-            timeout=90,
-        )
-        resp.raise_for_status()
-        content = resp.json()["choices"][0]["message"]["content"].strip()
-        content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content, flags=re.M)
-        return json.loads(content)
-    except Exception:  # noqa: BLE001
-        return None
+    payload = {
+        "model": _DEEPSEEK_MODEL,
+        "messages": [{"role": "user", "content": _LLM_PROMPT.format(text=text[:6000])}],
+        "response_format": {"type": "json_object"},
+        "temperature": 0,
+        "max_tokens": 1500,
+    }
+    for attempt in range(2):
+        try:
+            resp = requests.post(
+                _DEEPSEEK_URL,
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json=payload,
+                timeout=25,
+            )
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"].strip()
+            content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content, flags=re.M)
+            return json.loads(content)
+        except Exception:  # noqa: BLE001
+            if attempt == 0:
+                time.sleep(0.6)
+    return None
 
 
 def _normalize_experiences(exps: list) -> list:

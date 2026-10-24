@@ -18,7 +18,8 @@
 2. 从 JD 抽取细粒度技能实体（`分布式训练`、`向量数据库`、`Transformer` 等专有技能）
 3. 用户输入简历文本/技能列表，与 JD 技能做语义匹配（简历解析出的专业与技能自动带入差距报告）
 4. 输出匹配度打分 + 逐项对比 + 差距报告（缺失技能/优先级/学习资源）；AI 解读会结合简历解析出的专业给出迁移建议（未识别到专业则不展示）
-5. Streamlit 三页面：技能图谱 / 简历匹配 / 差距报告
+5. must/nice 判定读 JD 原文（句内触发词 → 章节标题 → 全行业占比兜底），再按「岗位内提及次数」加权，避免把加分项当硬门槛；零技能岗位用同公司相似岗位兜底并标注来源
+6. Streamlit 三页面：技能图谱 / 简历匹配 / 差距报告
 
 ## 二、技术选型
 
@@ -58,11 +59,11 @@ ai-skill-gap/
 ├── src/
 │   ├── data/           schema / normalize / job_filter(★标题过滤) / load / build_dataset
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
-│   ├── matcher/        TF-IDF / BGE / gap 分析
+│   ├── matcher/        TF-IDF / BGE / gap 分析 / jd_requirements(must 判定) / job_neighbors(零技能代理)
 │   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（91 用例已通过）
+├── tests/              pytest（122 用例已通过）
 ├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -180,6 +181,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W3 | BERT-NER 替换，F1 对比 | ✅ 微调 bert-base-chinese，F1 0.636(exact)/0.909(overlap) vs SiameseUIE 0.000 |
 | W4 | BGE 匹配，Recall@5 对比 | ✅ BGE vs TF-IDF：Recall@5 均 0.975，MRR/Hit@1 BGE 更优 |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
+| W7 | 迭代 1：must/nice 判定重构 + 零技能兜底 + 强调度加权 + 简历解析缓存 | ✅ 122 测试通过；57.0% 岗位有硬性要求（修复前 0%），零技能岗位 98.7% 可代理 |
 
 ## 八、数据采集与爬虫
 
@@ -239,6 +241,9 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 - 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4582 条 / 78 家**（原始 5013 条 → 过短 7 条 + 非 AI 工程岗 4 条（标题过滤）+ 重复 420 条后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
 - 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 36.2%、Python 36.0%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 13.0%
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
+- 需求强度判定（`src/matcher/jd_requirements.py`，4582 条语料实测）：**57.0% 的岗位能识别出 ≥1 项硬性要求（平均 1.48 项/岗）**；来源分布 句内触发词 4773 / 章节归属 179 / 全行业占比兜底 1831。修复前用「全语料需求占比 ≥ 40%」判定，因最高占比仅 36.2%，P0 分组恒为空
+- 零技能岗位兜底（`src/matcher/job_neighbors.py`）：**98.7% 的零技能岗位（1085 条）可用同公司相似岗位代理**，代理技能中位数 4 项；页面会标注推断来源，不再出现「匹配度 0% 却说已覆盖全部技能」
+- 岗位内强调度：45.2% 的岗位存在被重复提及（tf ≥ 2）的技能，权重按 `base × (1 + ln tf)` 计入匹配度
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
 

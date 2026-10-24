@@ -1,5 +1,7 @@
+import math
 from pathlib import Path
 
+import pytest
 import yaml
 
 from src.matcher.gap_analyzer import SkillGapAnalyzer
@@ -88,3 +90,28 @@ def test_priority_order_p0_first():
     # P0（硬性缺失）恒排在缺失清单最前，即使需求占比低
     assert rep.missing[0].priority == "P0"
     assert rep.missing[0].skill_id == "AITECH.LLM"
+
+
+def test_tf_emphasis_increases_weight():
+    """JD 内多次提及的技能权重更高（1 + ln tf），命中/缺失都按强调度计分。"""
+    analyzer = SkillGapAnalyzer(_tax())
+    jd = [
+        {"skill_id": "PROG.PYTHON", "name": "Python", "is_must": True, "tf": 1},
+        {"skill_id": "FRAMEWORK.PYTORCH", "name": "PyTorch", "is_must": True, "tf": 5},
+    ]
+    rep = analyzer.analyze(["Python"], jd)
+    # Python 权重 2.0（must）；PyTorch 权重 2.0 × (1 + ln5) = 5.219 → 2 / 7.219
+    assert analyzer.weight({"is_must": True, "tf": 5}) == pytest.approx(2.0 * (1 + math.log(5)))
+    assert rep.match_score == 27.7
+
+
+def test_must_evidence_appears_in_reason():
+    analyzer = SkillGapAnalyzer(_tax())
+    jd = [{
+        "skill_id": "PROG.PYTHON", "name": "Python", "is_must": True,
+        "must_evidence": "句内含「必须」", "tf": 1,
+    }]
+    rep = analyzer.analyze([], jd, demand={"PROG.PYTHON": 0.2})
+    assert rep.missing[0].priority == "P0"
+    assert "必须" in rep.missing[0].why
+

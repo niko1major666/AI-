@@ -1,6 +1,7 @@
 """技能差距诊断：匹配度打分 + 缺失技能 + 优先级 + 学习资源。"""
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -78,16 +79,29 @@ class SkillGapAnalyzer:
         return matched
 
     # ---- 主分析 ----
+    def weight(self, skill: dict, use_tf: bool = True) -> float:
+        """技能权重：must/nice 基础权重 × JD 内强调度（1 + ln tf）。
+
+        tf > 1 表示该技能在本岗位 JD 中被多次提及（岗位自己更看重它），
+        没有 tf 信息时（旧调用方/纯集合场景）退化为 1.0，保持历史行为不变。
+        """
+        base = self.must_weight if skill.get("is_must") else self.nice_weight
+        if not use_tf:
+            return base
+        tf = float(skill.get("tf", 1) or 1)
+        return base * (1.0 + math.log(max(tf, 1.0)))
+
     def analyze(self, user_skills: list[str], jd_skills: list[dict],
-                demand: Optional[dict] = None) -> GapReport:
-        """jd_skills: [{'skill_id','name','is_must'}]；demand: {skill_id: 需求占比}。"""
+                demand: Optional[dict] = None, use_tf: bool = True) -> GapReport:
+        """jd_skills: [{'skill_id','name','is_must','tf','must_evidence'}]；
+        demand: {skill_id: 需求占比}，用于优先级与兜底说明。"""
         matched = self.match_user_skills(user_skills)
         matched_ids = set(matched)
 
         total_w = 0.0
         got_w = 0.0
         for s in jd_skills:
-            w = self.must_weight if s.get("is_must") else self.nice_weight
+            w = self.weight(s, use_tf=use_tf)
             total_w += w
             if s["skill_id"] in matched_ids:
                 got_w += w
@@ -140,7 +154,9 @@ class SkillGapAnalyzer:
         else:
             prio = "P2"
         if s.get("is_must"):
-            why = f"硬性要求，需求占比 {ratio:.0%}"
+            ev = str(s.get("must_evidence") or "").strip()
+            why = (f"硬性要求（{ev}），需求占比 {ratio:.0%}" if ev
+                   else f"硬性要求，需求占比 {ratio:.0%}")
         elif ratio >= 0.3:
             why = f"高频需求（占比 {ratio:.0%}），多数岗位需要"
         else:

@@ -16,6 +16,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.data.translate import translate_title as _translate_title
+from src.matcher.jd_requirements import judge_requirements
+from src.matcher.job_neighbors import proxy_skills
 
 st.set_page_config(page_title="AI 岗位技能差距分析", layout="wide")
 
@@ -95,16 +97,31 @@ def load_jobs():
 
 @st.cache_data
 def extract_corpus():
+    """全语料抽取：技能集合 + JD 内强调度(tf) + must/nice 判定（结果缓存，冷启动只算一次）。
+
+    判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.2%，恒为 False，
+    导致 P0 分组永远为空。改为按 JD 文本判定，见 src/matcher/jd_requirements.py。
+    """
     taxonomy, rule, _ = load_core()
-    rows = []
+    rows, texts = [], []
     for j in load_jobs():
-        spans = rule.extract_spans(j["job_id"], j.get("jd_clean") or j.get("jd_text", ""))
+        text = j.get("jd_clean") or j.get("jd_text", "")
+        spans, counts = rule.extract(j["job_id"], text)
         rows.append({
             "job_id": j["job_id"], "title": j.get("title", ""),
             "company": j.get("company", ""), "location": j.get("location", ""),
             "department": j.get("department", ""), "publish_time": j.get("publish_time", ""),
             "skills": [s.skill_id for s in spans],
+            "skill_tf": counts,
+            "_spans": [(s.skill_id, s.start) for s in spans],
         })
+        texts.append(text)
+    demand = compute_demand(rows)
+    for r, text in zip(rows, texts):
+        judged = judge_requirements(text, r.pop("_spans"), demand)
+        r["must_skills"] = sorted(sid for sid, info in judged.items() if info["is_must"])
+        r["must_evidence"] = {sid: info["evidence"] for sid, info in judged.items()
+                              if info["is_must"] and info["evidence"]}
     return rows
 
 
@@ -166,6 +183,41 @@ def _job_label(r):
     return " · ".join([p for p in parts if p])
 
 
+def _build_jd_skills(taxonomy, target, demand):
+    """把岗位技能转成分析器输入：must 判定（JD 文本驱动）+ 岗位内强调度 tf + 判定依据。"""
+    must_ids = set(target.get("must_skills") or [])
+    evidence = target.get("must_evidence") or {}
+    tf = target.get("skill_tf") or {}
+    out = []
+    for sid in sorted(set(target.get("skills") or [])):
+        sk = taxonomy.by_id(sid)
+        out.append({
+            "skill_id": sid,
+            "name": sk.name if sk else sid,
+            "is_must": sid in must_ids,
+            "must_evidence": evidence.get(sid, ""),
+            "tf": int(tf.get(sid, 1) or 1),
+        })
+    return out
+
+
+def _proxy_jd_skills(taxonomy, target, rows, demand):
+    """零技能岗位兜底：用同公司相似岗位的技能集推断（无数据驱动 must 证据）。"""
+    ids, sources = proxy_skills(rows, target)
+    out = []
+    for sid in ids:
+        sk = taxonomy.by_id(sid)
+        ratio = float(demand.get(sid, 0.0) or 0.0)
+        out.append({
+            "skill_id": sid,
+            "name": sk.name if sk else sid,
+            "is_must": ratio >= 0.3,
+            "must_evidence": f"相似岗位高频（{ratio:.0%}）" if ratio >= 0.3 else "",
+            "tf": 1,
+        })
+    return out, sources
+
+
 def page_graph(taxonomy, rows):
     st.header("技能图谱")
     if not rows:
@@ -223,6 +275,13 @@ def _cooccurrence_html(taxonomy, rows):
     for a, b in edges:
         net.add_edge(a, b)
     return net.generate_html()
+@st.cache_data(show_spinner=False, max_entries=32)
+def _resume_profile(text: str):
+    """简历结构化解析缓存：同一份简历在后续 rerun 中不再重复调 LLM（原先每次 rerun 都调）。"""
+    from src.data.resume_parser import parse_resume_full
+    return parse_resume_full(text)
+
+
 def page_resume(taxonomy, rule, analyzer):
     st.header("简历匹配")
     uploaded = st.file_uploader("上传简历附件（支持 PDF / DOCX / TXT）",
@@ -241,9 +300,9 @@ def page_resume(taxonomy, rule, analyzer):
     with st.expander("查看解析出的文本", expanded=False):
         st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
 
-    # 结构化解析（正则 + DeepSeek LLM 增强，无 key 自动降级正则）
-    from src.data.resume_parser import ats_suggestions, parse_resume_full
-    profile = parse_resume_full(text)
+    # 结构化解析（正则 + DeepSeek LLM 增强，无 key 自动降级正则）；结果按简历文本缓存
+    from src.data.resume_parser import ats_suggestions
+    profile = _resume_profile(text)
     # 与「差距报告」联动：把解析出的专业写入会话，报告页据此生成专业相关建议
     st.session_state["user_majors"] = list(profile.majors or [])
 
@@ -346,11 +405,16 @@ def page_gap(taxonomy, analyzer, rows):
     label = st.selectbox("📋 选择岗位", list(options))
     target = options[label]
 
-    jd_skills = []
-    for sid in sorted(set(target["skills"])):
-        sk = taxonomy.by_id(sid)
-        jd_skills.append({"skill_id": sid, "name": sk.name if sk else sid,
-                          "is_must": demand.get(sid, 0) >= 0.4})
+    jd_skills = _build_jd_skills(taxonomy, target, demand)
+    if not jd_skills:
+        # 零技能岗位（列表式短 JD，全语料 23.7%）：用同公司相似岗位兜底，并明确标注来源
+        jd_skills, sources = _proxy_jd_skills(taxonomy, target, rows, demand)
+        if sources:
+            listed = "、".join(sources[:3]) + ("…" if len(sources) > 3 else "")
+            st.info(f"该岗位 JD 未抽取出技能要求（列表式短描述），已用同公司 {len(sources)} 个相似岗位推断：{listed}")
+    if not jd_skills:
+        st.error("该岗位既未抽取出技能要求，也没有可用的相似岗位，无法生成有意义的差距报告，请换一个岗位。")
+        return
 
     user_skills = st.session_state.get("user_skills", [])
     user_majors = st.session_state.get("user_majors", [])
@@ -364,12 +428,14 @@ def page_gap(taxonomy, analyzer, rows):
             return
         rep = analyzer.analyze(user_skills, jd_skills, demand=demand)
         st.metric("匹配度", f"{rep.match_score}%")
-        st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项")
+        must_n = sum(1 for s in jd_skills if s["is_must"])
+        st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项"
+                    f" ｜ JD 硬性要求 **{must_n}** 项")
         if user_majors:
             st.caption(f"🎓 已结合简历解析出的专业：{'、'.join(user_majors)}")
 
         if not rep.missing:
-            st.success("🎉 已覆盖目标岗位的全部技能，暂无差距")
+            st.success(f"🎉 该岗位要求的 {len(jd_skills)} 项技能你已全部覆盖，暂无差距")
             return
 
         p0 = [m for m in rep.missing if m.priority == "P0"]

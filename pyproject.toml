@@ -24,3 +24,17 @@ dev = ["pytest>=8.0"]
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
+markers = [
+    "slow: 需要遍历全语料或加载重模型；PR 用 -m \"not slow\" 跳过，nightly 跑全量",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = false
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise SystemExit",
+]

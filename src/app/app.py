@@ -252,6 +252,24 @@ def page_graph(taxonomy, rows):
     st.bar_chart(pd.DataFrame({"技能数": list(cat_cnt.values())},
                               index=list(cat_cnt.keys())))
 
+    # ---- 公司 × Top 技能（每条 = 该公司 JD 中提到该技能的比例）----
+    from src.data.skill_stats import demand_matrix
+    matrix = demand_matrix(rows, top_n=12)
+    if matrix["skills"]:
+        st.subheader("公司 × Top 12 技能")
+        st.caption("数值 = 该公司 JD 中提到该技能的比例；条形越长说明该技能在这家公司越是硬通货")
+        df_m = pd.DataFrame(
+            [[round(v * 100, 1) for v in row] for row in matrix["values"]],
+            index=matrix["companies"],
+            columns=[_skill_name(taxonomy, sid) for sid in matrix["skills"]],
+        )
+        st.dataframe(
+            df_m,
+            height=420,
+            column_config={c: st.column_config.ProgressColumn(
+                c, min_value=0, max_value=100, format="%.0f%%") for c in df_m.columns},
+        )
+
     if st.checkbox("显示技能共现网络"):
         st.components.v1.html(_cooccurrence_html(taxonomy, rows), height=560, scrolling=True)
 
@@ -282,7 +300,7 @@ def _resume_profile(text: str):
     return parse_resume_full(text)
 
 
-def page_resume(taxonomy, rule, analyzer):
+def page_resume(taxonomy, rule, analyzer, rows=None):
     st.header("简历匹配")
     uploaded = st.file_uploader("上传简历附件（支持 PDF / DOCX / TXT）",
                                 type=["pdf", "docx", "txt", "md"])
@@ -296,6 +314,9 @@ def page_resume(taxonomy, rule, analyzer):
     except Exception as e:  # noqa: BLE001
         st.error(f"文件解析失败：{e}")
         return
+
+    # 供「差距报告」页生成针对 P0 的简历补强建议
+    st.session_state["resume_text"] = text
 
     with st.expander("查看解析出的文本", expanded=False):
         st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
@@ -377,6 +398,76 @@ def page_resume(taxonomy, rule, analyzer):
         else:
             st.success("简历信息较完整，未发现明显 ATS 风险")
 
+    _render_strength_and_jobs(taxonomy, analyzer, rows or [])
+
+
+@st.cache_data(show_spinner=False, max_entries=16)
+def _recommendations(skill_ids: tuple):
+    """简历技能 -> Top 岗位（按技能 id 组合缓存；内部复用已缓存的全语料抽取结果）。"""
+    taxonomy, _rule, analyzer = load_core()
+    from dataclasses import asdict
+
+    from src.matcher.job_recommender import recommend_jobs
+
+    names = [taxonomy.by_id(s).name for s in skill_ids if taxonomy.by_id(s)]
+    return [asdict(s) for s in recommend_jobs(names, extract_corpus(), analyzer, top_k=10)]
+
+
+def _render_strength_and_jobs(taxonomy, analyzer, rows):
+    """简历页下半部分：技能画像（C7）+ 反向岗位推荐（C6）。"""
+    skill_ids = list(st.session_state.get("user_skill_ids") or [])
+    if not skill_ids:
+        return
+    if not rows:
+        return
+
+    import pandas as pd
+
+    from src.matcher.strength_profile import (
+        category_profile,
+        overall_coverage,
+        weakest_categories,
+    )
+
+    demand = compute_demand(rows)
+    st.subheader("🧭 我的技能画像")
+    profile = category_profile(skill_ids, taxonomy, demand)
+    cov = overall_coverage(skill_ids, taxonomy, demand)
+    weak = weakest_categories(profile, limit=1)
+    c1, c2 = st.columns(2)
+    c1.metric("需求加权覆盖率", f"{cov:.1%}")
+    if weak:
+        w = weak[0]
+        c2.metric("最大短板类别", w["name"], f"覆盖 {w['coverage']:.0%}")
+    st.caption("覆盖率 = 已掌握技能的需求占比之和 ÷ 该类别全部技能的需求占比之和（按全语料 JD）")
+    df = pd.DataFrame(
+        {"覆盖率": [round(p["coverage"] * 100, 1) for p in profile]},
+        index=[p["name"] for p in profile],
+    )
+    st.bar_chart(df)
+
+    st.subheader("🔎 适合我的岗位 Top 10")
+    st.caption("用简历技能反向扫描全语料（同公司 + 同标题去重），按 must/nice 加权匹配度排序")
+    with st.spinner("正在扫描全语料岗位…"):
+        sugs = _recommendations(tuple(sorted(set(skill_ids))))
+    if not sugs:
+        st.info("暂未匹配到合适的岗位：先补几项核心技能（Python / PyTorch / 大模型 等）再来看看")
+        return
+    df_jobs = pd.DataFrame([
+        {
+            "公司": s["company"],
+            "岗位": _translate_title(s["title"]),
+            "地点": s["location"],
+            "匹配度": f"{s['match_score']:.0f}%",
+            "缺口数": s["missing_total"],
+            "最该补": "、".join(s["top_missing"]),
+        }
+        for s in sugs
+    ])
+    st.dataframe(df_jobs, height=380, hide_index=True,
+                 column_config={"匹配度": st.column_config.TextColumn("匹配度")})
+
+
 
 def page_gap(taxonomy, analyzer, rows):
     st.header("差距报告")
@@ -385,6 +476,10 @@ def page_gap(taxonomy, analyzer, rows):
         return
 
     demand = compute_demand(rows)
+    mode = st.radio("分析模式", ["单岗位报告", "多岗位对比"], horizontal=True, key="gap_mode")
+    if mode == "多岗位对比":
+        page_gap_compare(taxonomy, analyzer, rows, demand)
+        return
 
     # 1) 先选公司
     companies = sorted({r["company"] for r in rows})
@@ -427,6 +522,14 @@ def page_gap(taxonomy, analyzer, rows):
             st.warning("请先在「简历匹配」提取技能，或在上方输入技能")
             return
         rep = analyzer.analyze(user_skills, jd_skills, demand=demand)
+        from src.matcher.learning_path import build_learning_path
+        path = build_learning_path(rep.missing, taxonomy=taxonomy)
+        # 报告与导出信息存 session：download_button 点击会 rerun，按钮块本身会消失
+        st.session_state["gap_report"] = rep
+        st.session_state["gap_path"] = path
+        st.session_state["gap_export"] = {
+            "company": company, "job_title": label, "skills": list(user_skills),
+        }
         st.metric("匹配度", f"{rep.match_score}%")
         must_n = sum(1 for s in jd_skills if s["is_must"])
         st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项"
@@ -477,6 +580,25 @@ def page_gap(taxonomy, analyzer, rows):
                 for r in m.resources:
                     st.markdown(f"- [{r.get('title')}]({r.get('url')})")
 
+        # ---- 简历补强建议（C5，仅当本次会话上传过简历）----
+        resume_text = st.session_state.get("resume_text") or ""
+        if resume_text:
+            from src.data.resume_advice import build_advice
+            advice = build_advice(p0 or rep.missing, taxonomy, resume_text, limit=3)
+            if advice:
+                st.subheader("✍️ 简历补强建议（针对 P0）")
+                for a in advice:
+                    mark = "✅" if a["status"] == "已有相关经历" else "➕"
+                    st.markdown(f"{mark} **{a['name']}** · {a['status']}")
+                    st.caption(a["suggestion"])
+                    st.caption("项目建议：" + a["project_idea"])
+
+        # ---- 规则版学习路径（C1，不依赖 LLM；无 API key 时也能出计划）----
+        st.subheader("📅 学习路径（规则版 · 无需 AI）")
+        from src.matcher.learning_path import format_path_markdown
+        st.markdown(format_path_markdown(path))
+        st.caption("学时按技能难度估算，顺序已考虑先修关系；更贴合个人情况的版本见下方「AI 解读」。")
+
         # ---- AI 解读 + 学习计划 ----
         st.subheader("🤖 AI 解读 + 学习计划")
         with st.spinner("正在生成 AI 解读与学习计划…"):
@@ -496,6 +618,98 @@ def page_gap(taxonomy, analyzer, rows):
         if interp.get("tips"):
             st.info(interp["tips"])
 
+    # ---- 报告导出（C2）：读 session 中的最近一次报告，rerun 后按钮仍在 ----
+    rep_cached = st.session_state.get("gap_report")
+    meta = st.session_state.get("gap_export") or {}
+    if rep_cached is not None and meta:
+        st.subheader("⬇️ 导出报告")
+        from src.app.report_export import report_docx, report_markdown, safe_filename
+        cached_path = st.session_state.get("gap_path")
+        company_name = meta.get("company", "")
+        job_name = meta.get("job_title", "")
+        md = report_markdown(rep_cached, company=company_name, job_title=job_name,
+                             user_skills=meta.get("skills") or [], learning_path=cached_path)
+        col_md, col_docx = st.columns(2)
+        col_md.download_button("下载 Markdown（.md）", md,
+                               file_name=safe_filename(company_name, job_name, "md"),
+                               mime="text/markdown", key="dl_gap_md")
+        try:
+            docx_bytes = report_docx(rep_cached, company=company_name, job_title=job_name,
+                                     user_skills=meta.get("skills") or [],
+                                     learning_path=cached_path)
+        except ImportError:
+            col_docx.caption("未安装 python-docx，暂不支持 Word 导出")
+        else:
+            col_docx.download_button(
+                "下载 Word（.docx）", docx_bytes,
+                file_name=safe_filename(company_name, job_name, "docx"),
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                key="dl_gap_docx",
+            )
+
+
+def page_gap_compare(taxonomy, analyzer, rows, demand):
+    """多岗位对比（C3）：同一份技能对 2~4 个岗位的匹配度与缺口差异。"""
+    from src.matcher.job_compare import compare_jobs
+
+    st.subheader("多岗位对比")
+    st.caption("同一份技能，对不同岗位的匹配度与缺口差异（最多 4 个）")
+    companies = sorted({r["company"] for r in rows})
+    company = st.selectbox("🏢 选择公司", companies, key="cmp_company")
+    pool = [r for r in rows if r["company"] == company and r.get("skills")]
+    if not pool:
+        st.warning("该公司没有可对比的岗位（JD 未抽到技能），换一家公司试试")
+        return
+
+    labels = {_job_label(r): r for r in pool}
+    picked = st.multiselect("📋 选择 2~4 个岗位", list(labels),
+                            default=list(labels)[:2],
+                            key=f"cmp_jobs_{company}")
+    user_input = st.text_input("技能（逗号分隔，留空则用「简历匹配」结果）", "", key="cmp_skills")
+    typed = [x.strip() for x in user_input.replace("，", ",").split(",") if x.strip()]
+    user_skills = typed or st.session_state.get("user_skills", [])
+
+    if not st.button("开始对比", key="cmp_run"):
+        return
+    if len(picked) < 2:
+        st.warning("请至少选择 2 个岗位")
+        return
+    if not user_skills:
+        st.warning("请先输入技能，或在「简历匹配」页提取技能")
+        return
+
+    targets = []
+    for lab in picked[:4]:
+        r = labels[lab]
+        targets.append({
+            "label": lab,
+            "company": r["company"],
+            "title": _translate_title(r["title"]),
+            "jd_skills": _build_jd_skills(taxonomy, r, demand),
+            "demand": demand,
+        })
+    res = compare_jobs(analyzer, user_skills, targets)
+
+    st.markdown(f"**🎯 优先投递**：{res.best_label}（匹配度最高）")
+    cols = st.columns(len(res.jobs))
+    for col, j in zip(cols, res.jobs):
+        col.metric(j.title, f"{j.match_score}%", f"缺 {j.missing_total} 项 · P0 {j.p0_total}")
+
+    import pandas as pd
+
+    st.dataframe(pd.DataFrame([
+        {"岗位": j.label, "匹配度": f"{j.match_score}%", "命中": j.matched_total,
+         "缺口": j.missing_total, "P0 缺口": j.p0_total}
+        for j in res.jobs
+    ]), hide_index=True)
+
+    if res.common_missing:
+        st.markdown("**共性缺口（所有岗位都缺，优先补）**："
+                    + "、".join(f"`{n}`" for n in res.common_missing))
+    for lab, names in res.unique_missing.items():
+        if names:
+            st.caption(f"{lab} 独有缺口：" + "、".join(names))
+
 
 def main():
     _inject_css()
@@ -508,7 +722,7 @@ def main():
     if page == "技能图谱":
         page_graph(taxonomy, rows)
     elif page == "简历匹配":
-        page_resume(taxonomy, rule, analyzer)
+        page_resume(taxonomy, rule, analyzer, rows)
     else:
         page_gap(taxonomy, analyzer, rows)
 

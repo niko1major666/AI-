@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "src" / "app" / "app.py"
@@ -46,3 +47,62 @@ def test_gap_page_interaction_has_no_exception(monkeypatch):
     if at.metric:
         assert "匹配度" in at.metric[0].label
         assert any("硬性要求" in m.value for m in at.markdown)
+        # C2：报告生成后应出现导出按钮（Markdown / Word）
+        downloads = at.get("download_button")
+        labels = [d.proto.label for d in downloads]
+        assert any("Markdown" in lb for lb in labels), labels
+        assert any("Word" in lb for lb in labels), labels
+
+
+def test_gap_compare_mode_has_no_exception():
+    """多岗位对比（C3）：切模式 → 选公司 → 输技能 → 对比，不抛异常且有匹配度指标。"""
+    at = AppTest.from_file(str(APP), default_timeout=180)
+    at.run()
+    at.sidebar.radio[0].set_value("差距报告").run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    mode = next(r for r in at.radio if r.label == "分析模式")
+    mode.set_value("多岗位对比").run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    company = next(s for s in at.selectbox if "选择公司" in s.label)
+    company.set_value("腾讯").run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    skills = next(t for t in at.text_input if "逗号分隔" in t.label)
+    skills.set_value("Python, PyTorch").run()
+    run_btn = next(b for b in at.button if b.label == "开始对比")
+    run_btn.click().run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+    assert at.metric, "对比结果应有每个岗位的匹配度指标"
+    assert any("%" in m.value for m in at.metric)
+    assert at.dataframe, "对比结果应有明细表"
+
+
+@pytest.mark.slow
+def test_resume_page_strength_and_recommendations(monkeypatch):
+    """简历页 C6/C7：上传 → 提取技能 → 技能画像 + 反向岗位推荐（全语料扫描，slow）。"""
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    import streamlit as st
+
+    class _FakeUpload:
+        name = "resume.txt"
+
+        def getvalue(self):
+            return "熟悉 Python、PyTorch，做过 Transformer 项目".encode("utf-8")
+
+    monkeypatch.setattr(st, "file_uploader", lambda *a, **k: _FakeUpload())
+
+    at = AppTest.from_file(str(APP), default_timeout=180)
+    at.run()
+    at.sidebar.radio[0].set_value("简历匹配").run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    extract_btn = next(b for b in at.button if b.label == "提取技能")
+    extract_btn.click().run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    assert any("技能画像" in s.value for s in at.subheader)
+    assert any("适合我的岗位" in s.value for s in at.subheader)
+    assert any("覆盖率" in m.label for m in at.metric)
+    assert at.dataframe, "岗位推荐应有表格"

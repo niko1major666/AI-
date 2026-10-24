@@ -21,6 +21,8 @@
 5. must/nice 判定读 JD 原文（句内触发词 → 章节标题 → 全行业占比兜底），再按「岗位内提及次数」加权，避免把加分项当硬门槛；零技能岗位用同公司相似岗位兜底并标注来源
 6. Streamlit 三页面：技能图谱 / 简历匹配 / 差距报告
 7. 知识库持续扩充：161 项技能（含 MCP、Function Calling、扩散模型、视觉语言模型、LangGraph、Dify、昇腾等高频缺失项）+ 106 项学习资源；高噪声写法（如裸「量化」= 可量化/量化指标）只在简历解析侧生效，不参与 JD 抽取
+8. 学习与投递闭环：**规则版学习路径**（无 API key 也出三阶段计划，含先修顺序/学时/周数）、**简历补强建议**（针对 P0 缺口给出「改写要点」或「补小项目」，不编造经历）、**报告导出**（Markdown / Word）
+9. 多岗位视角：**多岗位对比**（匹配度、共性缺口、各岗独有缺口）、**反向岗位推荐**（简历技能 → Top 10 岗位）、**技能画像**（按类别的需求加权覆盖率）、**公司 × Top 技能矩阵**（技能图谱页）
 
 ## 二、技术选型
 
@@ -58,14 +60,15 @@ ai-skill-gap/
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
 │   └── kb/             skill_taxonomy(161技能·难度+重要度[需求频率驱动]) / learning_resources(106 项)
 ├── src/
-│   ├── data/           schema / normalize / job_filter(★标题过滤) / load / build_dataset
+│   ├── data/           schema / normalize / job_filter(★标题过滤) / load / build_dataset / skill_stats / resume_advice
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析 / jd_requirements(must 判定) / job_neighbors(零技能代理)
+│   │                   / learning_path(规则学习路径) / job_compare(多岗对比) / job_recommender(反向推荐) / strength_profile(技能画像)
 │   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
-│   └── app/            Streamlit 三页面
-├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（131 用例已通过）
-├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）
+│   └── app/            Streamlit 三页面 + report_export（报告导出）
+├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / validate_kb(KB 校验)
+├── tests/              pytest（201 用例已通过；slow 标记留给 nightly）
+├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md
@@ -80,8 +83,11 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 # 2) 构建结构化数据集（含岗位标题过滤：剔除土木/施工等非 AI 岗位）
 .\.venv\Scripts\python.exe -m src.data.build_dataset --stats
 
-# 3) 跑测试
-.\.venv\Scripts\python.exe -m pytest tests -v
+# 3) 跑测试（PR 同款：跳过 slow，带覆盖率门槛）
+.\.venv\Scripts\python.exe -m pytest -m "not slow" --cov=src --cov-report=term-missing --cov-fail-under=55
+
+# 3.1) 全量测试（含全语料遍历的 slow 用例，约 40s）
+.\.venv\Scripts\python.exe -m pytest
 
 # 4) 技能抽取 demo（词表规则基线 + SiameseUIE 零样本）
 .\.venv\Scripts\python.exe -m src.extractor.siamese_uie --demo
@@ -91,6 +97,10 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 # 6) 前端（技能图谱 / 简历匹配 / 差距报告）
 .\.venv\Scripts\python.exe -m streamlit run src/app/app.py
+
+# 7) 指标回归报告 + 知识库校验（CI 同款）
+.\.venv\Scripts\python.exe scripts\eval_all.py       # 生成 docs/metrics.md
+.\.venv\Scripts\python.exe scripts\validate_kb.py    # 词表/资源结构校验
 ```
 
 ### 界面预览（三页面）
@@ -184,6 +194,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
 | W7 | 迭代 1：must/nice 判定重构 + 零技能兜底 + 强调度加权 + 简历解析缓存 | ✅ 122 测试通过；57.0% 岗位有硬性要求（修复前 0%），零技能岗位 98.7% 可代理 |
 | W8 | 迭代 2：知识库（KB）内容扩充 | ✅ 131 测试通过；技能 147→161（新增 16、合并 2），学习资源 11→106 项，JD 技能覆盖率 160/161 |
+| W9 | 迭代 3：功能扩展（C1–C7）+ 评测/CI 加固（D1–D7） | ✅ 201 测试通过；规则学习路径/报告导出/多岗对比/反向推荐/技能画像/公司×技能矩阵；覆盖率 58%（门槛 55%）+ 3.10/3.12 矩阵 + 抽取/匹配回归基线 + `docs/metrics.md` |
 
 ## 八、数据采集与爬虫
 
@@ -250,6 +261,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 - 岗位内强调度：45.2% 的岗位存在被重复提及（tf ≥ 2）的技能，权重按 `base × (1 + ln tf)` 计入匹配度
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
+- **回归基线（迭代 3，CI 固化）**：抽取 F1（test 0.9565 / 全量 0.9123，允许退化 1pt）、TF-IDF 匹配 Recall@5（skill_pair 0.9750 / resume_sentence 0.2200，允许退化 2pt）、语料快照（4582 条 / 78 家 / 4472 个唯一「公司+标题」）、KB 覆盖（160/161）；全量指标见 [`docs/metrics.md`](docs/metrics.md)，由 `python scripts/eval_all.py` 生成，CI 在 main 上校验是否过期
 
 ### 已产出：技能抽取 F1 对比（测试集 10 条，span 级）
 

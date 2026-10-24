@@ -23,6 +23,20 @@
 - ✅ 发行流水线：`.github/workflows/release.yml`（push `v*` tag → `gh release create`，标题取 `docs/release-notes/<tag>.md` 首行），已发布 v1.2.0；`scripts/capture_screenshots.py` 可一键重截 README 预览图
 - ✅ 迭代 1（缺陷修复）：`is_must` 由「全语料需求占比 ≥ 40%（实测最高 36.2% → 恒 False）」改为 `src/matcher/jd_requirements.py` 三级判定（句内触发词 → 章节标题 → 占比兜底），57.0% 岗位可判出硬性要求（1.48 项/岗）；零技能岗位（1085 条）改用 `src/matcher/job_neighbors.py` 同公司相似岗位代理（覆盖 98.7%，中位 4 项）并标注来源，不再误显示「已覆盖全部技能」；匹配度加入岗位内强调度 `base × (1 + ln tf)`（45.2% 岗位有 tf≥2）；`rule_baseline.extract()` 单次扫描同时产出 span + 词频（避免冷启动 9s→18s）；简历解析按文本缓存 + LLM 超时 90s→25s 重试一次；测试 108 → 122
 - ✅ 迭代 2（KB 内容补全）：技能 147 → 161 —— 新增 16 项 JD 高频缺失技能（视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%、DeepSeek 1.05%、Qwen / Llama / GLM / 世界模型 / 具身智能 / LangGraph / Dify），合并 2 个零命中冗余项（文本向量化→Embedding、华为云→云计算，别名保留）；学习资源 11 → 106 项（覆盖 Top 80 需求技能中的 77 项）；新增 `Skill.skip_extract` 机制修正「量化」误匹配（6.31% → 1.07%，importance 4→2，简历侧仍能解析「量化」）；技能命中 160/161（仅「联邦学习」语料未出现），抽取全语料 11.0s；新增 `tests/test_learning_resources.py`（6 用例）+ 词表/抽取回归用例，测试 122 → 131
+- ✅ 迭代 3（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）：
+  - C1 规则版学习路径 `src/matcher/learning_path.py`（P0/P1/P2 三阶段 + 先修拓扑排序 + 难度→学时 + 周数，无 API key 也出计划，`prereq_note` 提示缺口外前置）
+  - C2 报告导出 `src/app/report_export.py`（Markdown / docx，文件名清洗；报告存 session，`download_button` rerun 后仍可下载）
+  - C3 多岗位对比 `src/matcher/job_compare.py`（匹配度、P0 数、共性缺口、各岗独有缺口、优先投递）
+  - C4 公司 × Top 12 技能矩阵 `src/data/skill_stats.py`（技能图谱页 ProgressColumn 条形表，不引新依赖）
+  - C5 简历补强建议 `src/data/resume_advice.py`（原文命中→改写要点，未命中→小项目建议，数字一律占位符不编造）
+  - C6 反向岗位推荐 `src/matcher/job_recommender.py`（按「公司+标题」去重，must/nice 加权，Top 10 + 最该补 3 项，`st.cache_data` 缓存）
+  - C7 技能画像 `src/matcher/strength_profile.py`（按类别的需求加权覆盖率 + 最大短板）
+  - D1/D2 指标回归测试：抽取 F1（test 0.9565 / 全量 0.9123，容差 1pt）、TF-IDF Recall@5（skill_pair 0.9750 / resume_sentence 0.2200，容差 2pt）
+  - D3 语料快照：4582 条 / 78 家 / 4472 唯一「公司+标题」/ 字段与 job_id 唯一（slow 用例校验全语料 160/161 覆盖、零技能占比 20~28%）
+  - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
+  - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
+  - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
+  - 测试 131 → 201（199 快测 + 2 slow）；全量约 40s
 
 
 ## 量化指标（当前）
@@ -35,19 +49,20 @@
 | 零技能兜底 | 1085 条零技能岗位中 98.7% 可代理，中位 4 项技能 |
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
 | 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
-| 测试 | 131 用例 |
+| 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |
+| 测试 | 201 用例（slow 2 例 nightly）；覆盖率 58%，CI 门槛 55% |
 
 ## 待构建（按价值）
-1. 迭代 3：功能扩展（C1–C7）与评测/CI 加固（D1–D7）
-2. 阿里/智谱数据补充（需探查招聘渠道）
-3. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
+1. 阿里/智谱数据补充（需探查招聘渠道）
+2. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
+3. `ENGINEERING.UNITTEST` 泛化别名「测试」收紧（会带动抽取 F1 与需求占比，需要单独一轮回归）
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
 - git 工作区干净（HEAD eb6ba48），main 与远程一致，tag v1.2.0 已发布（Release「v1.2.0 语料扩充与岗位过滤」）
-- CI 绿：GitHub Actions 108 测试全通过；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+- CI 绿：GitHub Actions 201 测试全通过（`-m "not slow"` + 覆盖率门槛 55%，3.10/3.12 矩阵；nightly 跑含 slow 的全量）；在线体验 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 - 保活：`.github/workflows/keep-streamlit-alive.yml` 每 6 小时探测（cron `17 */6 * * *`，单步运行 + 20 分钟超时 + Playwright 缓存）
 
 ## 已知问题（诚实标注）
@@ -65,3 +80,6 @@
 4. 简历解析「正则优先」→「LLM 优先、正则兜底」（LLM 完整专业名更准确）
 5. 弱标注扩 BERT-NER 失败 → 结论：需人工标注更多样本
 6. 本地部署 → 支持云端：依赖分层（运行/重模型拆分）、清洗数据入库、secrets 优先、sys.path 兼容
+7. 学习计划「只有 LLM 能给」→「规则版常驻 + LLM 增强」：规则路径确定性、可单测、无 key 也有产出；LLM 版只做个性化补充
+8. CI 从「跑一遍 pytest」→「结构校验 + 覆盖率门槛 + 版本矩阵 + 指标回归 + nightly 全量」：指标阈值写进测试（容差 1~2pt），避免改词表后静默退化
+9. 报告导出放在 `st.session_state` 而不是按钮块内：Streamlit `download_button` 点击会 rerun，按钮块消失会导致下载丢失

@@ -1,7 +1,7 @@
 name: Release
 
 # 推送 v* tag 时自动创建 GitHub Release（正文取 docs/release-notes/<tag>.md 的首行作标题）；
-# 若该 tag 的 Release 已存在（重新发版/补丁说明），则更新标题与正文。
+# 若该 tag 的 Release 已存在（重新发版/补丁说明，或 tag 重建后 Release 变为 draft），则更新并发布。
 on:
   push:
     tags: [ 'v*' ]
@@ -26,7 +26,7 @@ jobs:
             TITLE=$(head -n 1 "$NOTES" | sed 's/^# //')
             tail -n +2 "$NOTES" > /tmp/notes.md
             if gh release view "$TAG" >/dev/null 2>&1; then
-              gh release edit "$TAG" --title "$TITLE" --notes-file /tmp/notes.md
+              gh release edit "$TAG" --title "$TITLE" --notes-file /tmp/notes.md --draft=false
             else
               gh release create "$TAG" --title "$TITLE" --notes-file /tmp/notes.md
             fi

@@ -1,6 +1,7 @@
 name: Release
 
-# 推送 v* tag 时自动创建 GitHub Release（正文取 docs/release-notes/<tag>.md 的首行作标题）
+# 推送 v* tag 时自动创建 GitHub Release（正文取 docs/release-notes/<tag>.md 的首行作标题）；
+# 若该 tag 的 Release 已存在（重新发版/补丁说明），则更新标题与正文。
 on:
   push:
     tags: [ 'v*' ]
@@ -15,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create GitHub Release
+      - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.ref_name }}
@@ -24,7 +25,11 @@ jobs:
           if [ -f "$NOTES" ]; then
             TITLE=$(head -n 1 "$NOTES" | sed 's/^# //')
             tail -n +2 "$NOTES" > /tmp/notes.md
-            gh release create "$TAG" --title "$TITLE" --notes-file /tmp/notes.md
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              gh release edit "$TAG" --title "$TITLE" --notes-file /tmp/notes.md
+            else
+              gh release create "$TAG" --title "$TITLE" --notes-file /tmp/notes.md
+            fi
           else
             gh release create "$TAG" --generate-notes
           fi

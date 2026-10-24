@@ -1,7 +1,8 @@
 """语料快照：jobs.jsonl 的规模/字段/来源发生意外变化时立刻报警。
 
-这些数字来自 `data/processed/build_stats.json`（构建产物自带统计），
-如果确实换了数据源，需要同步更新这里与 build_stats，避免「静默换数据」。
+期望值以常量固化；`data/processed/build_stats.json` 是构建产物（目录不入库，
+CI 上通常不存在），它在时额外做一次交叉校验，不在时只校验常量，避免测试依赖
+未入库文件而在干净克隆上失败。
 """
 import json
 from pathlib import Path
@@ -28,10 +29,18 @@ def jobs():
     return [json.loads(x) for x in text.splitlines() if x.strip()]
 
 
-def test_job_count_matches_build_stats(jobs):
-    stats = json.loads(STATS.read_text(encoding="utf-8"))
-    assert stats["cleaned_rows"] == EXPECTED_ROWS
+@pytest.fixture(scope="module")
+def stats():
+    """构建统计（可选）：`data/processed/` 在 .gitignore 里，干净克隆上没有此文件。"""
+    if not STATS.exists():
+        return None
+    return json.loads(STATS.read_text(encoding="utf-8"))
+
+
+def test_job_count_snapshot(jobs, stats):
     assert len(jobs) == EXPECTED_ROWS
+    if stats is not None:
+        assert stats["cleaned_rows"] == len(jobs)
 
 
 def test_required_fields_and_unique_job_id(jobs):
@@ -40,12 +49,12 @@ def test_required_fields_and_unique_job_id(jobs):
     assert len({j["job_id"] for j in jobs}) == len(jobs)
 
 
-def test_company_snapshot(jobs):
+def test_company_snapshot(jobs, stats):
     companies = {j["company"] for j in jobs}
     assert len(companies) == EXPECTED_COMPANIES
-    stats = json.loads(STATS.read_text(encoding="utf-8"))
-    assert stats["company_count"] == EXPECTED_COMPANIES
     assert {"腾讯", "字节跳动", "华为"} <= companies
+    if stats is not None:
+        assert stats["company_count"] == len(companies)
 
 
 def test_company_title_duplication_rate(jobs):

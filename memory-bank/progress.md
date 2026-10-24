@@ -2,12 +2,12 @@
 
 ## 什么能用（已完成）
 - ✅ 数据采集：4582 条真实 JD / 78 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书 + 英文科技岗位），含部门/发布时间等字段
-- ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），147 技能（难度+重要度）
+- ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），161 技能（难度+重要度）
 - ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源；AI 解读按简历专业生成迁移建议（无专业不展示）
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
-- ✅ 工程：108 测试全通过（含保活脚本纯函数测试 + 小红书爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
+- ✅ 工程：131 测试全通过（含保活脚本纯函数测试 + 小红书爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
@@ -22,6 +22,7 @@
 - ✅ 岗位标题过滤器：`src/data/job_filter.py`（黑名单：土木/建筑/施工/结构工程师等 34 词 + 白名单：AI/算法/数据等 31 词保护），`configs/dataset.yaml` 可开关与覆盖词表；构建时剔除 4 条非 AI 工程岗（4586→4582），重要度分档未变；新增 `tests/test_job_filter.py`（7 用例，含管线接入与禁用场景）
 - ✅ 发行流水线：`.github/workflows/release.yml`（push `v*` tag → `gh release create`，标题取 `docs/release-notes/<tag>.md` 首行），已发布 v1.2.0；`scripts/capture_screenshots.py` 可一键重截 README 预览图
 - ✅ 迭代 1（缺陷修复）：`is_must` 由「全语料需求占比 ≥ 40%（实测最高 36.2% → 恒 False）」改为 `src/matcher/jd_requirements.py` 三级判定（句内触发词 → 章节标题 → 占比兜底），57.0% 岗位可判出硬性要求（1.48 项/岗）；零技能岗位（1085 条）改用 `src/matcher/job_neighbors.py` 同公司相似岗位代理（覆盖 98.7%，中位 4 项）并标注来源，不再误显示「已覆盖全部技能」；匹配度加入岗位内强调度 `base × (1 + ln tf)`（45.2% 岗位有 tf≥2）；`rule_baseline.extract()` 单次扫描同时产出 span + 词频（避免冷启动 9s→18s）；简历解析按文本缓存 + LLM 超时 90s→25s 重试一次；测试 108 → 122
+- ✅ 迭代 2（KB 内容补全）：技能 147 → 161 —— 新增 16 项 JD 高频缺失技能（视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%、DeepSeek 1.05%、Qwen / Llama / GLM / 世界模型 / 具身智能 / LangGraph / Dify），合并 2 个零命中冗余项（文本向量化→Embedding、华为云→云计算，别名保留）；学习资源 11 → 106 项（覆盖 Top 80 需求技能中的 77 项）；新增 `Skill.skip_extract` 机制修正「量化」误匹配（6.31% → 1.07%，importance 4→2，简历侧仍能解析「量化」）；技能命中 160/161（仅「联邦学习」语料未出现），抽取全语料 11.0s；新增 `tests/test_learning_resources.py`（6 用例）+ 词表/抽取回归用例，测试 122 → 131
 
 
 ## 量化指标（当前）
@@ -32,11 +33,14 @@
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子） |
 | 需求强度判定 | 57.0% 岗位识别出 ≥1 项硬性要求（平均 1.48 项/岗） |
 | 零技能兜底 | 1085 条零技能岗位中 98.7% 可代理，中位 4 项技能 |
-| 测试 | 122 用例 |
+| KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
+| 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
+| 测试 | 131 用例 |
 
 ## 待构建（按价值）
-1. 阿里/智谱数据补充（需探查招聘渠道）
-2. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
+1. 迭代 3：功能扩展（C1–C7）与评测/CI 加固（D1–D7）
+2. 阿里/智谱数据补充（需探查招聘渠道）
+3. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
@@ -52,7 +56,7 @@
 3. 阿里招聘分散在业务集团、智谱招聘渠道未公开，尚未打通
 4. DeepSeek（公司）详情接口 necromancer 加密未逆向，只抓列表
 5. importance 频率≠价值（如「数据标注」高频低门槛），已用难度加权修正
-6. `ENGINEERING.UNITTEST` 的 aliases 含泛化词「测试」→ 11.4% 命中（importance 5），高于真实水平；收紧别名会改变规则基线 F1，故暂未改动，仅记录为口径噪声
+6. `ENGINEERING.UNITTEST` 的 aliases 含泛化词「测试」→ 11.4% 命中（importance 5），高于真实水平；收紧别名会改变规则基线 F1，故暂未改动，仅记录为口径噪声（「量化」的同类问题已用 `skip_extract` 修正：6.31% → 1.07%，未影响 F1）
 
 ## 决策演进（关键）
 1. SiameseUIE 零样本对抽象技能 F1=0 → 弃用，保留「规则基线 + BERT-NER」双路

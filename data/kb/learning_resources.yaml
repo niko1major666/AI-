@@ -1,7 +1,9 @@
 # ============================================================
 # 技能 -> 学习资源库（用于差距报告的学习建议，按优先级排序）
+# 覆盖：Top 需求技能 + 迭代 2 新增技能（2026-10，11 -> 106 项）
+# 约定：url 为空表示暂无稳定公开链接（纸书/内部课程），前端只展示标题
 # ============================================================
-version: 1
+version: 2
 
 resources:
   - skill_id: PROG.PYTHON
@@ -52,3 +54,307 @@ resources:
   - skill_id: ENGINEERING.GIT
     items:
       - {type: course, title: "Git 官方文档", url: "https://git-scm.com/doc"}
+
+  # ---- 迭代 2 补充：编程语言 ----
+  - skill_id: PROG.CPP
+    items:
+      - {type: doc, title: "cppreference 中文手册", url: "https://zh.cppreference.com/w/"}
+      - {type: book, title: "C++ Primer（第 5 版）", url: ""}
+  - skill_id: PROG.JAVA
+    items:
+      - {type: course, title: "dev.java 官方教程", url: "https://dev.java/learn/"}
+  - skill_id: PROG.GO
+    items:
+      - {type: course, title: "A Tour of Go（官方交互教程）", url: "https://go.dev/tour/"}
+  - skill_id: PROG.SQL
+    items:
+      - {type: course, title: "SQLBolt 交互式 SQL 教程", url: "https://sqlbolt.com/"}
+  - skill_id: PROG.SHELL
+    items:
+      - {type: course, title: "MIT The Missing Semester（中文版）", url: "https://missing-semester-cn.github.io/"}
+  - skill_id: PROG.JS
+    items:
+      - {type: course, title: "现代 JavaScript 教程（中文）", url: "https://zh.javascript.info/"}
+  - skill_id: PROG.RUST
+    items:
+      - {type: book, title: "The Rust Programming Language", url: "https://doc.rust-lang.org/book/"}
+
+  # ---- 迭代 2 补充：深度学习框架与 LLM 应用框架 ----
+  - skill_id: FRAMEWORK.TENSORFLOW
+    items:
+      - {type: course, title: "TensorFlow 官方教程", url: "https://www.tensorflow.org/tutorials?hl=zh-cn"}
+  - skill_id: FRAMEWORK.HF
+    items:
+      - {type: doc, title: "Transformers 官方文档", url: "https://huggingface.co/docs/transformers/index"}
+  - skill_id: FRAMEWORK.VLLM
+    items:
+      - {type: doc, title: "vLLM 官方文档", url: "https://docs.vllm.ai/en/latest/"}
+  - skill_id: FRAMEWORK.DEEPSPEED
+    items:
+      - {type: doc, title: "DeepSpeed 官方教程", url: "https://www.deepspeed.ai/tutorials/"}
+  - skill_id: FRAMEWORK.MEGATRON
+    items:
+      - {type: doc, title: "NVIDIA Megatron-LM", url: "https://github.com/NVIDIA/Megatron-LM"}
+  - skill_id: FRAMEWORK.TENSORRT
+    items:
+      - {type: doc, title: "TensorRT 开发者指南", url: "https://docs.nvidia.com/deeplearning/tensorrt/"}
+  - skill_id: FRAMEWORK.LANGCHAIN
+    items:
+      - {type: doc, title: "LangChain 官方教程", url: "https://python.langchain.com/docs/tutorials/"}
+  - skill_id: FRAMEWORK.LANGGRAPH
+    items:
+      - {type: doc, title: "LangGraph 官方文档", url: "https://langchain-ai.github.io/langgraph/"}
+  - skill_id: FRAMEWORK.LLAMAINDEX
+    items:
+      - {type: doc, title: "LlamaIndex 官方文档", url: "https://docs.llamaindex.ai/"}
+  - skill_id: FRAMEWORK.DIFY
+    items:
+      - {type: doc, title: "Dify 官方文档", url: "https://docs.dify.ai/"}
+  - skill_id: FRAMEWORK.PADDLE
+    items:
+      - {type: doc, title: "飞桨（PaddlePaddle）官网", url: "https://www.paddlepaddle.org.cn/"}
+
+  # ---- 迭代 2 补充：机器学习算法 ----
+  - skill_id: ML.CORE
+    items:
+      - {type: course, title: "吴恩达机器学习专项", url: "https://www.coursera.org/specializations/machine-learning-introduction"}
+      - {type: doc, title: "scikit-learn 用户指南", url: "https://scikit-learn.org/stable/user_guide.html"}
+  - skill_id: ML.CV
+    items:
+      - {type: course, title: "Stanford CS231n 课程笔记", url: "https://cs231n.github.io/"}
+  - skill_id: ML.NLP
+    items:
+      - {type: course, title: "Hugging Face NLP 课程（中文）", url: "https://huggingface.co/learn/nlp-course/zh-CN/chapter1/1"}
+  - skill_id: ML.MULTIMODAL
+    items:
+      - {type: paper, title: "CLIP: Learning Transferable Visual Models", url: "https://arxiv.org/abs/2103.00020"}
+  - skill_id: ML.VLM
+    items:
+      - {type: paper, title: "LLaVA: Visual Instruction Tuning", url: "https://arxiv.org/abs/2304.08485"}
+  - skill_id: ML.RL
+    items:
+      - {type: book, title: "蘑菇书 EasyRL", url: "https://github.com/datawhalechina/easy-rl"}
+      - {type: book, title: "Sutton & Barto: Reinforcement Learning (2nd)", url: "http://incompleteideas.net/book/the-book-2nd.html"}
+  - skill_id: ML.REC
+    items:
+      - {type: doc, title: "动手学深度学习 · 推荐系统", url: "https://zh.d2l.ai/chapter_recommender-systems/index.html"}
+  - skill_id: ML.QUANT
+    items:
+      - {type: paper, title: "GPTQ: 4-bit 权重量化", url: "https://arxiv.org/abs/2210.17323"}
+      - {type: paper, title: "LLM.int8(): 8-bit 推理", url: "https://arxiv.org/abs/2208.07339"}
+  - skill_id: ML.DIFFUSION
+    items:
+      - {type: paper, title: "DDPM: Denoising Diffusion Probabilistic Models", url: "https://arxiv.org/abs/2006.11239"}
+      - {type: course, title: "Hugging Face Diffusion 课程", url: "https://huggingface.co/learn/diffusion-course/unit0/1"}
+  - skill_id: ML.COMPRESS
+    items:
+      - {type: paper, title: "模型压缩综述（Sze et al.）", url: "https://arxiv.org/abs/1710.09282"}
+  - skill_id: ML.DISTILL
+    items:
+      - {type: paper, title: "Distilling the Knowledge in a Neural Network", url: "https://arxiv.org/abs/1503.02531"}
+  - skill_id: ML.GNN
+    items:
+      - {type: doc, title: "DGL 官方教程", url: "https://www.dgl.ai/"}
+  - skill_id: ML.OD
+    items:
+      - {type: paper, title: "YOLO: You Only Look Once", url: "https://arxiv.org/abs/1506.02640"}
+  - skill_id: ML.ASR
+    items:
+      - {type: doc, title: "FunASR 语音识别工具包", url: "https://github.com/modelscope/FunASR"}
+
+  # ---- 迭代 2 补充：AI 专有技术 ----
+  - skill_id: AITECH.LLM
+    items:
+      - {type: course, title: "Hugging Face LLM 课程（中文）", url: "https://huggingface.co/learn/llm-course/zh-CN/chapter1/1"}
+      - {type: paper, title: "A Survey of Large Language Models", url: "https://arxiv.org/abs/2303.18223"}
+  - skill_id: AITECH.AGENT
+    items:
+      - {type: paper, title: "LLM 自主智能体综述", url: "https://arxiv.org/abs/2308.11432"}
+      - {type: blog, title: "Lilian Weng: LLM Powered Autonomous Agents", url: "https://lilianweng.github.io/posts/2023-06-23-agent/"}
+  - skill_id: AITECH.FUNCALL
+    items:
+      - {type: doc, title: "OpenAI Function Calling 指南", url: "https://platform.openai.com/docs/guides/function-calling"}
+  - skill_id: AITECH.MCP
+    items:
+      - {type: doc, title: "Model Context Protocol 官方文档", url: "https://modelcontextprotocol.io/"}
+  - skill_id: AITECH.PROMPT
+    items:
+      - {type: doc, title: "Prompt Engineering Guide（中文）", url: "https://www.promptingguide.ai/zh"}
+  - skill_id: AITECH.FINETUNE
+    items:
+      - {type: doc, title: "Hugging Face PEFT 文档", url: "https://huggingface.co/docs/peft/index"}
+  - skill_id: AITECH.RLHF
+    items:
+      - {type: paper, title: "InstructGPT: Training with Human Feedback", url: "https://arxiv.org/abs/2203.02155"}
+  - skill_id: AITECH.DPO
+    items:
+      - {type: paper, title: "DPO: Direct Preference Optimization", url: "https://arxiv.org/abs/2305.18290"}
+  - skill_id: AITECH.COT
+    items:
+      - {type: paper, title: "Chain-of-Thought Prompting", url: "https://arxiv.org/abs/2201.11903"}
+  - skill_id: AITECH.MOE
+    items:
+      - {type: paper, title: "Switch Transformers（MoE）", url: "https://arxiv.org/abs/2101.03961"}
+  - skill_id: AITECH.INFER_ACC
+    items:
+      - {type: doc, title: "NVIDIA TensorRT-LLM", url: "https://github.com/NVIDIA/TensorRT-LLM"}
+  - skill_id: AITECH.SERVING
+    items:
+      - {type: doc, title: "Triton Inference Server", url: "https://github.com/triton-inference-server/server"}
+  - skill_id: AITECH.AIGC
+    items:
+      - {type: blog, title: "The Illustrated Stable Diffusion", url: "https://jalammar.github.io/illustrated-stable-diffusion/"}
+  - skill_id: AITECH.VIDEOGEN
+    items:
+      - {type: doc, title: "Hugging Face Diffusers 文档", url: "https://huggingface.co/docs/diffusers/index"}
+  - skill_id: AITECH.EMBEDDING
+    items:
+      - {type: doc, title: "Sentence-Transformers 文档", url: "https://www.sbert.net/"}
+  - skill_id: AITECH.ANNOTATE
+    items:
+      - {type: doc, title: "Label Studio 标注指南", url: "https://labelstud.io/guide/"}
+  - skill_id: AITECH.LONGCONTEXT
+    items:
+      - {type: paper, title: "Lost in the Middle: Long Context 检索", url: "https://arxiv.org/abs/2307.03172"}
+  - skill_id: AITECH.KG
+    items:
+      - {type: doc, title: "Neo4j 官方文档", url: "https://neo4j.com/docs/"}
+  - skill_id: AITECH.QWEN
+    items:
+      - {type: doc, title: "Qwen 官方文档（中文）", url: "https://qwen.readthedocs.io/zh-cn/latest/"}
+  - skill_id: AITECH.DEEPSEEK
+    items:
+      - {type: doc, title: "DeepSeek API 文档", url: "https://api-docs.deepseek.com/zh-cn/"}
+  - skill_id: AITECH.LLAMA
+    items:
+      - {type: doc, title: "Meta Llama 3 模型仓库", url: "https://github.com/meta-llama/llama3"}
+  - skill_id: AITECH.GLM
+    items:
+      - {type: doc, title: "智谱 GLM-4 模型仓库", url: "https://github.com/THUDM/GLM-4"}
+  - skill_id: AITECH.EMBODIED
+    items:
+      - {type: paper, title: "RT-2: Vision-Language-Action Models", url: "https://arxiv.org/abs/2307.15818"}
+  - skill_id: AITECH.WORLDMODEL
+    items:
+      - {type: blog, title: "Sora: Video generation models as world simulators", url: "https://openai.com/index/video-generation-models-as-world-simulators/"}
+
+  # ---- 迭代 2 补充：大数据与数据处理 ----
+  - skill_id: BIGDATA.SPARK
+    items:
+      - {type: doc, title: "Spark 快速入门", url: "https://spark.apache.org/docs/latest/quick-start.html"}
+  - skill_id: BIGDATA.FLINK
+    items:
+      - {type: doc, title: "Apache Flink 官网", url: "https://flink.apache.org/"}
+  - skill_id: BIGDATA.KAFKA
+    items:
+      - {type: doc, title: "Kafka 官方文档", url: "https://kafka.apache.org/documentation/"}
+  - skill_id: BIGDATA.HIVE
+    items:
+      - {type: doc, title: "Apache Hive 官网", url: "https://hive.apache.org/"}
+  - skill_id: BIGDATA.HADOOP
+    items:
+      - {type: doc, title: "Hadoop 官方文档", url: "https://hadoop.apache.org/docs/current/"}
+  - skill_id: BIGDATA.NUMPY
+    items:
+      - {type: doc, title: "NumPy 初学者指南", url: "https://numpy.org/doc/stable/user/absolute_beginners.html"}
+  - skill_id: BIGDATA.DATASCIENCE
+    items:
+      - {type: course, title: "Kaggle Learn 数据科学微课", url: "https://www.kaggle.com/learn"}
+  - skill_id: BIGDATA.DATAENG
+    items:
+      - {type: doc, title: "dbt 官方入门", url: "https://docs.getdbt.com/docs/introduction"}
+  - skill_id: BIGDATA.VIZ
+    items:
+      - {type: doc, title: "Matplotlib 教程", url: "https://matplotlib.org/stable/tutorials/index.html"}
+  - skill_id: BIGDATA.CLEAN
+    items:
+      - {type: doc, title: "Pandas 缺失值处理", url: "https://pandas.pydata.org/docs/user_guide/missing_data.html"}
+  - skill_id: BIGDATA.DW
+    items:
+      - {type: book, title: "数据仓库工具箱（Kimball）", url: ""}
+  - skill_id: BIGDATA.MINING
+    items:
+      - {type: book, title: "数据挖掘：概念与技术", url: ""}
+  - skill_id: BIGDATA.AIRFLOW
+    items:
+      - {type: doc, title: "Apache Airflow 文档", url: "https://airflow.apache.org/docs/"}
+  - skill_id: BIGDATA.NOSQL
+    items:
+      - {type: doc, title: "Redis 文档（KV 数据模型）", url: "https://redis.io/docs/latest/"}
+
+  # ---- 迭代 2 补充：工程工具与平台 ----
+  - skill_id: ENGINEERING.K8S
+    items:
+      - {type: doc, title: "Kubernetes 中文教程", url: "https://kubernetes.io/zh-cn/docs/tutorials/"}
+  - skill_id: ENGINEERING.CICD
+    items:
+      - {type: doc, title: "GitHub Actions 文档", url: "https://docs.github.com/zh/actions"}
+  - skill_id: ENGINEERING.AWS
+    items:
+      - {type: doc, title: "AWS 官方文档", url: "https://docs.aws.amazon.com/"}
+  - skill_id: ENGINEERING.GCP
+    items:
+      - {type: doc, title: "Google Cloud 文档", url: "https://cloud.google.com/docs"}
+  - skill_id: ENGINEERING.AZURE
+    items:
+      - {type: doc, title: "Azure 文档中心（中文）", url: "https://learn.microsoft.com/zh-cn/azure/"}
+  - skill_id: ENGINEERING.CLOUD
+    items:
+      - {type: doc, title: "The Twelve-Factor App（中文）", url: "https://12factor.net/zh_cn/"}
+  - skill_id: ENGINEERING.MICROSVC
+    items:
+      - {type: doc, title: "Microservices 模式目录", url: "https://microservices.io/patterns/index.html"}
+  - skill_id: ENGINEERING.UNITTEST
+    items:
+      - {type: doc, title: "pytest 官方文档", url: "https://docs.pytest.org/en/stable/"}
+  - skill_id: ENGINEERING.REDIS
+    items:
+      - {type: doc, title: "Redis 官方文档", url: "https://redis.io/docs/latest/"}
+  - skill_id: ENGINEERING.MYSQL
+    items:
+      - {type: doc, title: "MySQL 8.4 官方教程", url: "https://dev.mysql.com/doc/refman/8.4/en/tutorial.html"}
+  - skill_id: ENGINEERING.ES
+    items:
+      - {type: doc, title: "Elasticsearch 参考手册", url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html"}
+  - skill_id: ENGINEERING.CUDA
+    items:
+      - {type: doc, title: "CUDA C++ 编程指南", url: "https://docs.nvidia.com/cuda/cuda-c-programming-guide/"}
+  - skill_id: ENGINEERING.ASCEND
+    items:
+      - {type: doc, title: "昇腾社区文档", url: "https://www.hiascend.com/document"}
+  - skill_id: ENGINEERING.DEVOPS
+    items:
+      - {type: doc, title: "DevOps 学习路线", url: "https://roadmap.sh/devops"}
+  - skill_id: ENGINEERING.MLOPS
+    items:
+      - {type: course, title: "MLOps Zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp"}
+  - skill_id: ENGINEERING.MLFLOW
+    items:
+      - {type: doc, title: "MLflow 官方文档", url: "https://mlflow.org/docs/latest/"}
+  - skill_id: ENGINEERING.DVC
+    items:
+      - {type: doc, title: "DVC 官方文档", url: "https://dvc.org/doc"}
+  - skill_id: ENGINEERING.TERRAFORM
+    items:
+      - {type: doc, title: "Terraform 官方教程", url: "https://developer.hashicorp.com/terraform/tutorials"}
+  - skill_id: ENGINEERING.NODEJS
+    items:
+      - {type: doc, title: "Node.js 中文学习资源", url: "https://nodejs.org/zh-cn/learn"}
+  - skill_id: ENGINEERING.REACT
+    items:
+      - {type: doc, title: "React 官方教程", url: "https://react.dev/learn"}
+  - skill_id: ENGINEERING.VUE
+    items:
+      - {type: doc, title: "Vue 3 中文文档", url: "https://cn.vuejs.org/guide/introduction.html"}
+  - skill_id: ENGINEERING.FASTAPI
+    items:
+      - {type: doc, title: "FastAPI 中文教程", url: "https://fastapi.tiangolo.com/zh/"}
+  - skill_id: ENGINEERING.DJANGO
+    items:
+      - {type: doc, title: "Django 官方教程（中文）", url: "https://docs.djangoproject.com/zh-hans/stable/intro/tutorial01/"}
+  - skill_id: ENGINEERING.HPC
+    items:
+      - {type: doc, title: "HPC Wiki", url: "https://hpc-wiki.info/hpc/HPC_Wiki"}
+  - skill_id: ENGINEERING.DISTSTORAGE
+    items:
+      - {type: doc, title: "Ceph 分布式存储", url: "https://ceph.io/en/discover/technology/"}

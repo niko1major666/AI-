@@ -70,7 +70,7 @@ skills:
   - {id: ML.FED, name: 联邦学习, category: ML, aliases: [federated-learning], difficulty: 4, importance: 1}
   - {id: ML.DISTILL, name: 知识蒸馏, category: ML, aliases: [distillation], difficulty: 3, importance: 1}
   - {id: ML.COMPRESS, name: 模型压缩, category: ML, aliases: [compression], difficulty: 3, importance: 1}
-  - {id: ML.QUANT, name: 量化, category: ML, aliases: [quantization], difficulty: 3, importance: 4}
+  - {id: ML.QUANT, name: 模型量化, category: ML, aliases: [model-quantization, quantization, gptq, awq, 量化压缩], skip_extract: [量化], difficulty: 3, importance: 2}
   - {id: ML.HPT, name: 超参数调优, category: ML, aliases: [hyperparameter-tuning, 调参], difficulty: 2, importance: 1}
   # ---- AI专有技术 ----
   - {id: AITECH.DISTRIBUTED, name: 分布式训练, category: AITECH, aliases: [distributed-training, 多卡训练], difficulty: 4, importance: 3}
@@ -92,9 +92,8 @@ skills:
   - {id: AITECH.COT, name: 思维链, category: AITECH, aliases: [chain-of-thought, cot], difficulty: 3, importance: 2}
   - {id: AITECH.MOE, name: MoE, category: AITECH, aliases: [moe, 混合专家], difficulty: 4, importance: 2}
   - {id: AITECH.TOKENIZER, name: Tokenizer, category: AITECH, aliases: [tokenizer, 分词器], difficulty: 2, importance: 1}
-  - {id: AITECH.EMBEDDING, name: Embedding, category: AITECH, aliases: [embedding, 词向量, 向量化], difficulty: 2, importance: 1}
+  - {id: AITECH.EMBEDDING, name: Embedding, category: AITECH, aliases: [embedding, 词向量, 向量化, 文本向量化, 文本向量], difficulty: 2, importance: 1}
   - {id: AITECH.SEMSEARCH, name: 语义搜索, category: AITECH, aliases: [semantic-search], difficulty: 2, importance: 1}
-  - {id: AITECH.TEXTVEC, name: 文本向量化, category: AITECH, aliases: [文本向量], difficulty: 2, importance: 1}
   - {id: AITECH.DIALOG, name: 多轮对话, category: AITECH, aliases: [对话系统], difficulty: 2, importance: 2}
   - {id: AITECH.SERVING, name: 推理服务, category: AITECH, aliases: [inference-serving], difficulty: 2, importance: 2}
   - {id: AITECH.MONITOR, name: 模型监控, category: AITECH, aliases: [model-monitoring], difficulty: 3, importance: 1}
@@ -129,10 +128,9 @@ skills:
   - {id: ENGINEERING.K8S, name: Kubernetes, category: ENGINEERING, aliases: [k8s, kubernetes], difficulty: 3, importance: 4}
   - {id: ENGINEERING.GIT, name: Git, category: ENGINEERING, aliases: [git], difficulty: 1, importance: 2}
   - {id: ENGINEERING.CICD, name: CI/CD, category: ENGINEERING, aliases: [cicd, ci-cd, 持续集成], difficulty: 2, importance: 3}
-  - {id: ENGINEERING.CLOUD, name: 云计算, category: ENGINEERING, aliases: [cloud-computing, 云原生], difficulty: 2, importance: 3}
+  - {id: ENGINEERING.CLOUD, name: 云计算, category: ENGINEERING, aliases: [cloud-computing, 云原生, 华为云], difficulty: 2, importance: 3}
   - {id: ENGINEERING.AWS, name: AWS, category: ENGINEERING, aliases: [aws, 亚马逊云], difficulty: 3, importance: 3}
   - {id: ENGINEERING.ALIYUN, name: 阿里云, category: ENGINEERING, aliases: [aliyun], difficulty: 2, importance: 1}
-  - {id: ENGINEERING.HUAWEICLOUD, name: 华为云, category: ENGINEERING, aliases: [huawei-cloud], difficulty: 2, importance: 1}
   - {id: ENGINEERING.MLOPS, name: MLOps, category: ENGINEERING, aliases: [mlops], difficulty: 3, importance: 1}
   - {id: ENGINEERING.MLFLOW, name: MLflow, category: ENGINEERING, aliases: [mlflow], difficulty: 2, importance: 1}
   - {id: ENGINEERING.DVC, name: DVC, category: ENGINEERING, aliases: [dvc], difficulty: 3, importance: 1}
@@ -171,3 +169,23 @@ skills:
   - {id: ENGINEERING.REACT, name: React, category: ENGINEERING, aliases: [react, react.js], difficulty: 2, importance: 3}
   - {id: ENGINEERING.VUE, name: Vue, category: ENGINEERING, aliases: [vue, vue.js], difficulty: 2, importance: 2}
   - {id: ENGINEERING.NODEJS, name: Node.js, category: ENGINEERING, aliases: [node.js, nodejs], difficulty: 2, importance: 2}
+
+  # ---- 扩充：迭代 2 —— LLM 应用 / 生成式 AI 高频缺失技能（2026-10）----
+  # 占比为 4582 条 JD 实测；importance 口径同 scripts/recalc_importance.py：
+  #   >=10%→5  >=5%→4  >=2%→3  >=1%→2  <1%→1
+  - {id: ML.DIFFUSION, name: 扩散模型, category: ML, aliases: [diffusion-model, diffusion, ddpm, stable-diffusion, 扩散模型], difficulty: 3, importance: 3}
+  - {id: ML.VLM, name: 视觉语言模型, category: ML, aliases: [vlm, vision-language-model, mllm, 多模态大模型], difficulty: 4, importance: 4}
+  - {id: AITECH.MCP, name: MCP, category: AITECH, aliases: [mcp, model-context-protocol, 模型上下文协议], difficulty: 3, importance: 3}
+  - {id: AITECH.FUNCALL, name: Function Calling, category: AITECH, aliases: [function-calling, function calling, functioncall, 函数调用, 工具调用, tool-calling], difficulty: 3, importance: 3}
+  - {id: AITECH.EMBODIED, name: 具身智能, category: AITECH, aliases: [embodied-ai, embodied ai, 具身], difficulty: 4, importance: 1}
+  - {id: AITECH.WORLDMODEL, name: 世界模型, category: AITECH, aliases: [world-model, world model], difficulty: 4, importance: 1}
+  - {id: AITECH.QWEN, name: Qwen, category: AITECH, aliases: [qwen, 通义千问, 千问], difficulty: 2, importance: 1}
+  - {id: AITECH.DEEPSEEK, name: DeepSeek, category: AITECH, aliases: [deepseek-v3, deepseek-r1, deepseek模型], difficulty: 3, importance: 2}
+  - {id: AITECH.LLAMA, name: Llama, category: AITECH, aliases: [llama, llama3, llama2], difficulty: 2, importance: 1}
+  - {id: AITECH.GLM, name: GLM, category: AITECH, aliases: [chatglm, glm-4, 智谱清言], difficulty: 2, importance: 1}
+  - {id: AITECH.DPO, name: 偏好对齐, category: AITECH, aliases: [dpo, ppo, grpo, 偏好对齐], difficulty: 4, importance: 2}
+  - {id: AITECH.VIDEOGEN, name: 视频生成, category: AITECH, aliases: [video-generation, text-to-video, 文生视频], difficulty: 4, importance: 3}
+  - {id: AITECH.LONGCONTEXT, name: 长上下文, category: AITECH, aliases: [long-context, 长文本, 长上下文], difficulty: 3, importance: 2}
+  - {id: FRAMEWORK.LANGGRAPH, name: LangGraph, category: FRAMEWORK, aliases: [langgraph], difficulty: 3, importance: 1}
+  - {id: FRAMEWORK.DIFY, name: Dify, category: FRAMEWORK, aliases: [dify, coze, 扣子], difficulty: 2, importance: 1}
+  - {id: ENGINEERING.ASCEND, name: 昇腾, category: ENGINEERING, aliases: [ascend, 昇腾, npu, 昇腾芯片], difficulty: 4, importance: 2}

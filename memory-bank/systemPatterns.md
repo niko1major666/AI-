@@ -15,7 +15,7 @@ src/
 ├── data/        schema / normalize / load / build / file_parser / resume_parser / translate
 ├── extractor/   rule_baseline / bert_ner / siamese_uie / base / evaluate / postprocess
 ├── matcher/     tfidf_matcher / bge_matcher / gap_analyzer / evaluate / base
-├── skillkb/     loader（Taxonomy，147 技能：difficulty + importance）
+├── skillkb/     loader（Taxonomy，161 技能：difficulty + importance + skip_extract）
 ├── crawler/     tencent / bytedance / xiaomi / xiaomi_campus / deepseek / huawei /
 │                huawei_51job / kimi / minimax / util
 └── app/         app.py（Streamlit 三页面）
@@ -35,6 +35,7 @@ scripts/         merge_jobs / recrawl_all / recalc_importance / eval_resume_matc
 6. **岗位标题过滤**：只按**标题**剔除土建/施工等非 AI 岗位（黑名单 + AI 白名单保护），不做正文过滤——正文里的「桥梁」多为「业务与技术之间的桥梁」比喻（25 条真实样本验证过），按正文删会误伤真岗位。实现 `src/data/job_filter.py`，开关与词表覆盖在 `configs/dataset.yaml` 的 `cleaning.title_filter`，剔除条数计入 `build_stats.json` 的 `dropped_offtopic`。
 7. **must/nice 读 JD 原文，不读全行业频率**：曾经用 `demand >= 0.4` 判硬性要求，但语料里最高需求占比只有 36.2%，判据恒为 False（P0 恒空、must_weight 失效）。现在 `src/matcher/jd_requirements.py` 三级判定：句内触发词（加分语气优先，避免「熟悉 X 优先」被判硬门槛）→ 章节标题（任职要求 / 加分项）→ 全行业占比兜底；`demand` 只用于优先级排序与说明文案。实测 57.0% 岗位可判出 ≥1 项硬性要求（1.48 项/岗）。
 8. **零技能岗位必须显式兜底**：1085 条（23.7%）列表式短 JD 抽不到技能，直接出报告会出现「匹配度 0% + 已覆盖全部技能」的矛盾。`src/matcher/job_neighbors.py` 用同公司 + 标题相似岗位的技能并集代理（98.7% 可覆盖），页面标注「已用相似岗位推断」，代理结果不写入原始数据。
+9. **KB 扩充按「实测占比」定 importance，并用 skip_extract 分离解析/抽取口径**：新增技能先用临时脚本在 4582 条语料上跑一遍（不落库），确认命中率与对既有技能的挤占（更长的 token 优先匹配，如「多模态大模型」→ 视觉语言模型，使「多模态」12.05%）；importance 直接按 `ratio_to_importance` 口径填，跑 `recalc_importance.py` 后应零差异。同一技能若某些写法在 JD 里噪声大（「量化」多为「可量化」），把它写进 `skip_extract`：`Taxonomy.resolve()` 仍可解析（简历输入「量化」→ 模型量化），但 `RuleBaselineExtractor._build_tokens()` 不生成对应 token。学习资源按 `skill_id` 索引，`tests/test_learning_resources.py` 锁定「id 必须存在 / 不重复 / 高频技能有资源 / url 合法」，避免前端静默丢建议。
 
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测

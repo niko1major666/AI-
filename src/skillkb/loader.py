@@ -19,6 +19,9 @@ class Skill:
     aliases: list = field(default_factory=list)
     difficulty: int = 3
     importance: int = 3
+    # 参与「用户输入解析」，但不参与「JD 抽取」的高噪声写法。
+    # 例：「量化」在 JD 里大量是「可量化/量化指标」，不是模型量化。
+    skip_extract: list = field(default_factory=list)
 
 
 def _norm(s) -> str:
@@ -48,10 +51,11 @@ class Taxonomy:
                 aliases=list(s.get("aliases", [])),
                 difficulty=int(s.get("difficulty", 3)),
                 importance=int(s.get("importance", 3)),
+                skip_extract=list(s.get("skip_extract", [])),
             )
             self.skills.append(sk)
             self._by_id[sk.id] = sk
-            for token in [sk.name] + sk.aliases:
+            for token in [sk.name] + sk.aliases + sk.skip_extract:
                 self._alias_index[_norm(token)] = sk
         self._keys = sorted(self._alias_index.keys())
 

@@ -20,6 +20,7 @@
 4. 输出匹配度打分 + 逐项对比 + 差距报告（缺失技能/优先级/学习资源）；AI 解读会结合简历解析出的专业给出迁移建议（未识别到专业则不展示）
 5. must/nice 判定读 JD 原文（句内触发词 → 章节标题 → 全行业占比兜底），再按「岗位内提及次数」加权，避免把加分项当硬门槛；零技能岗位用同公司相似岗位兜底并标注来源
 6. Streamlit 三页面：技能图谱 / 简历匹配 / 差距报告
+7. 知识库持续扩充：161 项技能（含 MCP、Function Calling、扩散模型、视觉语言模型、LangGraph、Dify、昇腾等高频缺失项）+ 106 项学习资源；高噪声写法（如裸「量化」= 可量化/量化指标）只在简历解析侧生效，不参与 JD 抽取
 
 ## 二、技术选型
 
@@ -55,7 +56,7 @@ ai-skill-gap/
 │   ├── raw/            原始 JD（seed 样例 sample_jobs.csv 已入库）
 │   ├── processed/      清洗后结构化数据（jobs.jsonl / 统计）
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
-│   └── kb/             skill_taxonomy(147技能·难度+重要度[需求频率驱动]) / learning_resources
+│   └── kb/             skill_taxonomy(161技能·难度+重要度[需求频率驱动]) / learning_resources(106 项)
 ├── src/
 │   ├── data/           schema / normalize / job_filter(★标题过滤) / load / build_dataset
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
@@ -63,7 +64,7 @@ ai-skill-gap/
 │   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance
-├── tests/              pytest（122 用例已通过）
+├── tests/              pytest（131 用例已通过）
 ├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -182,6 +183,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W4 | BGE 匹配，Recall@5 对比 | ✅ BGE vs TF-IDF：Recall@5 均 0.975，MRR/Hit@1 BGE 更优 |
 | W5-6 | 美化 + Docker + README 量化指标 | `docker build -t ai-skill-gap .` |
 | W7 | 迭代 1：must/nice 判定重构 + 零技能兜底 + 强调度加权 + 简历解析缓存 | ✅ 122 测试通过；57.0% 岗位有硬性要求（修复前 0%），零技能岗位 98.7% 可代理 |
+| W8 | 迭代 2：知识库（KB）内容扩充 | ✅ 131 测试通过；技能 147→161（新增 16、合并 2），学习资源 11→106 项，JD 技能覆盖率 160/161 |
 
 ## 八、数据采集与爬虫
 
@@ -230,7 +232,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 # 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
 .\.venv\Scripts\python.exe -m src.data.build_dataset --stats
 
-# 语料变化后重算 147 技能重要度（JD 需求占比分档 → importance 1~5）
+# 语料变化后重算 161 技能重要度（JD 需求占比分档 → importance 1~5）
 .\.venv\Scripts\python.exe scripts/recalc_importance.py
 ```
 
@@ -239,7 +241,9 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 ## 九、量化指标（简历用）
 
 - 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4582 条 / 78 家**（原始 5013 条 → 过短 7 条 + 非 AI 工程岗 4 条（标题过滤）+ 重复 420 条后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
-- 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 36.2%、Python 36.0%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 13.0%
+- 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 35.8%、Python 36.1%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 12.1%（新增「视觉语言模型」后部分「多模态」文本归入更细粒度技能）
+- 知识库覆盖（迭代 2，161 技能）：**160/161 技能在 4582 条 JD 上可命中**（唯一未命中「联邦学习」，为语料未出现而非词表缺失）；学习资源 **106/161（65.8%）**，Top 80 需求技能覆盖 77 项；新增技能实测占比：视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%
+- KB 精度修正：`ML.QUANT` 原别名「量化」命中 6.31%，抽样发现多为「可量化/量化指标」→ 改为 name「模型量化」+ `skip_extract: [量化]`（解析侧仍识别「量化」，抽取侧不匹配），真实占比 1.07%、importance 4→2
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
 - 需求强度判定（`src/matcher/jd_requirements.py`，4582 条语料实测）：**57.0% 的岗位能识别出 ≥1 项硬性要求（平均 1.48 项/岗）**；来源分布 句内触发词 4773 / 章节归属 179 / 全行业占比兜底 1831。修复前用「全语料需求占比 ≥ 40%」判定，因最高占比仅 36.2%，P0 分组恒为空
 - 零技能岗位兜底（`src/matcher/job_neighbors.py`）：**98.7% 的零技能岗位（1085 条）可用同公司相似岗位代理**，代理技能中位数 4 项；页面会标注推断来源，不再出现「匹配度 0% 却说已覆盖全部技能」

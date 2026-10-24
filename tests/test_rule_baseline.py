@@ -32,6 +32,16 @@ def test_rule_baseline_ascii_word_boundary():
     assert all(s.skill_id != "PROG.GO" for s in spans)
 
 
+def test_skip_extract_ignores_noisy_cjk_token():
+    """「可量化/量化指标」不得抽成模型量化技能；真正的写法仍要抽到。"""
+    ex = _extractor()
+    noise = ex.extract_spans("j4", "建立可量化的评估体系，输出量化指标，量化分析业务")
+    assert all(s.skill_id != "ML.QUANT" for s in noise)
+
+    real = {s.skill_id for s in ex.extract_spans("j5", "熟悉模型量化与GPTQ、AWQ部署")}
+    assert "ML.QUANT" in real
+
+
 def test_rule_baseline_no_overlap_dup():
     ex = _extractor()
     spans = ex.extract_spans("j3", "熟悉PyTorch")

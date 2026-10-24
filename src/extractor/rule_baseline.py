@@ -23,9 +23,11 @@ class RuleBaselineExtractor:
         tokens = []
         seen = set()
         for sk in taxonomy.all_skills():
+            # skip_extract：只在「用户输入解析」时使用，JD 抽取忽略（避免“可量化”这类噪声）
+            skip = {str(x).strip().lower() for x in getattr(sk, "skip_extract", [])}
             for raw in [sk.name] + sk.aliases:
                 t = str(raw).strip().lower()
-                if not t or t in seen:
+                if not t or t in seen or t in skip:
                     continue
                 seen.add(t)
                 tokens.append((t, sk))

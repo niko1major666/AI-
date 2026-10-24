@@ -11,8 +11,62 @@ def _tax() -> Taxonomy:
 
 def test_load_counts():
     t = _tax()
-    assert len(t.all_skills()) == 147
+    # 147 + 迭代 2 新增 16（MCP/Function Calling/扩散模型/VLM/…）- 合并 2（文本向量化、华为云）
+    assert len(t.all_skills()) == 161
     assert len(t.categories) == 6
+
+
+def test_iter2_new_skills_resolve():
+    """迭代 2 新增技能可按名称/别名解析（原来这些词在 JD 里完全抽不到）。"""
+    t = _tax()
+    cases = {
+        "MCP": "AITECH.MCP",
+        "模型上下文协议": "AITECH.MCP",
+        "Function Calling": "AITECH.FUNCALL",
+        "工具调用": "AITECH.FUNCALL",
+        "具身智能": "AITECH.EMBODIED",
+        "世界模型": "AITECH.WORLDMODEL",
+        "Qwen": "AITECH.QWEN",
+        "通义千问": "AITECH.QWEN",
+        "DeepSeek": "AITECH.DEEPSEEK",
+        "Llama": "AITECH.LLAMA",
+        "GLM": "AITECH.GLM",
+        "DPO": "AITECH.DPO",
+        "GRPO": "AITECH.DPO",
+        "视频生成": "AITECH.VIDEOGEN",
+        "长上下文": "AITECH.LONGCONTEXT",
+        "扩散模型": "ML.DIFFUSION",
+        "视觉语言模型": "ML.VLM",
+        "多模态大模型": "ML.VLM",
+        "LangGraph": "FRAMEWORK.LANGGRAPH",
+        "Dify": "FRAMEWORK.DIFY",
+        "扣子": "FRAMEWORK.DIFY",
+        "昇腾": "ENGINEERING.ASCEND",
+    }
+    for text, want in cases.items():
+        got = t.resolve(text)
+        assert got is not None, f"{text} 未命中词表"
+        assert got.id == want, f"{text} -> {got.id}，期望 {want}"
+
+
+def test_iter2_merged_redundant_skills():
+    """零命中冗余技能合并到同义技能，别名仍可解析（避免出现无人引用的 id）。"""
+    t = _tax()
+    assert t.by_id("AITECH.TEXTVEC") is None
+    assert t.by_id("ENGINEERING.HUAWEICLOUD") is None
+    assert t.resolve("文本向量化").id == "AITECH.EMBEDDING"
+    assert t.resolve("文本向量").id == "AITECH.EMBEDDING"
+    assert t.resolve("华为云").id == "ENGINEERING.CLOUD"
+    # 真实存在但语料未出现的技能保留（不为了覆盖率删技能）
+    assert t.by_id("ML.FED") is not None
+
+
+def test_quantization_aliases():
+    """「模型量化 / GPTQ / AWQ」归到已有量化技能；裸「量化」仅用于用户输入解析。"""
+    t = _tax()
+    for text in ["模型量化", "GPTQ", "AWQ", "quantization", "量化"]:
+        assert t.resolve(text).id == "ML.QUANT"
+    assert "量化" in t.by_id("ML.QUANT").skip_extract
 
 
 def test_resolve_exact_name():

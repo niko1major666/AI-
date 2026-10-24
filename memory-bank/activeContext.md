@@ -13,6 +13,8 @@
    - 页面：简历页新增技能画像 + Top10 岗位；差距页新增「分析模式」单岗/多岗切换、简历补强建议、规则学习路径、导出按钮；图谱页新增公司×Top12 技能表
    - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4582/78/4472；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
    - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201，全量约 40s
+   - 发布 v1.3.0（Release「v1.3.0 求职闭环与评测加固」，正文 `docs/release-notes/v1.3.0.md`，由 push tag 的 `release.yml` 自动创建）
+   - 首次推 CI 暴露三处环境依赖并已修复：① `test_dataset_snapshot` 读 `data/processed/build_stats.json`，而 `data/processed/` 在 .gitignore 里（只有 jobs.jsonl 强制入库）→ 改为「常量必校验 + stats 存在时交叉校验」；② AppTest 默认 `default_timeout=60` 不够冷启动全语料抽取 → 提到 240s；③ 但 3.10 runner 上首个 AppTest 仍稳定卡死（60s/240s 两次均超时，同一代码 3.12 约 30s）→ `tests/test_app.py` 在 `sys.version_info < (3, 11)` 时整体 skip，UI 集成回归由 3.12 覆盖。CI 失败用例现在写进 check-run 注解 + job summary（无需登录即可用 API 查看）
 
 2. 迭代 2（KB 内容补全）：`skill_taxonomy` 147→161 —— 新增 16 项 JD 高频缺失技能（视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%、DeepSeek 1.05%、Qwen/Llama/GLM/世界模型/具身智能/LangGraph/Dify），合并 2 个零命中冗余项（文本向量化→Embedding、华为云→云计算）并保留别名；`learning_resources` 11→106 项（Top 80 需求技能覆盖 77）；新增 `Skill.skip_extract` 把「解析侧词表」与「抽取侧词表」分离，修正裸「量化」误匹配（6.31%→1.07%，importance 4→2，简历输入「量化」仍解析为模型量化）；实测 160/161 技能可命中（仅「联邦学习」未出现），全语料抽取 11.0s；新增 `tests/test_learning_resources.py`（6 用例）与词表/抽取回归，测试 122→131
 

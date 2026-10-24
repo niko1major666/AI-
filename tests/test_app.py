@@ -7,7 +7,8 @@ APP = Path(__file__).resolve().parents[1] / "src" / "app" / "app.py"
 
 
 def test_app_runs_without_exception():
-    at = AppTest.from_file(str(APP), default_timeout=60)
+    # 首屏要读 14MB 语料并跑一次规则抽取（冷缓存），CI 上 3.10 曾触发默认 60s 超时
+    at = AppTest.from_file(str(APP), default_timeout=240)
     at.run()
     assert not at.exception, f"app exceptions: {at.exception}"
 

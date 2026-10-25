@@ -50,6 +50,8 @@ class RuleBaselineExtractor:
         步进规则与 `finditer` 对齐：命中后从匹配末尾继续（不重叠），
         边界断言失败只前进 1 个字符（等价于正则「此处不匹配、从下一位重试」）。
         """
+        if not token:          # 空 token 永不匹配；同时避免 str.find("") 原地循环
+            return []
         ascii_token = token.isascii()
         n = len(token)
         size = len(text_lower)

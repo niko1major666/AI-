@@ -88,6 +88,8 @@ def test_iter_matches_equivalent_to_regex_reference():
             )
             checked += 1
     assert checked > 1000
+    # 空 token 不匹配也不能死循环（str.find("") 会一直原地命中）
+    assert ex._iter_matches("abc", "") == []
 
 
 def test_mention_count_respects_word_boundary_and_repeats():

@@ -1,15 +1,7 @@
-import sys
 from pathlib import Path
 
 import pytest
 from streamlit.testing.v1 import AppTest
-
-# AppTest 在 CI 的 Python 3.10 runner 上会卡住（实测两次：默认 60s 与 240s 均超时），
-# 同一份代码在 3.12 只需约 30s；UI 集成回归交由 3.12 覆盖，3.10 仍跑全部单元/回归测试。
-pytestmark = pytest.mark.skipif(
-    sys.version_info < (3, 11),
-    reason="AppTest 在 Python 3.10 runner 上挂起（>240s），UI 回归由 3.12 覆盖",
-)
 
 APP = Path(__file__).resolve().parents[1] / "src" / "app" / "app.py"
 

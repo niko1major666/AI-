@@ -44,6 +44,7 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 10. **学习计划「规则常驻 + LLM 增强」**：`src/matcher/learning_path.py` 用内置先修表（52 个技能、64 条强依赖）+ 拓扑排序 + 难度→学时（2/4/8/16/24h）生成确定性三阶段路径；若先修技能落在更靠后的阶段（如 P0 的 RAG 依赖 P2 的 Embedding），自动把先修提到前面阶段，否则计划顺序不可执行；缺口外的先修只写 `prereq_note` 不新增条目。LLM 解读（`report_interpreter`）仍保留，只做个性化补充。
 11. **反向匹配按「公司+标题」去重、只用已抽到技能的岗位**：`src/matcher/job_recommender.py` 用 `(company, normalize(title))` 去重（同一岗位多渠道重复导致榜单被同一 JD 占满），复用 `analyzer.must_weight/nice_weight` 与 `1 + ln tf` 计分；结果在页面用 `@st.cache_data` 按「技能 id 组合」缓存，避免每次 rerun 重扫 4472 个岗位。
 12. **评测阈值写进测试 + 指标报告可 diff**：`scripts/eval_all.py` 输出无时间戳的 `docs/metrics.md`，CI 在 main 上重跑并 `git diff --exit-code` 校验「报告是否随代码更新」；`tests/test_extraction_baseline.py` / `test_matcher_baseline.py` 固化实测基线（F1 容差 1pt、Recall 容差 2pt），`test_dataset_snapshot.py` 锁定语料规模与字段，`scripts/validate_kb.py` 做结构校验（id/别名冲突/类别/难度/资源 url）。CI 分层：PR 跑 `-m "not slow"` + 覆盖率门槛，nightly 跑含全语料遍历的全量。
+13. **覆盖率统计只挂 3.12**：Python 3.10 的 `coverage` 用 `sys.settrace` 逐行追踪，对「4582 条 JD × 约 430 词表 token」的纯 Python 正则循环（约 160 万次 `re.finditer`）放大约 15 倍（实测 5.8k 次/秒；3.12 的 PEP 669 `sys.monitoring` 为 80k 次/秒，仅慢 1.3 倍），AppTest 首屏从 14.5s 膨胀到 ~240s 撞超时。因此 CI 矩阵里 3.10 只跑用例（含 AppTest）不传 `--cov`，覆盖率门槛 `--cov-fail-under=55` 留在 3.12；不要为了「两边都统计覆盖率」在 3.10 上恢复 `--cov`。同理，首屏冷启动成本高时，任何逐行追踪工具（coverage/pydev/调试器）都会显著放大，先量基线再判断是不是应用本身慢。
 
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测

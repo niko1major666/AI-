@@ -13,6 +13,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -38,11 +39,23 @@ jobs:
       - name: Compile check
         run: python -m compileall -q src scripts
 
-      # D4/D5：快测 + 覆盖率门槛；slow 标记（全语料遍历）留给 nightly
-      - name: Run tests with coverage
+      # D4/D5：快测；slow 标记（全语料遍历）留给 nightly
+      # 覆盖率门槛只在 3.12 上跑：Python 3.10 的 coverage 用 sys.settrace 逐行追踪，
+      # 会把 AppTest 首屏的纯 Python 全语料抽取（约 160 万次 re.finditer）放慢约 15 倍
+      # （实测正则调用 5.8k/s vs 3.12 sys.monitoring 80k/s），首屏 14.5s 膨胀到 ~240s
+      # 撞 AppTest 超时；3.12 用 PEP 669 sys.monitoring，只放大约 1.3 倍。
+      # 3.10 仍然跑全量用例（含 AppTest），只是不开启覆盖率统计。
+      - name: Run tests with coverage (3.12)
+        if: matrix.python-version == '3.12'
         run: |
           set -o pipefail
           pytest -m "not slow" --cov=src --cov-report=term-missing --cov-fail-under=55 --tb=short 2>&1 | tee pytest.log
+
+      - name: Run tests (3.10, no coverage)
+        if: matrix.python-version == '3.10'
+        run: |
+          set -o pipefail
+          pytest -m "not slow" --tb=short 2>&1 | tee pytest.log
 
       # 把失败用例写进 check-run 注解：无需 Actions 登录也能从 API 看到失败详情
       - name: Annotate failing tests

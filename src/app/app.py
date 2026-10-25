@@ -73,18 +73,29 @@ def _inject_css():
 
 @st.cache_resource
 def load_core():
-    import yaml
+    """轻量核心：词表 + 规则抽取器。
+
+    刻意不在这里建 TfidfMatcher / SkillGapAnalyzer——它们要 import sklearn
+    （冷启动 1.5–4.5s），而默认首屏「技能图谱」用不到。需要时用 load_engine()。
+    """
     from src.extractor.rule_baseline import RuleBaselineExtractor
-    from src.matcher.gap_analyzer import SkillGapAnalyzer
-    from src.matcher.tfidf_matcher import TfidfMatcher
     from src.skillkb.loader import Taxonomy
 
     taxonomy = Taxonomy(str(ROOT / "data" / "kb" / "skill_taxonomy.yaml"))
-    rule = RuleBaselineExtractor(taxonomy)
+    return taxonomy, RuleBaselineExtractor(taxonomy)
+
+
+@st.cache_resource
+def load_engine():
+    """重量引擎：TF-IDF 匹配 + 差距分析（只有「简历匹配」「差距报告」页需要）。"""
+    import yaml
+    from src.matcher.gap_analyzer import SkillGapAnalyzer
+    from src.matcher.tfidf_matcher import TfidfMatcher
+
+    taxonomy, _rule = load_core()
     matcher = TfidfMatcher().fit([s.name for s in taxonomy.all_skills()])
     resources = yaml.safe_load((ROOT / "data" / "kb" / "learning_resources.yaml").read_text(encoding="utf-8"))
-    analyzer = SkillGapAnalyzer(taxonomy, resources=resources, matcher=matcher)
-    return taxonomy, rule, analyzer
+    return SkillGapAnalyzer(taxonomy, resources=resources, matcher=matcher)
 
 
 @st.cache_data
@@ -102,7 +113,7 @@ def extract_corpus():
     判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.2%，恒为 False，
     导致 P0 分组永远为空。改为按 JD 文本判定，见 src/matcher/jd_requirements.py。
     """
-    taxonomy, rule, _ = load_core()
+    taxonomy, rule = load_core()
     rows, texts = [], []
     for j in load_jobs():
         text = j.get("jd_clean") or j.get("jd_text", "")
@@ -404,7 +415,8 @@ def page_resume(taxonomy, rule, analyzer, rows=None):
 @st.cache_data(show_spinner=False, max_entries=16)
 def _recommendations(skill_ids: tuple):
     """简历技能 -> Top 岗位（按技能 id 组合缓存；内部复用已缓存的全语料抽取结果）。"""
-    taxonomy, _rule, analyzer = load_core()
+    taxonomy, _rule = load_core()
+    analyzer = load_engine()
     from dataclasses import asdict
 
     from src.matcher.job_recommender import recommend_jobs
@@ -713,18 +725,19 @@ def page_gap_compare(taxonomy, analyzer, rows, demand):
 
 def main():
     _inject_css()
-    taxonomy, rule, analyzer = load_core()
+    taxonomy, rule = load_core()
     rows = extract_corpus()
     st.sidebar.markdown("## 🎯 AI 岗位技能差距分析")
     st.sidebar.caption("面向非科班求职者的技能诊断与学习规划")
     st.sidebar.markdown("---")
     page = st.sidebar.radio("页面", ["技能图谱", "简历匹配", "差距报告"])
     if page == "技能图谱":
+        # 首屏不触发 load_engine()：避免为「技能图谱」付 sklearn 的冷导入开销
         page_graph(taxonomy, rows)
     elif page == "简历匹配":
-        page_resume(taxonomy, rule, analyzer, rows)
+        page_resume(taxonomy, rule, load_engine(), rows)
     else:
-        page_gap(taxonomy, analyzer, rows)
+        page_gap(taxonomy, load_engine(), rows)
 
 
 main()

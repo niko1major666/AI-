@@ -13,6 +13,7 @@
    - 页面：简历页新增技能画像 + Top10 岗位；差距页新增「分析模式」单岗/多岗切换、简历补强建议、规则学习路径、导出按钮；图谱页新增公司×Top12 技能表
    - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4582/78/4472；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
    - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201，全量约 40s
+   - 首屏冷启动优化：`rule_baseline._iter_matches()` 用 `str.find` + 手工词边界替代「每 token 一次 `re.finditer`」（全语料 4582 条 24.3s → 1.5s，逐条输出一致，`test_iter_matches_equivalent_to_regex_reference` 以旧正则作参照锁死语义）；`app.load_core()` 拆成轻核心（词表 + 抽取器）与 `load_engine()`（TF-IDF/差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏不再付该开销；本机 AppTest 首屏 32s → 3.9s；`scripts/bench_extract.py` 可复现
    - 发布 v1.3.0（Release「v1.3.0 求职闭环与评测加固」，正文 `docs/release-notes/v1.3.0.md`，由 push tag 的 `release.yml` 自动创建）
    - 首次推 CI 暴露三处环境依赖并已修复：① `test_dataset_snapshot` 读 `data/processed/build_stats.json`，而 `data/processed/` 在 .gitignore 里（只有 jobs.jsonl 强制入库）→ 改为「常量必校验 + stats 存在时交叉校验」；② AppTest 默认 `default_timeout=60` 不够冷启动全语料抽取 → 提到 240s；③ 3.10 runner 上首个 AppTest 240s 超时的**真因是覆盖率追踪而非 AppTest 挂起**：`pytest --cov` 在 3.10 用 `sys.settrace`，把首屏约 160 万次 Python 层 `re.finditer` 放慢约 15 倍（实测 5.8k/s；3.12 的 PEP 669 `sys.monitoring` 为 80k/s，仅慢 1.3 倍），首屏 14.5s → ~240s。修复：CI 在 3.10 上只跑用例不传 `--cov`（含 AppTest，全套 88s），覆盖率门槛保留 3.12；`tests/test_app.py` 的版本 skip 已删除。CI 失败用例现在写进 check-run 注解 + job summary（无需登录即可用 API 查看）
 

@@ -47,6 +47,8 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 13. **覆盖率统计只挂 3.12**：Python 3.10 的 `coverage` 用 `sys.settrace` 逐行追踪，对「4582 条 JD × 约 430 词表 token」的纯 Python 正则循环（约 160 万次 `re.finditer`）放大约 15 倍（实测 5.8k 次/秒；3.12 的 PEP 669 `sys.monitoring` 为 80k 次/秒，仅慢 1.3 倍），AppTest 首屏从 14.5s 膨胀到 ~240s 撞超时。因此 CI 矩阵里 3.10 只跑用例（含 AppTest）不传 `--cov`，覆盖率门槛 `--cov-fail-under=55` 留在 3.12；不要为了「两边都统计覆盖率」在 3.10 上恢复 `--cov`。同理，首屏冷启动成本高时，任何逐行追踪工具（coverage/pydev/调试器）都会显著放大，先量基线再判断是不是应用本身慢。
 14. **首屏冷启动：字面量匹配用 `str.find`，重依赖「用到才导入」**：词表抽取的 token 匹配本质是字面量子串搜索（CJK token 的 `re.finditer` pattern 就是 `re.escape(token)`，ASCII token 只多「前后非字母数字」断言），逐 token 调正则 = 4582 条 JD × 359 token ≈ 165 万次全文扫描；换成 `str.find` + 两次字符判断后，全语料抽取 24.3s → 1.5s，且逐条输出完全一致（`test_iter_matches_equivalent_to_regex_reference` 用旧正则做参照逐位置比对，永久锁死语义）。另外 `sklearn` 冷导入本机要 4.5s 却只服务「简历匹配 / 差距报告」，所以 `app.load_core()` 只建词表 + 抽取器，`load_engine()` 才建 TfidfMatcher/SkillGapAnalyzer —— 默认首屏 AppTest 32s → 3.9s。结论：任何「全语料 × 全词表」的纯 Python 循环先量级（`scripts/bench_extract.py`），别让首屏为用不到的依赖付钱。
 
+15. **版本元数据以 tag 为准，并用「最新发布说明」守护**：CI 浅克隆拿不到 tag，所以把 `docs/release-notes/vX.Y.Z.md` 当版本事实来源——`pyproject.toml` 的 `version` 必须等于该目录下最大的语义版本，标题行必须是 `# vX.Y.Z ...`（`release.yml` 取它作 Release 标题），由 `tests/test_release_metadata.py` 三条用例拦截漂移；README 用 shields.io 动态 Release 徽章（`img.shields.io/github/v/release/...`），不需要每版手改。发布流程写在 `docs/RELEASING.md`，含「重打 tag」路径：`release.yml` 对已存在 Release 走 `gh release edit --draft=false`，因此 `git tag -f` + `git push -f origin vX.Y.Z` 可把后续提交并入同一版本（v1.3.1 用过）。
+
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测
 - **dataclass 数据模型**：`JobPosting`、`SkillSpan`、`GapItem`、`GapReport`、`ResumeProfile`、`LearningPath/Stage/Step`、`ComparedJob/CompareResult`、`JobSuggestion`

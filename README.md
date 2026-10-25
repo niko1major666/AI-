@@ -1,6 +1,7 @@
 # AI 岗位技能差距分析系统（ai-skill-gap）
 
 [![CI](https://github.com/niko1major666/AI-/actions/workflows/ci.yml/badge.svg)](https://github.com/niko1major666/AI-/actions)
+[![Release](https://img.shields.io/github/v/release/niko1major666/AI-?label=release&sort=semver)](https://github.com/niko1major666/AI-/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-red.svg)](https://streamlit.io/)
@@ -195,6 +196,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W7 | 迭代 1：must/nice 判定重构 + 零技能兜底 + 强调度加权 + 简历解析缓存 | ✅ 122 测试通过；57.0% 岗位有硬性要求（修复前 0%），零技能岗位 98.7% 可代理 |
 | W8 | 迭代 2：知识库（KB）内容扩充 | ✅ 131 测试通过；技能 147→161（新增 16、合并 2），学习资源 11→106 项，JD 技能覆盖率 160/161 |
 | W9 | 迭代 3：功能扩展（C1–C7）+ 评测/CI 加固（D1–D7） | ✅ 201 测试通过；规则学习路径/报告导出/多岗对比/反向推荐/技能画像/公司×技能矩阵；覆盖率 58%（门槛 55%）+ 3.10/3.12 矩阵 + 抽取/匹配回归基线 + `docs/metrics.md` |
+| W10 | 迭代 4：首屏冷启动与 CI 修复（v1.3.1 补丁） | ✅ 203 测试通过；全语料抽取 24.3s→1.5s、AppTest 首屏 32s→3.9s、3.10 恢复跑全量用例 |
 
 ## 八、数据采集与爬虫
 
@@ -335,3 +337,10 @@ jobs.jsonl     skills_long        skill_id 匹配      GapReport        3 页面
 3. **transformers 版本耦合** → 锁 `transformers<5`、`sentence-transformers<6`，防止 modelscope 崩
 4. **SiameseUIE 输出为嵌套 list** `{'output': [[...]]}` → 递归展开解析
 5. **Windows 无 symlink** → HF 缓存降级警告（无害），设 `HF_HUB_DISABLE_SYMLINKS_WARNING` 可静默
+
+## 十三、版本与发布
+
+- 版本号以 git tag 为准，最新版本见顶部 **Release** 徽章或 [Releases](https://github.com/niko1major666/AI-/releases)（徽章由 shields.io 动态读取最新 Release，**不需要改 README**）
+- 每个版本对应一份发布说明 `docs/release-notes/vX.Y.Z.md`（首行标题即 Release 标题，其余作正文），索引见 [`docs/release-notes/`](docs/release-notes/)
+- `pyproject.toml` 的 `version` 与该文件对齐，由 `tests/test_release_metadata.py` 守护（「`pyproject` 版本 == 最新发布说明的 tag」不一致就让 CI 红），避免元数据静默漂移
+- 推送 `v*` tag 后 `.github/workflows/release.yml` 自动创建/更新 GitHub Release；完整步骤（含改版本号、跑门禁、重打 tag）见 [`docs/RELEASING.md`](docs/RELEASING.md)

@@ -62,6 +62,7 @@
 - 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
 - DeepSeek API key 已配置到用户环境变量
 - 首屏冷启动（v1.3.1）：全语料抽取 24.3s → 1.5s（`str.find` 替代逐 token `re.finditer`，输出逐条一致），默认首屏不再 import sklearn；本机 AppTest 首屏 32s → 3.9s
+- 版本元数据（v1.3.1）：`pyproject.toml` 的 `version` 由 `0.1.0` 对齐为 `1.3.1`；README 加动态 Release 徽章 + 「版本与发布」章节 + 路线图 W10；新增 `docs/RELEASING.md`（含重打 tag 路径）与 `tests/test_release_metadata.py`（pyproject 版本必须等于最新 `docs/release-notes/vX.Y.Z.md`，漏改即红）
 - git 工作区干净，main 与远程一致；tag **v1.3.1** 已发布（补丁：首屏冷启动 + 3.10 CI 修复，正文 `docs/release-notes/v1.3.1.md`；上一版本 v1.3.0「求职闭环与评测加固」）
 - CI 绿：GitHub Actions 全绿（`metrics` + `test (3.10)` + `test (3.12)`；`-m "not slow"`，nightly 跑含 slow 的全量）；**3.10 与 3.12 都跑全量 201 用例（含 3 个 AppTest）**，覆盖率门槛 55% 只在 3.12 上统计（实测 3.10 全套 88s / 3.12 含覆盖率 76s）
 - AppTest「3.10 超时」根因（已定位并修复）：不是 AppTest 挂起，而是 `pytest --cov` 在 3.10 上走 `sys.settrace` 逐行追踪，把首屏「全语料抽取」的约 160 万次 Python 层 `re.finditer` 放慢约 15 倍（实测正则调用 5.8k/s；3.12 用 PEP 669 `sys.monitoring` 为 80k/s，只慢 1.3 倍）→ 首屏 14.5s 膨胀到 ~240s，正好撞 `default_timeout=240`。修复：CI 在 3.10 上不传 `--cov`（用例全跑），覆盖率门槛保留在 3.12；`tests/test_app.py` 的版本 skip 已删除

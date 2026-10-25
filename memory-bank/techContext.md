@@ -7,7 +7,7 @@
 - **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）
 - **前端**：Streamlit + pyvis（图谱可视化）
 - **爬虫**：requests + Playwright（chromium headless）
-- **工程**：pytest（66 用例）、Docker、yaml 配置化、pandas
+- **工程**：pytest（207 用例 = 205 快测 + 2 slow）、Docker、yaml 配置化、pandas
 
 ## 开发设置
 - 项目根目录：`D:\ai-skill-gap`
@@ -18,7 +18,7 @@
 - SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
-- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，66 测试）
+- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，207 测试；3.10 只跑用例、3.12 加覆盖率门槛）
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）
@@ -34,7 +34,7 @@
 
 ## 工具使用模式
 - 跑测试：`.\.venv\Scripts\python.exe -m pytest -q`
-- 重爬：`python scripts/recrawl_all.py`（8 源，约 20+ 分钟）
+- 重爬：`python scripts/recrawl_all.py`（11 源，约 20+ 分钟）
 - 合并+构建：`merge_jobs.py` → `python -m src.data.build_dataset --stats`
 - 重要度重算：`python scripts/recalc_importance.py`
 - 匹配评测：`python scripts/eval_resume_match.py`（需 BGE 缓存）

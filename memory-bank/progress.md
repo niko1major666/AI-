@@ -3,11 +3,11 @@
 ## 什么能用（已完成）
 - ✅ 数据采集：4582 条真实 JD / 78 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书 + 英文科技岗位），含部门/发布时间等字段
 - ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），161 技能（难度+重要度）
-- ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24
+- ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24（147 技能词表时期；161 技能下 TF-IDF 当前基线 0.2200，见 `docs/metrics.md`）
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源；AI 解读按简历专业生成迁移建议（无专业不展示）
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
-- ✅ 工程：131 测试全通过（含保活脚本纯函数测试 + 小红书爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
+- ✅ 工程：207 测试全通过（205 快测 + 2 slow；含保活脚本纯函数测试 + 小红书爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
@@ -36,17 +36,18 @@
   - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
   - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
   - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
-  - 测试 131 → 207（205 快测 + 2 slow）；快测约 35s
+  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（当前：205 快测 + 2 slow）；快测约 35s
 - ✅ README 界面预览补两张「区域截图」（`scripts/capture_screenshots.py --page company_matrix|gap_compare`）：**公司 × Top 12 技能**（技能图谱页 ProgressColumn 矩阵，行=公司按 JD 数降序、值=该公司 JD 命中比例；`demand_matrix` 由公司名字母序改为 JD 数降序，避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`）与**多岗位对比初始界面**（差距报告页第二种模式：选公司 → 勾 2~4 岗 → 技能留空沿用简历匹配结果 → 开始对比）；脚本新增区域裁剪（`stMainBlockContainer` 定宽 + 内层 `stMain` 滚动，因为 Streamlit 不滚 window）、模式切换与公司下拉选择，`--page all` 一次出 3 整屏 + 2 区域共 5 张；两段介绍改用实测数字（Top 12 需求占比、跨公司对比、31/78 家 JD≤2 的读图提示）
+- ✅ 文档数字统一（以 `docs/metrics.md` 为准，`eval_all.py` 重跑零 diff）：零技能 1085→1104（24.1%）、代理 98.7%→98.1%（中位 3 项）、must 57.0%→56.8%（1.50 项/岗）、最高需求占比 36.2%→36.1%；`PROJECT_REPORT.md` 1799 条/74 家/147 技能/56 用例 → 4582/78/161/207，数据源表改「去重后」口径并补快手/小红书/Kimi/MiniMax；`techContext` 66→207 测试、8→11 源
 
 ## 量化指标（当前）
 | 项 | 值 |
 |---|---|
 | 数据规模 | 4582 条 / 78 家公司（原始 5013 → 过短 7 + 非 AI 工程岗 4 + 重复 420） |
 | 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
-| 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子） |
-| 需求强度判定 | 57.0% 岗位识别出 ≥1 项硬性要求（平均 1.48 项/岗） |
-| 零技能兜底 | 1085 条零技能岗位中 98.7% 可代理，中位 4 项技能 |
+| 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子，147 技能词表时期）；161 技能下 TF-IDF 当前基线 0.2200 |
+| 需求强度判定 | 56.8% 岗位识别出 ≥1 项硬性要求（平均 1.50 项/岗；句内 4868 / 章节 194 / 兜底 1804） |
+| 零技能兜底 | 1104 条零技能岗位（24.1%）中 98.1% 可代理，中位 3 项技能 |
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
 | 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
 | 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |

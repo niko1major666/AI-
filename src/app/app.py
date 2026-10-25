@@ -110,7 +110,7 @@ def load_jobs():
 def extract_corpus():
     """全语料抽取：技能集合 + JD 内强调度(tf) + must/nice 判定（结果缓存，冷启动只算一次）。
 
-    判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.2%，恒为 False，
+    判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.1%，恒为 False，
     导致 P0 分组永远为空。改为按 JD 文本判定，见 src/matcher/jd_requirements.py。
     """
     taxonomy, rule = load_core()
@@ -514,7 +514,7 @@ def page_gap(taxonomy, analyzer, rows):
 
     jd_skills = _build_jd_skills(taxonomy, target, demand)
     if not jd_skills:
-        # 零技能岗位（列表式短 JD，全语料 23.7%）：用同公司相似岗位兜底，并明确标注来源
+        # 零技能岗位（列表式短 JD，全语料 24.1%）：用同公司相似岗位兜底，并明确标注来源
         jd_skills, sources = _proxy_jd_skills(taxonomy, target, rows, demand)
         if sources:
             listed = "、".join(sources[:3]) + ("…" if len(sources) > 3 else "")

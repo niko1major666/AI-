@@ -26,6 +26,8 @@ def demand_matrix(rows, top_n: int = 15) -> dict:
 
     返回 {'skills': [skill_id], 'companies': [...], 'values': [[占比]]}，
     values 与 companies/skills 对齐；占比按「该公司 JD 数」为分母。
+    公司按 JD 数降序（同数量按名称升序）：1~2 条 JD 的公司容易出现 0% / 100%
+    的极端值，排在后面可避免干扰读者对「行业趋势」的判断。
     """
     rows = list(rows or [])
     skills = top_skill_ids(rows, top_n)
@@ -33,7 +35,7 @@ def demand_matrix(rows, top_n: int = 15) -> dict:
     for r in rows:
         by_company.setdefault(str(r.get("company") or ""), []).append(r)
 
-    companies = sorted(by_company)
+    companies = sorted(by_company, key=lambda c: (-len(by_company[c]), c))
     values = []
     for c in companies:
         group = by_company[c]

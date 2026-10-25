@@ -68,8 +68,8 @@ ai-skill-gap/
 │   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面 + report_export（报告导出）
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / validate_kb(KB 校验)
-├── tests/              pytest（201 用例已通过；slow 标记留给 nightly）
-├── docs/               images/（README 界面预览截图 3 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）
+├── tests/              pytest（205 用例已通过，另有 2 个 slow 留给 nightly）
+├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md
@@ -110,6 +110,14 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 ![技能图谱](docs/images/skill_graph.png)
 
+**公司 × Top 12 技能**（技能图谱页）：把全行业需求最高的 12 项技能放进同一张表，对比各家公司的「技能偏好」
+
+- 行 = 公司（按 JD 数降序，样本量大的在前）；列 = 全行业需求占比 Top 12（Python 36.1%、大模型 35.7%、智能体 22.3%、C++ 18.3%、Java 16.4% …），12 列可横向滚动（截图为前 6 列）
+- 数值 = 该公司 JD 中提到该技能的比例。横向看同一技能的公司差异（大模型：字节 62% / MiniMax 59% / DeepSeek 58%，快手 29%），纵向看一家公司的长短板（腾讯「智能体」43%，明显高于行业的 22.3%）
+- 读图提示：78 家里有 31 家 JD ≤ 2 条，这类行容易出现 0% / 100% 的极端值，看趋势请优先看 JD 数多的行；顶部「筛选公司」选「全部」是行业画像，选中某一家则只统计该公司的 JD
+
+![公司 × Top 12 技能](docs/images/company_skill_matrix.png)
+
 **简历匹配**：上传简历 → 结构化解析（正则 + DeepSeek LLM，含工作经历细粒度：职责/量化成果/技术栈）→ 技能提取 → ATS 建议
 
 ![简历匹配](docs/images/resume_match.png)
@@ -117,6 +125,14 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 **差距报告**：选公司 → 搜岗位 → 选目标岗位 → 生成差距报告（缺失技能 + 优先补充建议）
 
 ![差距报告](docs/images/gap_report.png)
+
+**多岗位对比**（差距报告页的第二种分析模式）：同一套技能，横向比较 2~4 个岗位的匹配度与缺口差异
+
+- 操作：选公司 → 勾 2~4 个岗位（技能留空即沿用「简历匹配」页的解析结果）→ 点「开始对比」
+- 产出：**优先投递**建议（匹配度最高）、逐岗 匹配度 / 命中 / 缺口 / P0 缺口，以及**共性缺口**（所有岗位都缺，优先补）与**各岗独有缺口**（决定往哪个方向专精）
+- 截图为初始界面：已选 DeepSeek 与 2 个岗位，尚未点击「开始对比」
+
+![多岗位对比](docs/images/gap_compare.png)
 
 ### Docker 方式（可选）
 

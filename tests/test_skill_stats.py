@@ -42,3 +42,13 @@ def test_matrix_alignment_and_per_company_ratio():
     # 每个公司的占比都按该公司 JD 数为分母
     ic = m["companies"].index("C")
     assert m["values"][ic] == [0.0, 0.0]
+
+
+def test_matrix_companies_sorted_by_job_count_desc():
+    """行序：JD 数多的公司在前，同数量按名称升序（小样本的 0%/100% 不占据首屏）。"""
+    rows = [{"company": c, "skills": ["PROG.PYTHON"]} for c in ("A", "A", "A", "B", "B", "C")]
+    m = demand_matrix(rows, top_n=1)
+    assert m["companies"] == ["A", "B", "C"]
+    # A 有 3 条 JD，若按字母序则会得到同样的结果，故再加一组「字母序相反」的用例
+    rows2 = [{"company": c, "skills": ["PROG.PYTHON"]} for c in ("B", "B", "A")]
+    assert demand_matrix(rows2, top_n=1)["companies"] == ["B", "A"]

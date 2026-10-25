@@ -36,8 +36,8 @@
   - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
   - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
   - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
-  - 测试 131 → 201（199 快测 + 2 slow）；全量约 40s
-
+  - 测试 131 → 207（205 快测 + 2 slow）；快测约 35s
+- ✅ README 界面预览补两张「区域截图」（`scripts/capture_screenshots.py --page company_matrix|gap_compare`）：**公司 × Top 12 技能**（技能图谱页 ProgressColumn 矩阵，行=公司按 JD 数降序、值=该公司 JD 命中比例；`demand_matrix` 由公司名字母序改为 JD 数降序，避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`）与**多岗位对比初始界面**（差距报告页第二种模式：选公司 → 勾 2~4 岗 → 技能留空沿用简历匹配结果 → 开始对比）；脚本新增区域裁剪（`stMainBlockContainer` 定宽 + 内层 `stMain` 滚动，因为 Streamlit 不滚 window）、模式切换与公司下拉选择，`--page all` 一次出 3 整屏 + 2 区域共 5 张；两段介绍改用实测数字（Top 12 需求占比、跨公司对比、31/78 家 JD≤2 的读图提示）
 
 ## 量化指标（当前）
 | 项 | 值 |
@@ -50,7 +50,7 @@
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
 | 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
 | 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |
-| 测试 | 201 用例（slow 2 例 nightly）；覆盖率 58%，CI 门槛 55% |
+| 测试 | 207 用例（205 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）
@@ -64,7 +64,7 @@
 - 首屏冷启动（v1.3.1）：全语料抽取 24.3s → 1.5s（`str.find` 替代逐 token `re.finditer`，输出逐条一致），默认首屏不再 import sklearn；本机 AppTest 首屏 32s → 3.9s
 - 版本元数据（v1.3.1）：`pyproject.toml` 的 `version` 由 `0.1.0` 对齐为 `1.3.1`；README 加动态 Release 徽章 + 「版本与发布」章节 + 路线图 W10；新增 `docs/RELEASING.md`（含重打 tag 路径）与 `tests/test_release_metadata.py`（pyproject 版本必须等于最新 `docs/release-notes/vX.Y.Z.md`，漏改即红）
 - git 工作区干净，main 与远程一致；tag **v1.3.1** 已发布（补丁：首屏冷启动 + 3.10 CI 修复，正文 `docs/release-notes/v1.3.1.md`；上一版本 v1.3.0「求职闭环与评测加固」）
-- CI 绿：GitHub Actions 全绿（`metrics` + `test (3.10)` + `test (3.12)`；`-m "not slow"`，nightly 跑含 slow 的全量）；**3.10 与 3.12 都跑全量 201 用例（含 3 个 AppTest）**，覆盖率门槛 55% 只在 3.12 上统计（实测 3.10 全套 88s / 3.12 含覆盖率 76s）
+- CI 绿：GitHub Actions 全绿（`metrics` + `test (3.10)` + `test (3.12)`；`-m "not slow"`，nightly 跑含 slow 的全量）；**3.10 与 3.12 都跑全量 204 用例（含 3 个 AppTest）**，覆盖率门槛 55% 只在 3.12 上统计（实测 3.10 全套 88s / 3.12 含覆盖率 76s）
 - AppTest「3.10 超时」根因（已定位并修复）：不是 AppTest 挂起，而是 `pytest --cov` 在 3.10 上走 `sys.settrace` 逐行追踪，把首屏「全语料抽取」的约 160 万次 Python 层 `re.finditer` 放慢约 15 倍（实测正则调用 5.8k/s；3.12 用 PEP 669 `sys.monitoring` 为 80k/s，只慢 1.3 倍）→ 首屏 14.5s 膨胀到 ~240s，正好撞 `default_timeout=240`。修复：CI 在 3.10 上不传 `--cov`（用例全跑），覆盖率门槛保留在 3.12；`tests/test_app.py` 的版本 skip 已删除
 - 首屏冷启动优化：`RuleBaselineExtractor._iter_matches()` 不再「每 token 一次 `re.finditer`」，改为 `str.find` + 手工词边界（CJK token 的 pattern 本来就是 `re.escape`，ASCII token 只多「前后非字母数字」断言，步进规则与 `finditer` 对齐）→ 全语料 4582 条抽取 **24.3s → 1.5s**（同机 3.12）；`tests/test_rule_baseline.py::test_iter_matches_equivalent_to_regex_reference` 用旧正则做参照逐位置比对，全语料输出逐条一致。同时 `src/app/app.py` 把 `load_core()` 拆成「轻核心（词表 + 抽取器）」+ `load_engine()`（TF-IDF / 差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏「技能图谱」不再付 sklearn 开销 → AppTest 首屏 **32s → 3.9s**（本机；仅抽优化后是 8.8s）；新增 `scripts/bench_extract.py` 复现抽取耗时
 - CI 失败可见性：失败用例写入 check-run 注解 + job summary，并上传 `pytest.log` 产物（无需登录 Actions 即可用 API 查看）

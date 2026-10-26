@@ -151,13 +151,14 @@ def load_jobs():
 
 
 @st.cache_data
-def _extract_corpus_cached(path: str, mtime_ns: int, size: int):
+def _extract_corpus_cached(path: str, mtime_ns: int, size: int,
+                           taxonomy_path: str, taxonomy_mtime_ns: int, taxonomy_size: int):
     """全语料抽取：技能集合 + JD 内强调度(tf) + must/nice 判定（结果缓存，冷启动只算一次）。
 
     判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.1%，恒为 False，
     导致 P0 分组永远为空。改为按 JD 文本判定，见 src/matcher/jd_requirements.py。
     """
-    taxonomy, rule = load_core()
+    taxonomy, rule = _load_core_cached(taxonomy_path, taxonomy_mtime_ns, taxonomy_size)
     rows, texts = [], []
     for j in _load_jobs_cached(path, mtime_ns, size):
         text = j.get("jd_clean") or j.get("jd_text", "")
@@ -181,7 +182,10 @@ def _extract_corpus_cached(path: str, mtime_ns: int, size: int):
 
 
 def extract_corpus():
-    return _extract_corpus_cached(*_file_fingerprint("data/processed/jobs.jsonl"))
+    return _extract_corpus_cached(
+        *_file_fingerprint("data/processed/jobs.jsonl"),
+        *_file_fingerprint("data/kb/skill_taxonomy.yaml"),
+    )
 
 
 def compute_demand(rows):
@@ -545,12 +549,19 @@ def page_resume(taxonomy, rule, analyzer, rows=None):
 
 
 def _recommendations(skill_ids: tuple):
-    return _recommendations_cached(skill_ids, _file_fingerprint("data/processed/jobs.jsonl"))
+    return _recommendations_cached(
+        skill_ids,
+        _file_fingerprint("data/processed/jobs.jsonl"),
+        _file_fingerprint("data/kb/skill_taxonomy.yaml"),
+        _file_fingerprint("data/kb/learning_resources.yaml"),
+    )
 
 
 @st.cache_data(show_spinner=False, max_entries=16)
-def _recommendations_cached(skill_ids: tuple, jobs_fingerprint: tuple[str, int, int]):
-    """简历技能 -> Top 岗位（技能组合 + 语料指纹缓存；数据更新后自动重算）。"""
+def _recommendations_cached(skill_ids: tuple, jobs_fingerprint: tuple[str, int, int],
+                            taxonomy_fingerprint: tuple[str, int, int],
+                            resources_fingerprint: tuple[str, int, int]):
+    """简历技能 -> Top 岗位（技能组合 + 语料/词表/资源指纹缓存；任一更新自动重算）。"""
     taxonomy, _rule = load_core()
     analyzer = load_engine()
     from dataclasses import asdict

@@ -112,9 +112,9 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 **公司 × Top 12 技能**（技能图谱页）：把全行业需求最高的 12 项技能放进同一张表，对比各家公司的「技能偏好」
 
-- 行 = 公司（按 JD 数降序，样本量大的在前）；列 = 全行业需求占比 Top 12（Python 36.1%、大模型 35.7%、智能体 22.3%、C++ 18.3%、Java 16.4% …），12 列可横向滚动（截图为前 6 列）
+- 行 = 公司（按 JD 数降序，样本量大的在前）；列 = 全行业需求占比 Top 12（Python 36.6%、大模型 36.5%、智能体 23.1%、C++ 18.9%、Java 17.2% …），12 列可横向滚动（截图为前 6 列）
 - 数值 = 该公司 JD 中提到该技能的比例。横向看同一技能的公司差异（大模型：字节 62% / MiniMax 59% / DeepSeek 58%，快手 29%），纵向看一家公司的长短板（腾讯「智能体」43%，明显高于行业的 22.3%）
-- 读图提示：78 家里有 31 家 JD ≤ 2 条，这类行容易出现 0% / 100% 的极端值，看趋势请优先看 JD 数多的行；顶部「筛选公司」选「全部」是行业画像，选中某一家则只统计该公司的 JD
+- 读图提示：79 家里有 31 家 JD ≤ 2 条，这类行容易出现 0% / 100% 的极端值，看趋势请优先看 JD 数多的行；顶部「筛选公司」选「全部」是行业画像，选中某一家则只统计该公司的 JD
 
 ![公司 × Top 12 技能](docs/images/company_skill_matrix.png)
 
@@ -215,12 +215,12 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W10 | 迭代 4：首屏冷启动与 CI 修复（v1.3.1 补丁） | ✅ 203 测试通过；全语料抽取 24.3s→1.5s、AppTest 首屏 32s→3.9s、3.10 恢复跑全量用例 |
 | W11 | 迭代 5：README 界面预览 + 文档数字校正 | ✅ 207 测试通过（205 快测 + 2 slow）；新增「公司×Top12 技能」「多岗对比初始界面」预览，矩阵行序改为 JD 数降序；`memory-bank` / 本报告 / 项目报告数字统一到 `docs/metrics.md` |
 | W12 | 迭代 6：抽取口径收紧 + 学习路径「已学进度」联动 | ✅ 213 测试通过（211 快测 + 2 slow）；裸「测试」噪声清理（命中 11.37%→0.28%，gold F1 不变）；差距报告改为 session 渲染，勾选已掌握技能即时重排学习路径，AI 解读按岗位缓存不重复调用 |
-| W12 | 迭代 6：抽取口径收紧 + 学习路径「已学进度」联动 | ✅ 213 测试通过（211 快测 + 2 slow）；裸「测试」噪声清理（命中 11.37%→0.28%，gold F1 不变）；差距报告改为 session 渲染，勾选已掌握技能即时重排学习路径，AI 解读按岗位缓存不重复调用 |
-| W13 | 数据扩充工具化：新源接入前体检 | ✅ 222 测试通过（220 快测 + 2 slow）；`scripts/preflight_new_source.py` 只读体检（~2s，FAIL 退出 1）覆盖 job_id 冲突 / 正文跨源重复 / 公司写法分裂 / 合并后零技能占比与技能覆盖 / must 偏移；现有语料自检复现 4582·78·1162·160·56.5% 口径；SOP 见 `memory-bank/dataOnboarding.md` |
+| W13 | 数据扩充工具化：新源接入前体检 | ✅ 222 测试通过（220 快测 + 2 slow）；`scripts/preflight_new_source.py` 只读体检（~2s，FAIL 退出 1）覆盖 job_id 冲突 / 正文跨源重复 / 公司写法分裂 / 合并后零技能占比与技能覆盖 / must 偏移；现有语料自检可复现当期基线口径（数字见 W14）；SOP 见 `memory-bank/dataOnboarding.md` |
+| W14 | 数据扩充实践：接入哔哩哔哩（技术/AI 岗） | ✅ 236 测试通过（234 快测 + 2 slow）；新增 `src/crawler/bilibili.py`（`X-AppKey` + `X-CSRF` 匿名取数，社招 87 + 校招 117）+ `tests/test_bilibili.py`（14 用例）；全站 876 条中技术/AI 仅 204 条（其余岗位 42.4% 零技能），默认只入技术/AI，`--all` 可切全量；语料 4582→4776 条 / 78→79 家，零技能 25.4%→24.4%，must 56.5%→57.5%，importance 6 项微调 |
 
 ## 八、数据采集与爬虫
 
-### 数据源总览（4582 条 / 78 家公司，清洗去重后；原始 5013 条，标题过滤剔除 4 条非 AI 工程岗）
+### 数据源总览（4776 条 / 79 家公司，清洗去重后；原始 5217 条，标题过滤剔除 4 条非 AI 工程岗）
 
 | 数据源 | 平台 / 接口 | 技术方案 | 条数 | 部门/发布时间 |
 |---|---|---|---|---|
@@ -235,10 +235,14 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | 快手（校招） | campus.kuaishou.cn 公开 POST | requests（无 sign） | 266 | ✅ departmentName / releaseTime |
 | 小红书（社招） | job.xiaohongshu.com `pageQueryPosition` | requests POST（无需签名） | 836 | ✅ jobType / publishTime |
 | 小红书（校招） | 同上，`recruitType=campus` | requests POST 翻页 | 448 | ✅ jobType / publishTime |
+| 哔哩哔哩（社招） | jobs.bilibili.com `api/srs/position/positionList` | requests POST（匿名 CSRF：`X-AppKey` + `X-CSRF`） | 87 | ✅ postCodeName / pushTime |
+| 哔哩哔哩（校招） | 同站 `api/campus/position/positionList` | 同上，路径区分社招/校招 | 117 | ✅ postCodeName / pushTime |
 | 华为 | career.huawei.com 公开 GET + 51job 尝试 | requests + Playwright | 2 | ❌ 门户已枯竭，第三方 AI 岗极少 |
 | 英文科技岗位 | HuggingFace `tech-job-postings` 数据集 | `download_tech_jobs.py` | 600 | ❌ |
 
-> 表中「条数」为各渠道**原始抓取量**（合计 5013 条）；去重后 4582 条按公司分布：快手 1395、小红书 1283、小米 647、腾讯 475、字节跳动 220、MiniMax 49、DeepSeek 33、Kimi 30、华为 2、英文 448。
+> 表中「条数」为各渠道**原始抓取量**（合计 5217 条）；去重后 4776 条按公司分布：快手 1395、小红书 1283、小米 647、腾讯 475、字节跳动 220、哔哩哔哩 194、MiniMax 49、DeepSeek 33、Kimi 30、华为 2、英文 448。
+
+> 哔哩哔哩全站 876 条岗位里只有 204 条属于「技术类 / AI类」（其余为产品运营、内容、设计等，42.4% 抽不到任何技能）；爬虫默认只落这部分（`--all` 可保留全站），入语料 194 条（源内正文重复 10 条被 `build_dataset` 去重）。
 
 ### 关键技术难点
 
@@ -248,12 +252,16 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 4. **详情接口加密**（DeepSeek / Kimi · Moka）：详情接口响应被 `necromancer` 加密，未逆向，只抓已渲染列表（标题+类别+地点，含 AI 技能词）。
 5. **门户岗位稀缺**（华为）：官网门户社招 2 条 / 校招 0 条已枯竭；51job 等第三方平台投放的多为非 AI 岗，BOSS直聘/猎聘需登录——华为 AI 核心岗位走官网/内推/校招渠道，公开数据源受限。
 6. **SPA 签名头排查**（小红书）：站点会加载 `as.xiaohongshu.com` 安全 SDK 并给业务请求注入 `x-s` 签名头，但 `websiterecruit/position/pageQueryPosition` 实测**未强制校验**——直接 requests POST（`pageSize=100`）即可翻页拿到含 `duty` + `qualification` 的完整 JD，无需 Playwright。数据比列表页 DOM 更完整（社招 864 / 校招 508）。
+7. **匿名 CSRF 令牌**（哔哩哔哩）：`jobs.bilibili.com` 的岗位列表是 POST，需要 `X-AppKey: ops.ehr-api.auth` + `X-CSRF` 头；token 由 `api/auth/apply/csrf/token` 匿名签发（不需要登录/验证码），过期时接口返回 `code=-3`，客户端自动刷新 token 重试一次即可翻页。社招/校招只是路径不同（站点渲染状态里 `path="/api/srs/..."` / `"/api/campus/..."`），响应直接带 `positionDescription` 全文 JD。
 
 ### 复现采集
 
 ```powershell
-# 一键顺序重爬 8 个数据源（约 20+ 分钟，含 Playwright 交互）
+# 一键顺序重爬 11 个数据源（约 20+ 分钟，含 Playwright 交互）
 .\.venv\Scripts\python.exe scripts/recrawl_all.py
+
+# 哔哩哔哩（匿名 CSRF，默认只落技术类+AI类；加 --all 保留全站 876 条）
+.\.venv\Scripts\python.exe -m src.crawler.bilibili
 
 # 快手（社招 sign 逆向 + 校招 POST，约 1445 条）
 .\.venv\Scripts\python.exe -m src.crawler.kuaishou
@@ -261,7 +269,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 # 小红书（社招 864 + 校招 508，requests 直连，约 1 分钟）
 .\.venv\Scripts\python.exe -m src.crawler.xiaohongshu
 
-# 十一源合并 -> data/raw/all_jobs.csv
+# 十二源合并 -> data/raw/all_jobs.csv
 .\.venv\Scripts\python.exe scripts/merge_jobs.py
 
 # 清洗 + 去重 + 技能抽取 -> data/processed/jobs.jsonl
@@ -279,18 +287,18 @@ python scripts/preflight_new_source.py --source data/raw/ali_ai_jobs.csv
 
 ## 九、量化指标（简历用）
 
-- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4582 条 / 78 家**（原始 5013 条 → 过短 7 条 + 非 AI 工程岗 4 条（标题过滤）+ 重复 420 条后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
-- 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 35.8%、Python 36.1%、智能体 22.3%、C++ 18.3%、Java 16.4%、机器学习 16.3%、SQL 13.9%、多模态 12.1%（新增「视觉语言模型」后部分「多模态」文本归入更细粒度技能）
-- 知识库覆盖（迭代 2，161 技能）：**160/161 技能在 4582 条 JD 上可命中**（唯一未命中「联邦学习」，为语料未出现而非词表缺失）；学习资源 **106/161（65.8%）**，Top 80 需求技能覆盖 77 项；新增技能实测占比：视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%
+- 采集 JD 数量 / 覆盖公司数（`build_dataset --stats`）：**4776 条 / 79 家**（原始 5217 条 → 过短 7 条 + 非 AI 工程岗 4 条（标题过滤）+ 重复 430 条后；含小红书 1284[社招836+校招448]、快手 1445[社招1179+校招266]、腾讯500、字节261、小米710[社招600+校招110]、哔哩哔哩204[社招87+校招117]、DeepSeek33、Kimi30、MiniMax60、华为2、英文科技岗位600）
+- 技能重要度（`recalc_importance.py`，全语料需求占比分档 ≥10%→5 / ≥5%→4 / ≥2%→3 / ≥1%→2 / <1%→1）：Top 为大模型 36.5%、Python 36.6%、智能体 23.1%、C++ 18.9%、Java 17.2%、机器学习 16.4%、SQL 13.9%、多模态 13.0%（接入哔哩哔哩后 6 项微调：Go 4→5、Scala 1→2、模型部署 1→2、思维链 2→1、Embedding 1→2、偏好对齐 2→3）
+- 知识库覆盖（迭代 2，161 技能）：**160/161 技能在 4776 条 JD 上可命中**（唯一未命中「联邦学习」，为语料未出现而非词表缺失）；学习资源 **106/161（65.8%）**，Top 80 需求技能覆盖 78 项；新增技能实测占比：视觉语言模型 5.87%、Function Calling 4.60%、MCP 2.75%、视频生成 2.58%、扩散模型 2.36%、偏好对齐 1.70%、昇腾 1.70%、长上下文 1.16%
 - KB 精度修正：`ML.QUANT` 原别名「量化」命中 6.31%，抽样发现多为「可量化/量化指标」→ 改为 name「模型量化」+ `skip_extract: [量化]`（解析侧仍识别「量化」，抽取侧不匹配），真实占比 1.07%、importance 4→2
 - KB 精度修正（迭代 6）：`ENGINEERING.UNITTEST` 原别名含泛化「测试」→ JD 命中 **11.37%（521 条）**，其中 508 条只靠裸「测试」（多为 A/B 测试、渗透测试、性能测试、测试团队）→ 加 `skip_extract: [测试]` 后真实占比 **0.28%（13 条）**、importance 5→1；「单元测试 / unit-test」照常抽取，gold F1 不变（test 0.9565 / 全量 0.9123）
 - 技能抽取 F1（SiameseUIE vs BERT-NER，在 `data/gold/jd_skills_gold.jsonl` 上算 span 级）
-- 需求强度判定（`src/matcher/jd_requirements.py`，4582 条语料实测）：**56.5% 的岗位能识别出 ≥1 项硬性要求（平均 1.49 项/岗）**；来源分布 句内触发词 4830 / 章节归属 175 / 全行业占比兜底 1804。修复前用「全语料需求占比 ≥ 40%」判定，因最高占比仅 36.1%，P0 分组恒为空
-- 零技能岗位兜底（`src/matcher/job_neighbors.py`）：**97.9% 的零技能岗位（1162 条）可用同公司相似岗位代理**，代理技能中位数 3 项；页面会标注推断来源，不再出现「匹配度 0% 却说已覆盖全部技能」
-- 岗位内强调度：43.9% 的岗位存在被重复提及（tf ≥ 2）的技能，权重按 `base × (1 + ln tf)` 计入匹配度
+- 需求强度判定（`src/matcher/jd_requirements.py`，4776 条语料实测）：**57.5% 的岗位能识别出 ≥1 项硬性要求（平均 1.66 项/岗）**；来源分布 句内触发词 5227 / 章节归属 896 / 全行业占比兜底 1804。修复前用「全语料需求占比 ≥ 40%」判定，因最高占比仅 36.6%，P0 分组恒为空
+- 零技能岗位兜底（`src/matcher/job_neighbors.py`）：**97.9% 的零技能岗位（1166 条）可用同公司相似岗位代理**，代理技能中位数 3 项；页面会标注推断来源，不再出现「匹配度 0% 却说已覆盖全部技能」
+- 岗位内强调度：45.3% 的岗位存在被重复提及（tf ≥ 2）的技能，权重按 `base × (1 + ln tf)` 计入匹配度
 - 语义匹配 Recall@5（BGE vs TF-IDF，在 `data/gold/skill_pair_gold.jsonl` 上算）
 - 单次推理延迟（`scripts/benchmark.py`，CPU/GPU 两口径）
-- **回归基线（迭代 3，CI 固化）**：抽取 F1（test 0.9565 / 全量 0.9123，允许退化 1pt）、TF-IDF 匹配 Recall@5（skill_pair 0.9750 / resume_sentence 0.2200，允许退化 2pt）、语料快照（4582 条 / 78 家 / 4472 个唯一「公司+标题」）、KB 覆盖（160/161）；全量指标见 [`docs/metrics.md`](docs/metrics.md)，由 `python scripts/eval_all.py` 生成，CI 在 main 上校验是否过期
+- **回归基线（迭代 3，CI 固化）**：抽取 F1（test 0.9565 / 全量 0.9123，允许退化 1pt）、TF-IDF 匹配 Recall@5（skill_pair 0.9750 / resume_sentence 0.2200，允许退化 2pt）、语料快照（4776 条 / 79 家 / 4664 个唯一「公司+标题」）、KB 覆盖（160/161）；全量指标见 [`docs/metrics.md`](docs/metrics.md)，由 `python scripts/eval_all.py` 生成，CI 在 main 上校验是否过期
 
 ### 已产出：技能抽取 F1 对比（测试集 10 条，span 级）
 

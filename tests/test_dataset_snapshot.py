@@ -17,9 +17,9 @@ JOBS = ROOT / "data" / "processed" / "jobs.jsonl"
 STATS = ROOT / "data" / "processed" / "build_stats.json"
 TAX = ROOT / "data" / "kb" / "skill_taxonomy.yaml"
 
-EXPECTED_ROWS = 4582
-EXPECTED_COMPANIES = 78
-EXPECTED_UNIQUE_COMPANY_TITLE = 4472
+EXPECTED_ROWS = 4776
+EXPECTED_COMPANIES = 79
+EXPECTED_UNIQUE_COMPANY_TITLE = 4664
 REQUIRED_FIELDS = {"job_id", "title", "company", "jd_text"}
 
 
@@ -64,7 +64,7 @@ def test_company_title_duplication_rate(jobs):
 
 @pytest.mark.slow
 def test_full_corpus_extraction_coverage(jobs):
-    """全语料抽取（约 10s）：技能覆盖 160/161，零技能岗位约 23.7%。
+    """全语料抽取（约 10s）：技能覆盖 160/161，零技能岗位约 24.4%。
 
     标记 slow：PR 只跑快测，nightly 跑全量（见 .github/workflows/nightly.yml）。
     """

@@ -41,7 +41,7 @@ class RuleBaselineExtractor:
     def _iter_matches(text_lower, token):
         """返回 token 在 text_lower 中的全部 (start, end)，语义等价于旧的正则实现。
 
-        旧实现每个 token 一次 `re.finditer`：4582 条 JD × 359 个 token ≈ 165 万次
+        旧实现每个 token 一次 `re.finditer`：4776 条 JD × 359 个 token ≈ 171 万次
         全文正则扫描，首屏冷启动 12.4s（CI）。但非 ASCII token 的 pattern 就是
         `re.escape(token)`，与 `str.find` 完全等价；ASCII token 只多一个「前后不是
         字母数字」的边界断言，用两次字符判断即可——`str.find` 走 C 层 Boyer-Moore，
@@ -73,7 +73,7 @@ class RuleBaselineExtractor:
         """一次扫描同时产出技能 span 与「每技能提及次数」。
 
         拆成 extract_spans + count_mentions 会把全文正则扫描跑两遍，
-        实测 4582 条 JD 冷启动从 9s 变成 18s，故合并为单次扫描。
+        实测 4776 条 JD 冷启动从 9s 变成 18s，故合并为单次扫描。
         返回 (去重后的 spans, {skill_id: 提及次数})。
         """
         text_lower = text.lower()

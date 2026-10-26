@@ -47,7 +47,7 @@ def test_skip_extract_ignores_noisy_cjk_token():
 def test_skip_extract_ignores_generic_testing_words():
     """裸「测试」在 JD 里多是 A/B 测试、渗透测试、测试团队等泛化语境，不代表单元测试。
 
-    4582 条语料实测：收紧前 ENGINEERING.UNITTEST 命中 521 条（11.37%），
+    当期语料（4582 条，迭代 6 实测）统计：收紧前 ENGINEERING.UNITTEST 命中 521 条（11.37%），
     其中 508 条（11.09%）只靠裸「测试」；收紧后降到 13 条（0.28%）。
     真正的「单元测试 / unit-test」仍须抽到。
     """

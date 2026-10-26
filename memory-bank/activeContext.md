@@ -8,16 +8,18 @@
 
 ## 权威数字（以 `docs/metrics.md` 为准；2026-10-26 重跑 `eval_all.py` 零 diff）
 
-- 语料 **4582 条 / 78 家公司 / 4472 个唯一「公司+标题」**（原始 5013 → 过短 7 + 非 AI 工程岗 4 + 重复 420）
-- 零技能岗位 **1162 条（25.4%）**，其中 **1138 条（97.9%）** 可用同公司相似岗位代理（中位 3 项）
+- 语料 **4776 条 / 79 家公司 / 4664 个唯一「公司+标题」**（原始 5217 → 过短 7 + 非 AI 工程岗 4 + 重复 430）
+- 零技能岗位 **1166 条（24.4%）**，其中 **1140 条（97.9%）** 可用同公司相似岗位代理（中位 3 项）
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
-- 硬性要求 **56.5% 岗位 / 平均 1.49 项**（句内触发词 4830 / 章节归属 175 / 占比兜底 1804）；最高技能需求占比 **36.1%**（Python）
+- 硬性要求 **57.5% 岗位 / 平均 1.66 项**（句内触发词 5227 / 章节归属 896 / 占比兜底 1804）；最高技能需求占比 **36.6%**（Python）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **222**（220 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
+- 测试 **236**（234 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
 
 ## 近期变更（按时间倒序）
 
-- **本轮（数据扩充工具化，未发版）**：新增 `scripts/preflight_new_source.py`（只读体检，~2s，FAIL→退出码 1）：模拟 `merge_jobs`/`build_dataset` 的合并与去重后，输出结构清洗、job_id 冲突、正文跨源重复（含「新源在前/在后」两种丢行数）、公司写法分裂、新源零技能率、合并后零技能占比（20%~28%）、技能覆盖（≥159）、must 占比偏移（±3pt）与自带 skills 列的词表缺口；现有语料自检精确复现文档口径（4582/78/1162/160/56.5%/1.49 项每岗/句内 4830·章节 175·兜底 1804）。新增 `memory-bank/dataOnboarding.md`（SOP + 四处常量同步清单 + 五个静默坑 + 基线 + 自检清单）；新增 `tests/test_preflight_new_source.py`（9 用例），测试 213→222
+- **本轮（接入哔哩哔哩，未发版）**：新增 `src/crawler/bilibili.py`——`jobs.bilibili.com` 岗位列表 POST 需要 `X-AppKey: ops.ehr-api.auth` + `X-CSRF`，token 由 `api/auth/apply/csrf/token` **匿名**签发（无需登录/验证码），过期返回 `code=-3` 自动刷新重试一次；社招（`/api/srs/...`，87 条）+ 校招（`/api/campus/...`，117 条）共抓 877 条，响应自带 `positionDescription` 全文 JD。全站 876 条可用岗位中技术类 184（零技能 2.2%）+ AI类 20（0%），其余运营/内容/设计岗 42%~82% 零技能 → 爬虫默认只落 `技术类 + AI类`（`--all` 保留全站）。体检预演全绿（零技能 24.4%、must +1.0pt），合并构建后语料 4582→4776 条 / 79 家，零技能 25.4%→24.4%，must 56.5%→57.5%（1.66 项/岗；句内 5227 / 章节 896 / 兜底 1804），tf≥2 45.3%，技能覆盖仍 160/161；`recalc_importance` 6 项微调（Go 4→5、Scala 1→2、模型部署 1→2、思维链 2→1、Embedding 1→2、偏好对齐 2→3）；新增 `tests/test_bilibili.py`（14 用例，含 CSRF 重试与类别过滤），测试 222→236
+
+- **本轮（数据扩充工具化，未发版）**：新增 `scripts/preflight_new_source.py`（只读体检，~2s，FAIL→退出码 1）：模拟 `merge_jobs`/`build_dataset` 的合并与去重后，输出结构清洗、job_id 冲突、正文跨源重复（含「新源在前/在后」两种丢行数）、公司写法分裂、新源零技能率、合并后零技能占比（20%~28%）、技能覆盖（≥159）、must 占比偏移（±3pt）与自带 skills 列的词表缺口；现有语料自检精确复现当期货架口径（接入哔哩哔哩前为 4582/78/1162/160/56.5%/1.49 项每岗/句内 4830·章节 175·兜底 1804）。新增 `memory-bank/dataOnboarding.md`（SOP + 四处常量同步清单 + 五个静默坑 + 基线 + 自检清单）；新增 `tests/test_preflight_new_source.py`（9 用例），测试 213→222
 
 - **本轮（迭代 6，未发版）**：`ENGINEERING.UNITTEST` 收紧（`skip_extract: [测试]`）：JD 命中 521 条（11.37%）→ 13 条（0.28%），其中 508 条原本只靠裸「测试」（A/B 测试、渗透测试、性能测试、测试团队）；`recalc_importance` 5→1，gold F1 三项零变化（0.9565 / 0.9011 / 0.9123）。连带指标：零技能 1104→1162（25.4%）、代理 98.1%→97.9%（1138 条，中位 3）、must 56.8%→56.5%（1.49 项/岗；句内 4830 / 章节 175 / 兜底 1804）、tf≥2 岗位 43.9%。学习路径新增「已学进度」：`build_learning_path(..., learned=...)` 跳过已掌握技能并视为已具备先修（`path.skipped` 记录），页面差距报告改为 session 渲染（勾选即时重排、报告不再因 rerun 消失），AI 解读按「岗位+技能」缓存；测试 207→213
 
@@ -26,7 +28,7 @@
 1. 迭代 3（功能 + 评测/CI）：
    - 功能：`learning_path`（规则版学习路径：P0/P1/P2 三阶段、先修拓扑排序、难度→学时 2/4/8/16/24h、周数向上取整；先修若落在后续阶段自动提前并给 `prereq_note`）、`report_export`（Markdown + docx，`safe_filename` 清洗；报告写 `st.session_state` 以躲过 download_button 的 rerun）、`job_compare`（多岗匹配度/P0 数/共性缺口/独有缺口/优先投递）、`skill_stats`（公司×Top12 技能矩阵，Streamlit ProgressColumn 呈现，未引入 matplotlib）、`resume_advice`（简历原文命中 → 改写要点；未命中 → 小项目建议；数字全用 XXX 占位符）、`job_recommender`（「公司+标题」去重 + must/nice 加权 + Top10 + 最该补）、`strength_profile`（类别需求加权覆盖率 + 最大短板）
    - 页面：简历页新增技能画像 + Top10 岗位；差距页新增「分析模式」单岗/多岗切换、简历补强建议、规则学习路径、导出按钮；图谱页新增公司×Top12 技能表
-   - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4582/78/4472；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
+   - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4776/79/4664；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
    - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201（当前 213：211 快测 + 2 slow），全量约 40s
    - 首屏冷启动优化：`rule_baseline._iter_matches()` 用 `str.find` + 手工词边界替代「每 token 一次 `re.finditer`」（全语料 4582 条 24.3s → 1.5s，逐条输出一致，`test_iter_matches_equivalent_to_regex_reference` 以旧正则作参照锁死语义）；`app.load_core()` 拆成轻核心（词表 + 抽取器）与 `load_engine()`（TF-IDF/差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏不再付该开销；本机 AppTest 首屏 32s → 3.9s；`scripts/bench_extract.py` 可复现
    - 发布 v1.3.0（Release「v1.3.0 求职闭环与评测加固」，正文 `docs/release-notes/v1.3.0.md`，由 push tag 的 `release.yml` 自动创建）

@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 CRAWLERS = ["tencent", "xiaomi", "huawei", "deepseek", "xiaomi_campus", "bytedance",
-            "kimi", "minimax", "kuaishou", "xiaohongshu"]
+            "kimi", "minimax", "kuaishou", "xiaohongshu", "bilibili"]
 
 
 def main():

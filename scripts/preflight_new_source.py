@@ -2,7 +2,7 @@
 
 为什么需要它 —— 语料一变，会同时踩到两类坑：
 
-- **一定会红**：`tests/test_dataset_snapshot.py` 的精确常量（4582 / 78 / 4472）、slow 用例的
+- **一定会红**：`tests/test_dataset_snapshot.py` 的精确常量（4776 / 79 / 4664）、slow 用例的
   「零技能占比 20%~28% + 技能覆盖 ≥159」、CI 对 `docs/metrics.md` 的过期校验
   （`git diff --exit-code`）、`tests/test_skillkb.py` 的 importance 断言；
 - **静默出错**：job_id 撞车被 `merge_jobs` 的 keep=first 丢行、正文跨源重复让公司归属取决于
@@ -260,7 +260,7 @@ def must_stats(rows, demand) -> dict:
     """硬性要求占比（与 README / PROJECT_REPORT 同口径：占全语料岗位数）。
 
     `evidence` 记录 must 判定的来源分布（句内触发词 / 章节归属 / 占比兜底），
-    现有语料应复现「56.5% / 1.49 项每岗 / 句内 4830 · 章节 175 · 兜底 1804」。
+    现有语料应复现「57.5% / 1.66 项每岗 / 句内 5227 · 章节 896 · 兜底 1804」。
     """
     total = len(rows)
     judged_jobs = with_must = must_items = 0
@@ -538,12 +538,6 @@ def main(argv=None) -> int:
     return exit_code(report["checks"])
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
-
-
-
-
 _STATUS_ICON = {"PASS": "✅", "WARN": "⚠️", "FAIL": "❌"}
 
 
@@ -640,6 +634,10 @@ def build_checks(report) -> list[dict]:
 def exit_code(checks) -> int:
     """有 FAIL 即返回 1（可接在 CI / 脚本链里当闸门）。"""
     return 1 if any(c["status"] == "FAIL" for c in checks) else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
 
 
 

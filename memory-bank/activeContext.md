@@ -17,7 +17,7 @@
 
 ## 近期变更（按时间倒序）
 
-- **修复线上旧语料（2026-10-27）**：线上截图显示 4582 条 / 78 家（旧版），但页面已有迭代 7 的收藏夹 → 不是数据没构建，而是 `@st.cache_data` 缓存未随 `jobs.jsonl` 更新失效。`app.py` 新增 `_file_fingerprint()`（路径 + mtime_ns + size），给 `load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 的缓存加指纹参数；注意 Streamlit 会跳过下划线开头的参数，首版用 `_mtime_ns`/`_size` 时缓存键实际没变，已改为非下划线并在 `tests/test_app.py` 加缓存失效回归。测试 284→**285**；推送后线上应为 **5832 / 81**。
+- **修复线上旧语料（2026-10-27）**：线上截图显示 4582 条 / 78 家（旧版），但页面已有迭代 7 的收藏夹 → 不是数据没构建，而是 `@st.cache_data` 缓存未随 `jobs.jsonl` 更新失效。`app.py` 新增 `_file_fingerprint()`（路径 + mtime_ns + size），给 `load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 的缓存加指纹参数；注意 Streamlit 会跳过下划线开头的参数，首版用 `_mtime_ns`/`_size` 时缓存键实际没变，已改为非下划线并在 `tests/test_app.py` 加缓存失效回归。测试 284→**285**；已推送 `086602a` 并线上验收 **5832 / 81**（旧版 4582 / 78），公司下拉含美团 / 滴滴 / 哔哩哔哩。
 
 - **协作约定（2026-10-26）**：新增 `memory-bank/workingAgreements.md`，固化上下文与输出预算执行规则（单文件单次 ≤400 行 / 超过分页、命令输出过滤、里程碑落盘、新会话交接、不得为省 token 牺牲的例外），并在「重要模式与偏好」加入口，后续会话按此执行
 

@@ -70,7 +70,7 @@
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
-- 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）
+- 云端部署已就绪：Streamlit Community Cloud（secrets 填 `DEEPSEEK_API_KEY`，详见 README「云端部署」）；2026-10-27 验证首屏 **5832 条 / 81 家**（缓存指纹修复 commit `086602a`）
 - DeepSeek API key 已配置到用户环境变量
 - 首屏冷启动（v1.3.1）：全语料抽取 24.3s → 1.5s（`str.find` 替代逐 token `re.finditer`，输出逐条一致），默认首屏不再 import sklearn；本机 AppTest 首屏 32s → 3.9s
 - 版本元数据（v1.3.1）：`pyproject.toml` 的 `version` 由 `0.1.0` 对齐为 `1.3.1`；README 加动态 Release 徽章 + 「版本与发布」章节 + 路线图 W10；新增 `docs/RELEASING.md`（含重打 tag 路径）与 `tests/test_release_metadata.py`（pyproject 版本必须等于最新 `docs/release-notes/vX.Y.Z.md`，漏改即红）

@@ -1,4 +1,8 @@
-"""简历结构化解析（中文简历启发式规则 + DeepSeek LLM 增强）+ ATS 视角改进建议。"""
+"""简历结构化解析（中文简历启发式规则 + DeepSeek LLM 增强）+ ATS 视角改进建议。
+
+经历按 `kind` 区分工作 / 实习 / 项目：LLM 优先给出类型，正则兜底用
+「章节标题 → 组织/角色关键词」推断，便于区分「工作经历」与「项目经历」。
+"""
 from __future__ import annotations
 
 import json
@@ -35,6 +39,63 @@ TITLE_RE = re.compile(
 
 _DEGREE_RANK = {"博士": 5, "硕士": 4, "研究生": 4, "本科": 3, "学士": 3, "大专": 2, "专科": 2}
 
+# ---- 经历类型（工作 / 实习 / 项目）----
+EXPERIENCE_KINDS = ("work", "internship", "project", "other")
+EXPERIENCE_KIND_LABELS = {"work": "工作", "internship": "实习", "project": "项目", "other": "其他"}
+_KIND_ALIASES = {
+    "work": "work", "工作": "work", "全职": "work", "正式": "work", "在职": "work",
+    "internship": "internship", "intern": "internship", "实习": "internship",
+    "project": "project", "项目": "project", "科研": "project", "研究": "project",
+    "other": "other", "其他": "other",
+}
+# 章节标题 → 经历类型（教育经历不作为工作/项目，value 用 None 表示跳过）
+_SECTION_HEADING_RE = re.compile(
+    r"(实习经历|实习经验|工作经历|工作经验|职业经历|项目经历|项目经验|科研经历|科研项目|"
+    r"研究经历|研究项目|实践经历|校园经历|教育经历|教育背景)"
+)
+_SECTION_KIND = {
+    "实习经历": "internship", "实习经验": "internship",
+    "工作经历": "work", "工作经验": "work", "职业经历": "work",
+    "项目经历": "project", "项目经验": "project", "科研经历": "project",
+    "科研项目": "project", "研究经历": "project", "研究项目": "project",
+    "实践经历": "project", "校园经历": "project",
+    "教育经历": None, "教育背景": None,
+}
+_INTERN_TITLE_RE = re.compile(r"(实习|intern)", re.I)
+_PROJECT_TITLE_RE = re.compile(r"(项目|科研|课题|竞赛|比赛)")
+_MANAGER_TITLE_RE = re.compile(r"(经理|总监|主管)")
+_WORK_TITLE_RE = re.compile(r"(工程师|架构师|科学家|经理|总监|专员|主管|分析师|顾问|讲师|教师)")
+_WORK_ORG_RE = re.compile(r"(公司|集团|有限公司|事务所|银行|医院)")
+_PROJECT_ORG_RE = re.compile(r"(实验室|大学|学院|研究院|研究所|研究中心|课题组|工作室)")
+
+
+def _infer_experience_kind(item: dict) -> str:
+    """按角色/组织关键词推断经历类型（LLM 缺字段或纯正则兜底时用）。"""
+    title = str(item.get("title") or "")
+    company = str(item.get("company") or "")
+    if _INTERN_TITLE_RE.search(title):
+        return "internship"
+    if _PROJECT_TITLE_RE.search(title) and not _MANAGER_TITLE_RE.search(title):
+        return "project"
+    if _WORK_TITLE_RE.search(title):
+        return "work"
+    if _WORK_ORG_RE.search(company):
+        return "work"
+    if _PROJECT_ORG_RE.search(company):
+        return "project"
+    return "other"
+
+
+def _normalize_experience_kind(value, item: dict | None = None) -> str:
+    """把 LLM / 旧数据里的类型写法归一；缺省时按角色/组织推断。"""
+    raw = str(value or "").strip().lower()
+    if raw in _KIND_ALIASES:
+        return _KIND_ALIASES[raw]
+    for key, kind in _KIND_ALIASES.items():
+        if key and key in raw:
+            return kind
+    return _infer_experience_kind(item or {})
+
 
 @dataclass
 class ResumeProfile:
@@ -51,6 +112,23 @@ class ResumeProfile:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+    @property
+    def work_experiences(self) -> list:
+        """工作 + 实习经历（实习归入「工作侧」，页面用 kind 标签区分）。"""
+        return [e for e in self.experiences if isinstance(e, dict)
+                and _normalize_experience_kind(e.get("kind"), e) in ("work", "internship")]
+
+    @property
+    def project_experiences(self) -> list:
+        return [e for e in self.experiences if isinstance(e, dict)
+                and _normalize_experience_kind(e.get("kind"), e) == "project"]
+
+    @property
+    def other_experiences(self) -> list:
+        """未分类经历（LLM/正则都没给出类型且关键词也推断不出）。"""
+        return [e for e in self.experiences if isinstance(e, dict)
+                and _normalize_experience_kind(e.get("kind"), e) == "other"]
 
 
 def _extract_work_years(text: str) -> str:
@@ -97,10 +175,12 @@ _LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提
 - school: 毕业院校（字符串）
 - major: 所学专业（字符串）
 - work_years: 工作年限数字（整数，没有则 0；只填数字，不要带「年」字）
-- experiences: 工作/项目经历数组，每项含：
+- experiences: 工作/实习/项目经历数组，每项含：
+    kind(类型：work=全职工作、internship=实习、project=项目或科研、other=其他)、
     company(组织名称)、title(角色/职位)、duration(时间段，如「2023.06-至今」)、
     description(一句话职责概述，30 字以内)、achievements(量化成果字符串数组)、
     tech_stack(用到的技术栈字符串数组)
+    （同一段经历只出现一次；不要把教育经历写进 experiences）
 - skills: 技能字符串数组（编程语言/框架/算法/工具，尽量用标准名称）
 
 简历文本：
@@ -182,24 +262,44 @@ def _normalize_experiences(exps: list) -> list:
         for k in ("achievements", "tech_stack"):
             v = e.get(k)
             item[k] = [str(x).strip() for x in v if str(x).strip()] if isinstance(v, list) else []
-        # 只要有一个非空字段就保留
-        if any(item.values()):
+        item["kind"] = _normalize_experience_kind(e.get("kind"), item)
+        # 只要有一个非空字段就保留（kind 一定有值，不能参与判空）
+        if any(item.get(k) for k in ("company", "title", "duration", "description",
+                                     "achievements", "tech_stack")):
             out.append(item)
     return out
 
 
+def _section_kind_at(text: str, pos: int) -> tuple[bool, str | None]:
+    """返回 (是否找到章节标题, 章节类型)。
+
+    章节类型为 None 表示该段属于「教育经历」等非工作/项目章节，调用方应跳过。
+    """
+    found = False
+    kind = None
+    for m in _SECTION_HEADING_RE.finditer(text, 0, pos):
+        found = True
+        kind = _SECTION_KIND.get(m.group(1))
+    return found, kind
+
+
 def _extract_experiences_regex(text: str) -> list:
-    """无 LLM 时按时间段粗切工作/项目经历，提取组织 + 角色 + 时间段。"""
+    """无 LLM 时按时间段粗切经历，并按章节标题/关键词标注工作、实习或项目。"""
     spans = list(TIME_RANGE_RE.finditer(text))
     if not spans:
         return []
     exps = []
     for i, m in enumerate(spans):
+        # 教育经历里的时间范围（2019.09-2023.06 某大学）不算工作/项目经历
+        found, section_kind = _section_kind_at(text, m.start())
+        if found and section_kind is None:
+            continue
         end = spans[i + 1].start() if i + 1 < len(spans) else len(text)
         seg = text[m.start():end]
         comp = COMPANY_RE.search(seg)
         title = TITLE_RE.search(seg)
         item = {
+            "kind": "",
             "company": comp.group(0) if comp else "",
             "title": title.group(0) if title else "",
             "duration": m.group(0),
@@ -207,6 +307,7 @@ def _extract_experiences_regex(text: str) -> list:
             "achievements": [],
             "tech_stack": [],
         }
+        item["kind"] = section_kind or _infer_experience_kind(item)
         if item["company"] or item["title"]:
             exps.append(item)
     return exps
@@ -264,10 +365,21 @@ def ats_suggestions(profile: ResumeProfile, text: str, user_skills: list[str]) -
     if not profile.work_years:
         tips.append({"level": "suggest", "tip": "未标注工作年限：建议明确写「N 年经验」，ATS 会按年限做初筛"})
 
-    # 2) 经历完整性
+    # 2) 经历完整性（工作/实习 vs 项目分开看：非科班/应届更依赖项目经历）
     if not profile.experiences:
         tips.append({"level": "suggest",
                      "tip": "未识别到工作/项目经历：建议按「时间段 + 组织 + 角色 + 职责」清晰分段，ATS 与 HR 都看重经历结构化"})
+    else:
+        # 类型未识别（全是 other）时不做工作/项目二选一的判断，避免重复打扰
+        has_work = bool(profile.work_experiences)
+        has_project = bool(profile.project_experiences)
+        if has_work or has_project:
+            if not has_work:
+                tips.append({"level": "suggest",
+                             "tip": "未识别到工作/实习经历：建议补充实习、开源贡献或竞赛等能证明工程能力的经历"})
+            if not has_project:
+                tips.append({"level": "suggest",
+                             "tip": "未识别到项目经历：建议至少写 1~2 个项目（问题背景 → 你的方案 → 技术栈 → 量化结果），这是非科班/应届最有力的能力证明"})
 
     # 3) 成果量化（优先看经历里的 achievements，再看全文量化数字）
     has_quant_achievement = any(

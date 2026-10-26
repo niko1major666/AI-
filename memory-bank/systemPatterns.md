@@ -17,7 +17,7 @@ src/
 ├── extractor/   rule_baseline / bert_ner / siamese_uie / base / evaluate / postprocess
 ├── matcher/     tfidf_matcher / bge_matcher / gap_analyzer / evaluate / base /
 │                jd_requirements / job_neighbors / learning_path / job_compare /
-│                job_recommender / strength_profile
+│                job_recommender / strength_profile / job_favorites（岗位收藏）
 ├── skillkb/     loader（Taxonomy，161 技能：difficulty + importance + skip_extract）
 ├── crawler/     tencent / bytedance / xiaomi / xiaomi_campus / deepseek / huawei /
 │                huawei_51job / kimi / minimax / kuaishou / xiaohongshu / bilibili /
@@ -51,6 +51,8 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 15. **版本元数据以 tag 为准，并用「最新发布说明」守护**：CI 浅克隆拿不到 tag，所以把 `docs/release-notes/vX.Y.Z.md` 当版本事实来源——`pyproject.toml` 的 `version` 必须等于该目录下最大的语义版本，标题行必须是 `# vX.Y.Z ...`（`release.yml` 取它作 Release 标题），由 `tests/test_release_metadata.py` 三条用例拦截漂移；README 用 shields.io 动态 Release 徽章（`img.shields.io/github/v/release/...`），不需要每版手改。发布流程写在 `docs/RELEASING.md`，含「重打 tag」路径：`release.yml` 对已存在 Release 走 `gh release edit --draft=false`，因此 `git tag -f` + `git push -f origin vX.Y.Z` 可把后续提交并入同一版本（v1.3.1 用过）。
 
 16. **扩充数据先过体检，再动语料**：加公司/数据源不是「爬完丢进 raw 就 merge」——`tests/test_dataset_snapshot.py` 的精确常量、slow 用例的零技能区间与技能覆盖、CI 的 `docs/metrics.md` 过期校验、`tests/test_skillkb.py` 的 importance 断言会同时红，而 `merge_jobs`（job_id keep=first）与 `build_dataset`（text_hash keep=first，公司归属看 `FILES` 顺序）失败时**不留日志**。所以新增 `scripts/preflight_new_source.py`：只读、~2s，把新 CSV 按构建同款口径清洗后**模拟合并**，输出 job_id 冲突、正文跨源重复（前后两种丢行数）、公司写法分裂、零技能率与技能覆盖、must 占比偏移，FAIL 即退出码 1。它能精确复现现有语料口径（5832/81/1252/160/60.0%），因此「体检数字对不对」本身就是一次链路自检。阈值（`ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`）故意与 snapshot 测试同值：加数据要改常量时，两处一起改，别让体检比测试松。完整 SOP 写在 `memory-bank/dataOnboarding.md`（含四处常量同步清单与七个静默坑）。
+
+17. **简历经历「先分类、再展示」，收藏「无后端也能持久」**：经历类型 `kind` 由 LLM 先给，缺失时 `_normalize_experience_kind` 按三级兜底（章节标题 → 角色关键词 → 组织关键词），教育经历在正则抽取阶段直接跳过（否则「2019.09-2023.06 吉林大学」会被当成一段工作）；「项目经理」属岗位而非项目，所以项目判定要排除经理/总监/主管。页面只按 `work_experiences` / `project_experiences` / `other_experiences` 分组，ATS 建议在「全是 other」时不做二选一提示，避免同一条经历同时被说「缺工作」和「缺项目」。收藏夹没有数据库：`src/matcher/job_favorites.py` 只做纯函数（去重键 = 公司 + 归一化标题，与 `job_recommender` 的去重口径一致），`app.py` 把 `job_id` 列表写进 `st.query_params` 的 `?fav=`，刷新/书签可用、换设备会丢（提供 JSON 导出），语料重建后用 `hydrate_favorites` 按 `job_id` 还原并静默丢弃失效 id。AppTest 里 `st.query_params` 写入异常被兜底捕获，但按钮仍必须能 rerun 后保持报告（收藏按钮加了回归用例）。
 
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测

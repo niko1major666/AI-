@@ -17,6 +17,15 @@ if str(ROOT) not in sys.path:
 
 from src.data.translate import translate_title as _translate_title
 from src.matcher.jd_requirements import judge_requirements
+from src.matcher.job_favorites import (
+    FAVORITE_LIMIT,
+    decode_favorites,
+    encode_favorites,
+    hydrate_favorites,
+    is_favorited,
+    remove_favorite,
+    toggle_favorite,
+)
 from src.matcher.job_neighbors import proxy_skills
 
 st.set_page_config(page_title="AI 岗位技能差距分析", layout="wide")
@@ -194,6 +203,79 @@ def _job_label(r):
     return " · ".join([p for p in parts if p])
 
 
+# ---- 岗位收藏（求职短名单）----
+def _favorites() -> list:
+    return list(st.session_state.get("favorite_jobs") or [])
+
+
+def _save_favorites(favs) -> None:
+    """收藏同步到 session + 链接参数：刷新/书签不丢（无后端存储）。"""
+    st.session_state["favorite_jobs"] = list(favs)
+    try:
+        if favs:
+            st.query_params["fav"] = encode_favorites(favs)
+        elif "fav" in st.query_params:
+            del st.query_params["fav"]
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _init_favorites(rows) -> None:
+    """首次进入时从 ?fav=job_id,... 还原收藏（语料重建后失效的 id 自动丢弃）。"""
+    if st.session_state.get("favorites_loaded"):
+        return
+    try:
+        raw = st.query_params.get("fav") or ""
+    except Exception:  # noqa: BLE001
+        raw = ""
+    st.session_state["favorite_jobs"] = hydrate_favorites(decode_favorites(raw), rows)
+    st.session_state["favorites_loaded"] = True
+
+
+def _toggle_favorite(job: dict) -> None:
+    favs, action = toggle_favorite(_favorites(), job)
+    if action == "full":
+        st.warning(f"收藏夹最多 {FAVORITE_LIMIT} 个岗位，请先在左侧「我的收藏」移除一些")
+        return
+    _save_favorites(favs)
+    st.rerun()
+
+
+def _render_favorite_button(job: dict, key_prefix: str = "") -> None:
+    """⭐ 收藏/取消收藏按钮（差距报告页、简历推荐列表共用）。"""
+    jid = str(job.get("job_id") or "")
+    token = re.sub(r"[^0-9A-Za-z\u4e00-\u9fa5]+",
+                   "", f"{job.get('company', '')}{job.get('title', '')}")[:40]
+    key = f"{key_prefix}fav_{jid or token}"
+    fav = is_favorited(_favorites(), job)
+    label = "✅ 已收藏（点击取消）" if fav else "⭐ 收藏该岗位"
+    if st.button(label, key=key, help=f"收藏写入当前链接参数，最多 {FAVORITE_LIMIT} 个"):
+        _toggle_favorite(job)
+
+
+def _render_favorites_sidebar() -> None:
+    """侧边栏收藏夹：列表 + 移除 + 导出（跨页面可见）。"""
+    favs = _favorites()
+    st.sidebar.markdown("---")
+    with st.sidebar.expander(f"⭐ 我的收藏（{len(favs)}/{FAVORITE_LIMIT}）", expanded=False):
+        if not favs:
+            st.caption("在「差距报告」或「简历匹配」页点「⭐ 收藏该岗位」。收藏写入当前链接（?fav=…），刷新/书签不丢。")
+            return
+        for idx, f in enumerate(favs):
+            name = _translate_title(str(f.get("title") or "")) or "未命名岗位"
+            meta = " · ".join(x for x in [str(f.get("company") or ""), str(f.get("location") or "")] if x)
+            c1, c2 = st.columns([0.78, 0.22])
+            c1.markdown(f"**{name}**  \n{meta}")
+            if c2.button("移除", key=f"fav_remove_{idx}"):
+                _save_favorites(remove_favorite(favs, f))
+                st.rerun()
+        st.download_button(
+            "导出收藏（JSON）", json.dumps(favs, ensure_ascii=False, indent=2),
+            file_name="job_favorites.json", mime="application/json", key="fav_export",
+        )
+        st.caption("收藏存在链接参数里，换设备/清缓存会丢；可导出 JSON 备份。")
+
+
 def _build_jd_skills(taxonomy, target, demand):
     """把岗位技能转成分析器输入：must 判定（JD 文本驱动）+ 岗位内强调度 tf + 判定依据。"""
     must_ids = set(target.get("must_skills") or [])
@@ -351,25 +433,36 @@ def page_resume(taxonomy, rule, analyzer, rows=None):
     if profile.majors:
         st.caption("🎓 所学专业：" + "、".join(profile.majors))
     if profile.experiences:
-        st.markdown("**💼 工作/项目经历：**")
-        for e in profile.experiences:
-            if not isinstance(e, dict):
+        from src.data.resume_parser import EXPERIENCE_KIND_LABELS
+        groups = [
+            ("💼 工作/实习经历", profile.work_experiences),
+            ("🚀 项目经历", profile.project_experiences),
+            ("📌 其他经历（未识别类型）", profile.other_experiences),
+        ]
+        for group_label, items in groups:
+            if not items:
                 continue
-            comp = e.get("company") or ""
-            title = e.get("title") or ""
-            dur = e.get("duration") or ""
-            line = " · ".join(x for x in [comp, title, dur] if x)
-            if line:
-                st.markdown(f"- **{line}**")
-            desc = e.get("description") or ""
-            if desc:
-                st.markdown(f"  - 职责：{desc}")
-            techs = e.get("tech_stack") or []
-            if techs:
-                st.markdown(f"  - 技术栈：{'、'.join(techs)}")
-            achieves = e.get("achievements") or []
-            if achieves:
-                st.markdown("  - 成果：" + "；".join(achieves))
+            st.markdown(f"**{group_label}（{len(items)} 段）：**")
+            for e in items:
+                if not isinstance(e, dict):
+                    continue
+                comp = e.get("company") or ""
+                title = e.get("title") or ""
+                dur = e.get("duration") or ""
+                line = " · ".join(x for x in [comp, title, dur] if x)
+                kind = EXPERIENCE_KIND_LABELS.get(str(e.get("kind") or "other"), "")
+                tag = f"`{kind}` " if kind and kind != "其他" else ""
+                if line:
+                    st.markdown(f"- {tag}**{line}**")
+                desc = e.get("description") or ""
+                if desc:
+                    st.markdown(f"  - 职责：{desc}")
+                techs = e.get("tech_stack") or []
+                if techs:
+                    st.markdown(f"  - 技术栈：{'、'.join(techs)}")
+                achieves = e.get("achievements") or []
+                if achieves:
+                    st.markdown("  - 成果：" + "；".join(achieves))
 
     if st.button("提取技能"):
         spans = rule.extract_spans("user", text)
@@ -479,6 +572,14 @@ def _render_strength_and_jobs(taxonomy, analyzer, rows):
     st.dataframe(df_jobs, height=380, hide_index=True,
                  column_config={"匹配度": st.column_config.TextColumn("匹配度")})
 
+    st.markdown("**⭐ 加入收藏夹**")
+    fav_labels = {
+        f"{s['company']} · {_translate_title(s['title'])} · {s['location']}": s
+        for s in sugs
+    }
+    picked = st.selectbox("选择要收藏的岗位", list(fav_labels),
+                          key="rec_fav_pick", label_visibility="collapsed")
+    _render_favorite_button(fav_labels[picked], key_prefix="rec_")
 
 
 def _render_learning_path(taxonomy, rep, meta):
@@ -665,6 +766,7 @@ def page_gap(taxonomy, analyzer, rows):
     options = {_job_label(r): r for r in company_jobs}
     label = st.selectbox("📋 选择岗位", list(options))
     target = options[label]
+    _render_favorite_button(target, key_prefix="gap_")
 
     jd_skills = _build_jd_skills(taxonomy, target, demand)
     if not jd_skills:
@@ -777,10 +879,12 @@ def main():
     _inject_css()
     taxonomy, rule = load_core()
     rows = extract_corpus()
+    _init_favorites(rows)
     st.sidebar.markdown("## 🎯 AI 岗位技能差距分析")
     st.sidebar.caption("面向非科班求职者的技能诊断与学习规划")
     st.sidebar.markdown("---")
     page = st.sidebar.radio("页面", ["技能图谱", "简历匹配", "差距报告"])
+    _render_favorites_sidebar()
     if page == "技能图谱":
         # 首屏不触发 load_engine()：避免为「技能图谱」付 sklearn 的冷导入开销
         page_graph(taxonomy, rows)

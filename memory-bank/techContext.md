@@ -7,7 +7,7 @@
 - **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）
 - **前端**：Streamlit + pyvis（图谱可视化）
 - **爬虫**：requests + Playwright（chromium headless）
-- **工程**：pytest（267 用例 = 265 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`
+- **工程**：pytest（284 用例 = 282 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`
 
 ## 开发设置
 - 项目根目录：`D:\ai-skill-gap`
@@ -19,7 +19,7 @@
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
 - 当前版本：**v1.4.0**（tag，2026-10-26；发布说明 `docs/release-notes/v1.4.0.md`）
-- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，267 测试；3.10 只跑用例、3.12 加覆盖率门槛）
+- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，284 测试；3.10 只跑用例、3.12 加覆盖率门槛）
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）

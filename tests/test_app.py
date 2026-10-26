@@ -41,7 +41,7 @@ def test_gap_page_interaction_has_no_exception(monkeypatch):
     # 注意：页面还有一个「搜索岗位」输入框，这里必须按 label 精确定位技能输入框
     skill_input = next(t for t in at.text_input if "直接输入技能" in t.label)
     skill_input.set_value("Python, PyTorch").run()
-    at.button[0].click().run()
+    next(b for b in at.button if b.label == "生成差距报告").click().run()
     assert not at.exception, f"app exceptions: {at.exception}"
 
     # 抽到技能的岗位应给出匹配度，并展示 JD 硬性要求数量
@@ -61,6 +61,14 @@ def test_gap_page_interaction_has_no_exception(monkeypatch):
             assert not at.exception, f"app exceptions: {at.exception}"
             assert at.metric, "勾选已学进度后报告不应消失（session 渲染）"
             assert any("已学进度" in md.value for md in at.markdown)
+
+        # 岗位收藏：点击后按钮变「已收藏」，报告仍在（rerun 不丢）
+        fav_btn = next((b for b in at.button if "收藏该岗位" in b.label), None)
+        if fav_btn is not None:
+            fav_btn.click().run()
+            assert not at.exception, f"app exceptions: {at.exception}"
+            assert any("已收藏" in b.label for b in at.button)
+            assert at.metric, "收藏触发的 rerun 不应让报告消失"
 
 
 def test_gap_compare_mode_has_no_exception():

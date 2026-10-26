@@ -76,3 +76,10 @@ def test_must_weight_affects_score():
     res = recommend_jobs(["Python"], rows, analyzer, min_score=0)
     assert res[0].company == "A"
     assert res[0].match_score > res[1].match_score
+
+
+def test_suggestion_carries_job_id_for_favorites():
+    rows = _rows()
+    rows[0]["job_id"] = "tx-1"
+    res = recommend_jobs(["Python", "大模型"], rows, _analyzer(), min_score=0)
+    assert res[0].job_id == "tx-1"

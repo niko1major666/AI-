@@ -17,6 +17,8 @@
 
 ## 近期变更（按时间倒序）
 
+- **协作约定（2026-10-26）**：新增 `memory-bank/workingAgreements.md`，固化上下文与输出预算执行规则（单文件单次 ≤400 行 / 超过分页、命令输出过滤、里程碑落盘、新会话交接、不得为省 token 牺牲的例外），并在「重要模式与偏好」加入口，后续会话按此执行
+
 - **迭代 7：求职闭环（经历分类 + 岗位收藏，2026-10-26）**：① 简历经历新增 `kind`（`work` / `internship` / `project` / `other`）——LLM 先判定，缺省时正则按章节标题（工作/实习/项目/教育）→ 角色关键词（实习/项目/工程师等）→ 组织关键词（公司/实验室/大学）推断，教育经历明确跳过；`ResumeProfile` 增加 `work_experiences` / `project_experiences` / `other_experiences`，简历页按类型分组展示，ATS 建议改为分别提示「缺工作/实习」与「缺项目」（全为 other 时不重复提示）。② 新增 `src/matcher/job_favorites.py`（纯函数）：按「公司 + 归一化标题」去重、上限 20、`toggle_favorite` / `remove_favorite` / `is_favorited`、`?fav=job_id,...` 编解码、按 job_id 从语料还原；`JobSuggestion` 增加 `job_id`。③ `app.py` 侧边栏新增跨页面「我的收藏」面板（列表 / 移除 / 导出 JSON），差距报告页与简历推荐 Top10 增加「⭐ 收藏该岗位」按钮，收藏写入 `st.query_params`（无后端存储，刷新/书签不丢），并给 `tests/test_app.py` 差距页补收藏回归。④ 新增 `tests/test_job_favorites.py`（9 用例）+ 经历分类/ATS 用例 + recommender job_id 用例，测试 267→**284**；语料与 `docs/metrics.md` 指标不变
 
 - **v1.4.0 已发布（2026-10-26，tag `v1.4.0`）**：把 W11–W16 一并发版（`pyproject` 1.3.1→1.4.0、`docs/release-notes/v1.4.0.md`）。语料 4582→**5832 条 / 81 家**（哔哩哔哩 194 + 滴滴 387 + 美团 669），零技能 25.4%→**21.5%**，must 56.5%→**60.0%**（1.80 项/岗），覆盖仍 160/161，测试 203→**267**；preflight 体检工具化 + 3 个爬虫/探针并入本版。顺手修掉 README 目录结构两处过期数字（13 爬虫模块 / 14 数据源、267 用例）。发版后 main 与远程一致，tag 推送触发 Release 工作流
@@ -89,6 +91,7 @@
 - 双路抽取（规则基线 + BERT-NER）互补、双路匹配（TF-IDF + BGE）
 - 所有实验**诚实标注**（含失败：SiameseUIE F1=0、弱标注未达预期）
 - 数据/脚本/测试分离；改动后必跑 pytest + 语法检查
+- **上下文/输出预算按 `memory-bank/workingAgreements.md` 执行**：单文件单次 ≤400 行（大文件分页）、命令输出先过滤、里程碑后固化记忆并优先新开会话；不为省 token 牺牲安全、测试口径与关键决策
 
 ## 学习与洞察
 - st.secrets 会读取本地 `.streamlit/secrets.toml` 占位符，覆盖环境变量 key → HTTP header latin-1 编码崩溃；key 获取应环境变量优先 + 过滤占位符

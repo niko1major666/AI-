@@ -7,7 +7,7 @@
 - **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）
 - **前端**：Streamlit + pyvis（图谱可视化）
 - **爬虫**：requests + Playwright（chromium headless）
-- **工程**：pytest（250 用例 = 248 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`
+- **工程**：pytest（267 用例 = 265 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`
 
 ## 开发设置
 - 项目根目录：`D:\ai-skill-gap`
@@ -18,7 +18,7 @@
 - SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
-- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，250 测试；3.10 只跑用例、3.12 加覆盖率门槛）
+- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，267 测试；3.10 只跑用例、3.12 加覆盖率门槛）
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）
@@ -34,7 +34,7 @@
 
 ## 工具使用模式
 - 跑测试：`.\.venv\Scripts\python.exe -m pytest -q`
-- 重爬：`python scripts/recrawl_all.py`（12 个爬虫模块 / 13 个数据源，约 20+ 分钟）
+- 重爬：`python scripts/recrawl_all.py`（13 个爬虫模块 / 14 个数据源，约 20+ 分钟）
 - 合并+构建：`merge_jobs.py` → `python -m src.data.build_dataset --stats`
 - 重要度重算：`python scripts/recalc_importance.py`
 - 匹配评测：`python scripts/eval_resume_match.py`（需 BGE 缓存）
@@ -46,5 +46,6 @@
 - 快手爬虫：`python -m src.crawler.kuaishou`（社招 sign 逆向 + 校招 POST，约 1445 条）
 - 哔哩哔哩爬虫：`python -m src.crawler.bilibili`（匿名 CSRF；默认只落技术类+AI类，`--all` 保留全站 876 条）
 - 滴滴爬虫：`python -m src.crawler.didi`（公开 GET 无鉴权；默认只落「技术」，`--all` 保留全站 1081 条；`size` 上限 100）
+- 美团爬虫：`python -m src.crawler.meituan`（移动端匿名 POST；默认只落「技术类」，`--all` 保留全站 3231 条；`pageSize` 实测上限 1000、固定用 200，查询 token 必须整轮复用）
 - 恢复 BERT-NER：`python scripts/restore_ner.py 3`（从 bert-base-chinese 重训 30 条人工标注）
 - **扩充数据（唯一入口）**：`python scripts/preflight_new_source.py --source data/raw/<company>_ai_jobs.csv`（只读，~2s；FAIL 退出码 1）。完整 SOP / 会红清单 / 静默坑见 `memory-bank/dataOnboarding.md`

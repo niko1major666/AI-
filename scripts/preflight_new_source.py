@@ -2,7 +2,7 @@
 
 为什么需要它 —— 语料一变，会同时踩到两类坑：
 
-- **一定会红**：`tests/test_dataset_snapshot.py` 的精确常量（5163 / 80 / 4988）、slow 用例的
+- **一定会红**：`tests/test_dataset_snapshot.py` 的精确常量（5832 / 81 / 5645）、slow 用例的
   「零技能占比 20%~28% + 技能覆盖 ≥159」、CI 对 `docs/metrics.md` 的过期校验
   （`git diff --exit-code`）、`tests/test_skillkb.py` 的 importance 断言；
 - **静默出错**：job_id 撞车被 `merge_jobs` 的 keep=first 丢行、正文跨源重复让公司归属取决于
@@ -260,7 +260,7 @@ def must_stats(rows, demand) -> dict:
     """硬性要求占比（与 README / PROJECT_REPORT 同口径：占全语料岗位数）。
 
     `evidence` 记录 must 判定的来源分布（句内触发词 / 章节归属 / 占比兜底），
-    现有语料应复现「57.7% / 1.69 项每岗 / 句内 5899 · 章节 939 · 兜底 1873」。
+    现有语料应复现「60.0% / 1.80 项每岗 / 句内 7340 · 章节 974 · 兜底 2191」。
     """
     total = len(rows)
     judged_jobs = with_must = must_items = 0

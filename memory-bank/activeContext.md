@@ -8,14 +8,16 @@
 
 ## 权威数字（以 `docs/metrics.md` 为准；2026-10-26 重跑 `eval_all.py` 零 diff）
 
-- 语料 **5163 条 / 80 家公司 / 4988 个唯一「公司+标题」**（原始 5640 → 过短 7 + 非 AI 工程岗 5 + 重复 465）
-- 零技能岗位 **1212 条（23.5%）**，其中 **1188 条（98.0%）** 可用同公司相似岗位代理（中位 3 项）
+- 语料 **5832 条 / 81 家公司 / 5645 个唯一「公司+标题」**（原始 6321 → 过短 7 + 非 AI 工程岗 6 + 重复 476）
+- 零技能岗位 **1252 条（21.5%）**，其中 **1228 条（98.1%）** 可用同公司相似岗位代理（中位 3 项）
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
-- 硬性要求 **57.7% 岗位 / 平均 1.69 项**（句内触发词 5899 / 章节归属 939 / 占比兜底 1873）；最高技能需求占比 **36.3%**（Python）
+- 硬性要求 **60.0% 岗位 / 平均 1.80 项**（句内触发词 7340 / 章节归属 974 / 占比兜底 2191）；最高技能需求占比 **38.6%**（大模型）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **250**（248 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
+- 测试 **267**（265 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
 
 ## 近期变更（按时间倒序）
+
+- **本轮（接入美团，未发版）**：新增 `src/crawler/meituan.py`——`job.meituan.com` 是 Owl + ESM 移动端 SPA（入口 bundle 仅 7KB、无接口字符串），用 Playwright 抓 `/m/position` 的 XHR 才定位到 `official/mobile/job/getJobList`；接口**匿名公开**（无 token / 签名 / cookie），`list[]` 自带 `jobDuty` + `jobRequirement` 全文，社招 3231 条。三个坑：① 分页参数必须嵌在 `page` 对象里（PC 版同名接口收顶层 `pageNo` 且把 `pageSize` 锁死 20；移动版 `pageSize` 实测上限 1000、固定用 200，17 页抓完）；② `u_query_id` / `r_query_id` 是「本次查询」token，**整轮翻页必须复用**，每页换新会被当成新搜索、永远返回第 1 页（17 页只有 200 条唯一岗位，`totalCount` 仍是 3231）→ 爬虫按 job_id 去重并在「整页无新增」/「唯一条数 < total」时抛错；③ `jobShareType=2`（2326 条）虽免 token，但正文全空，固定用 `1`。技术类 681 条（零技能 6.0%、平均 6.7 项技能），零售 90.6% / 销售客服 97.0% / 职能 71.1% / 运营 48.1% / 产品 37.0% 零技能 → 默认只落「技术类」（`--all` 全量 3231）。体检预演全绿（零技能 21.4%、must +2.3pt），合并构建后语料 5163→5832 条 / 81 家（零技能 23.5%→21.5%，must 57.7%→60.0% / 1.80 项每岗、tf≥2 49.2%、覆盖仍 160/161）；`recalc_importance` 16 项微调（强化学习 4→5、计算机视觉 3→4、Spark 3→4、Kubernetes 4→3、GCP 3→2 等）；新增 `scripts/probe_meituan.py` + `tests/test_meituan.py`（17 用例，含 token 复用与分页失效），测试 250→267
 
 - **本轮（接入滴滴，未发版）**：新增 `src/crawler/didi.py`——`talent.didiglobal.com` 是 Vue SPA（入口 bundle 里没有 `/api` 字符串），用 Playwright 抓 XHR 才定位到 `recruit-portal-service/api/job/front/list`；接口**公开无鉴权**（无 token / 无签名），`items[]` 自带 `jobDuty` + `jobQualification` 全文，社招 1081 条。**`size` 上限 100**（传 200 返回 `meta.code=10039`「拦截返回」+ `data=null`，HTTP 仍 200）→ 爬虫校验业务码并对「空页但只拿到 N/total」显式抛错。全站技术类 423 条（零技能 11.8%、平均 5.3 项技能），运营 53.7% / 产品 65.6% / 安全 75.0% 零技能 → 默认只落「技术」（`--all` 全量 1081）。校招在 Moka（`/api/outer/ats-apply/website/jobs` 返回 AES 密文）未接入。体检预演全绿（零技能 23.4%、must +0.3pt），合并构建后语料 4776→5163 条 / 80 家（零技能 24.4%→23.5%，must 57.5%→57.7% / 1.69 项每岗、tf≥2 45.7%、覆盖仍 160/161）；`recalc_importance` 6 项微调（计算机视觉 4→3、特征工程 1→2、Elasticsearch 2→3、Function Calling 3→4、DeepSeek 2→1、偏好对齐 3→2）；新增 `scripts/probe_didi.py` + `tests/test_didi.py`（14 用例，含分页拦截与类别过滤），测试 236→250
 
@@ -68,7 +70,7 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 阿里/智谱数据补充（需继续探查招聘渠道）；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
+1. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
 2. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 3. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
 4. 迭代 6 已收尾：UNITTEST 别名收紧 ✅、学习路径「已学进度」联动 ✅；剩余候选：岗位订阅/收藏、BGE 进 CI（模型缓存化）

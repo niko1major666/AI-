@@ -1,7 +1,7 @@
 """冷启动抽取 benchmark：全语料 JD 的规则抽取耗时（首屏冷启动的主要开销）。
 
 用法：
-    python scripts/bench_extract.py            # 全部语料（当前 5163 条）
+    python scripts/bench_extract.py            # 全部语料（当前 5832 条）
     python scripts/bench_extract.py --limit 500
 
 参照数据（同一台机器 / 同一 Python）：

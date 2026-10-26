@@ -23,7 +23,7 @@
 | `job_id` **必须带源前缀**（`ks_` / `kimi_` / `hw51_` / `xhs_` / 自建 `ali_`） | `merge_jobs` 按 `job_id` `keep="first"` 去重，撞车 = 静默丢行（体检报 FAIL） |
 | `company` 用**统一中文名** | `normalize_company()` 只去后缀/括号/小写，**没有别名表**，「阿里」与「阿里巴巴」会算成两家 |
 | 正文放 `jd_text`，岗位名放 `title` | 标题黑/白名单只作用于 `title`，不做正文过滤 |
-| 整站爬虫要按岗位类别过滤 | 全站岗位里非技术岗大量零技能（哔哩哔哩 876 条中 42.4%、滴滴 1081 条中 39.8% 抽不到技能，全量入语料会把零技能率从 23.5% 顶到 27.4%，must 从 57.7% 掉到 53.3%）；`bilibili.py` 默认只留「技术类 + AI类」、`didi.py` 默认只留「技术」，`--all` 才全量 |
+| 整站爬虫要按岗位类别过滤 | 全站岗位里非技术岗大量零技能（哔哩哔哩 876 条中 42.4%、滴滴 1081 条中 39.8%、美团 3231 条中 57.4% 抽不到技能，全量入语料会把零技能率从当前 21.5% 显著拉高）；`bilibili.py` 默认只留「技术类 + AI类」、`didi.py` 默认只留「技术」、`meituan.py` 默认只留「技术类」，`--all` 才全量 |
 | CSV 落在 `data/raw/`，**不要提交** | `.gitignore` 例外只有 `data/raw/sample_jobs.csv`；语料走 `data/processed/jobs.jsonl` |
 
 ## 2. 双处注册（漏一处就静默不进语料）
@@ -72,31 +72,31 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 
 | 位置 | 要改什么 |
 |---|---|
-| `tests/test_dataset_snapshot.py` | 精确常量 `5163 / 80 / 4988`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
+| `tests/test_dataset_snapshot.py` | 精确常量 `5832 / 81 / 5645`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
 | `tests/test_skillkb.py` | 个别技能 importance 断言（如 `PROG.PYTHON=5`、`BIGDATA.FLINK=3`）——占比变了就要重跑 `recalc_importance.py` 再对齐 |
 | `scripts/preflight_new_source.py` | `ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`（与 snapshot 测试同步） |
 | `docs/metrics.md` | `python scripts/eval_all.py` 生成，CI 在 main 上 `git diff --exit-code` 校验是否过期 |
 | `README.md` | 数据源表「条数」+ 公司分布行 + 量化指标段 + 路线图新增 W 行 |
 | `PROJECT_REPORT.md` | §四 各源条数、§五 数据规模 / 零技能 / must 占比 |
 | `memory-bank/*` | `activeContext`（当前状态）、`progress`（本轮记录）、`techContext`（测试数）、`systemPatterns`（口径） |
-| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 1212 / 23.5% / 98.0%）、`src/matcher/jd_requirements.py`（57.7% / 3951 / 5899·939·1873）、`src/extractor/rule_baseline.py`（5163） |
+| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 1252 / 21.5% / 98.1%）、`src/matcher/jd_requirements.py`（60.0% / 4580 / 7340·974·2191）、`src/extractor/rule_baseline.py`（5832） |
 
-## 6. 当前基线（W15 接入滴滴之后，2026-10）
+## 6. 当前基线（W16 接入美团之后，2026-10）
 
 | 指标 | 值 | 来源 |
 |---|---|---|
-| 语料 | 5163 条 / 80 家 / 4988 唯一「公司+标题」 | `build_stats.json` |
-| 原始抓取 | 5640 条（过短 7 + 标题过滤 5 + 去重 465） | 同上 |
-| 零技能岗位 | 1212 条（23.5%），98.0% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
-| 有技能岗位 | 3951 条（must 判定的分母） | `jd_requirements` |
+| 语料 | 5832 条 / 81 家 / 5645 唯一「公司+标题」 | `build_stats.json` |
+| 原始抓取 | 6321 条（过短 7 + 标题过滤 6 + 去重 476） | 同上 |
+| 零技能岗位 | 1252 条（21.5%），98.1% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
+| 有技能岗位 | 4580 条（must 判定的分母） | `jd_requirements` |
 | 技能覆盖 | 160/161（缺「联邦学习」，语料未出现） | `test_dataset_snapshot` slow |
 | 学习资源 | 106/161（65.8%） | `learning_resources.yaml` |
-| 硬性要求 | 57.7% 岗位 / 1.69 项每岗（句内 5899 · 章节 939 · 兜底 1873） | 体检脚本 `[6]` 段可复现 |
+| 硬性要求 | 60.0% 岗位 / 1.80 项每岗（句内 7340 · 章节 974 · 兜底 2191） | 体检脚本 `[6]` 段可复现 |
 | 抽取 F1 | test 0.9565 / 全量 0.9123 | `docs/metrics.md` |
 
 **单公司零技能率**（决定「还能不能加列表式短 JD」）：
-小红书 37.4%、快手 32.5%、Kimi 20%、小米 19.8%、腾讯 16.6%、滴滴 11.9%、字节 5.0%、哔哩哔哩 2.1%、英文岗 ~0%。
-→ 再加约 1950 条列表式 JD（约 40% 零技能）会把整体从 23.5% 推到 28% 上界。
+小红书 37.4%、快手 32.5%、Kimi 20%、小米 19.8%、腾讯 16.6%、滴滴 11.9%、美团 6.0%、字节 5.0%、哔哩哔哩 2.1%、英文岗 ~0%。
+→ 再加约 3170 条列表式 JD（约 40% 零技能）会把整体从 21.5% 推到 28% 上界。
 
 ## 7. 静默坑（脚本已覆盖，人工评审也别放过）
 
@@ -106,22 +106,23 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 4. **整站列表式短 JD**：抽取为空 → 零技能率上升 → `job_neighbors` 对「整站列表」会返回空，页面重新出现「匹配度 0% + 已覆盖全部技能」的矛盾。
 5. **标题黑名单只作用于构造期**（`src/data/job_filter.py`）：白名单保留「测试/数据/智能」，放宽时要看 `dropped_offtopic` 抽样。
 6. **分页参数被网关拦截**（滴滴）：`size=200` 返回 `meta.code=10039`「拦截返回」+ `data=null`，HTTP 仍是 200——只看状态码会当成「没有岗位」。爬虫必须校验业务码、分页固定 100，并对「空页但 `len(rows) < total`」显式抛错；新源接入时先确认 `total` 与实际行数一致。
+7. **查询 token 与分页绑定**（美团）：`u_query_id` / `r_query_id` 是「本次查询」的 token，不是鉴权——**整轮翻页必须复用同一个**。每页换新会被当成新搜索、永远返回第 1 页（17 页抓下来只有 200 条唯一岗位，`totalCount` 却一直是 3231）；同时分页参数必须嵌在 `page` 对象里（PC 版同名接口收顶层 `pageNo`，且把 `pageSize` 锁死 20）。爬虫按 job_id 去重，并在「整页无新增」或「唯一条数 < total」时抛错，别把重复当抓全。
 
 ## 8. 已知缺口（按优先级）
 
 1. `company_aliases` 配置 + 接进 `normalize_company()`——体检只能报「写法分裂」，不能自动合并。
 2. `merge_jobs.py` / `analyze_skills.py` / `verify_real.py` 的 `ROOT = Path("D:/ai-skill-gap")` 改仓库相对路径。
-3. `data/processed/jobs.jsonl`（13.6MB）入库而 `data/raw/*` 不入库 ⇒ **语料不可复现**，每次扩数据多一个二进制 blob；建议 raw 走 Release 附件或 Git LFS。
+3. `data/processed/jobs.jsonl`（18.9MB）入库而 `data/raw/*` 不入库 ⇒ **语料不可复现**，每次扩数据多一个二进制 blob；建议 raw 走 Release 附件或 Git LFS。
 4. 代理（`job_neighbors`）对「无可用相似岗位的公司」缺兜底文案，扩源后要复测。
 
 ## 9. 成本参考（本机 CPU）
 
 | 动作 | 耗时 |
 |---|---|
-| 读 `jobs.jsonl`（13.6MB） | 0.09s |
+| 读 `jobs.jsonl`（18.9MB） | 0.09s |
 | 全语料规则抽取 | 0.84s（0.18s/1000 行） |
 | preflight（抽取 + 合并预测 + must 判定） | ~2.0s |
-| 全量 pytest | ~50s（250 条后仍 < 1min） |
+| 全量 pytest | ~50s（267 条后仍 < 1min） |
 
 ## 10. 自检清单（复制到 PR / 提交说明里）
 

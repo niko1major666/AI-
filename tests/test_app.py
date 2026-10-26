@@ -54,6 +54,14 @@ def test_gap_page_interaction_has_no_exception(monkeypatch):
         assert any("Markdown" in lb for lb in labels), labels
         assert any("Word" in lb for lb in labels), labels
 
+        # 「已学进度」联动（迭代 6）：勾选已掌握技能 → 路径重排，报告不消失、不报错
+        if at.multiselect:
+            first = list(at.multiselect[0].options)[0]
+            at.multiselect[0].set_value([first]).run()
+            assert not at.exception, f"app exceptions: {at.exception}"
+            assert at.metric, "勾选已学进度后报告不应消失（session 渲染）"
+            assert any("已学进度" in md.value for md in at.markdown)
+
 
 def test_gap_compare_mode_has_no_exception():
     """多岗位对比（C3）：切模式 → 选公司 → 输技能 → 对比，不抛异常且有匹配度指标。"""

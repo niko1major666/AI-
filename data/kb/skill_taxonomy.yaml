@@ -138,7 +138,7 @@ skills:
   - {id: ENGINEERING.GRPC, name: gRPC, category: ENGINEERING, aliases: [grpc], difficulty: 2, importance: 1}
   - {id: ENGINEERING.REST, name: "RESTful API", category: ENGINEERING, aliases: [restful, rest-api, api开发], difficulty: 1, importance: 1}
   - {id: ENGINEERING.MICROSVC, name: 微服务, category: ENGINEERING, aliases: [microservice, microservices], difficulty: 2, importance: 3}
-  - {id: ENGINEERING.UNITTEST, name: 单元测试, category: ENGINEERING, aliases: [unit-test, 测试], difficulty: 1, importance: 5}
+  - {id: ENGINEERING.UNITTEST, name: 单元测试, category: ENGINEERING, aliases: [unit-test, 测试], skip_extract: [测试], difficulty: 1, importance: 1}
   - {id: ENGINEERING.HPC, name: 高性能计算, category: ENGINEERING, aliases: [hpc], difficulty: 4, importance: 2}
   - {id: ENGINEERING.CUDA, name: CUDA, category: ENGINEERING, aliases: [cuda], difficulty: 4, importance: 3}
   - {id: ENGINEERING.PARALLEL, name: 并行计算, category: ENGINEERING, aliases: [parallel-computing], difficulty: 3, importance: 1}

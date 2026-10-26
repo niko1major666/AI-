@@ -99,3 +99,43 @@ def test_markdown_contains_totals_and_skills():
     md = format_path_markdown(path, hours_per_week=5)
     assert "Python" in md and "阶段 1" in md and "每周 5 小时" in md
     assert path.total_hours == 2
+
+
+def test_learned_skills_are_skipped_and_recorded():
+    """标记「已学完」的技能不再进入路径，并计入 skipped（保持缺口原顺序）。"""
+    path = build_learning_path([
+        _gap("PROG.PYTHON", "Python", "P0", diff=1),
+        _gap("AITECH.RAG", "RAG", "P1", diff=3),
+    ], learned={"PROG.PYTHON"})
+    assert [s.skill_id for st in path.stages for s in st.steps] == ["AITECH.RAG"]
+    assert path.skipped == ["Python"]
+    assert path.total_hours == 8               # 2 + 8 → 只剩 RAG 的 8 学时
+    assert path.to_dict()["skipped"] == ["Python"]
+    assert "已学进度" in format_path_markdown(path)
+
+
+def test_learned_prereq_no_longer_hints_extra_prep():
+    """已学完的先修视为已具备：不再提示「前置技能不在缺口内」。"""
+    path = build_learning_path([
+        _gap("AITECH.RAG", "RAG", "P0", score=99),
+        _gap("AITECH.EMBEDDING", "Embedding", "P2", score=1),
+    ], taxonomy=Taxonomy(str(TAX)), learned={"AITECH.LLM"})
+    rag = next(s for s in path.stages[0].steps if s.skill_id == "AITECH.RAG")
+    assert rag.prereq_note == ""
+    assert [s.skill_id for s in path.stages[0].steps] == ["AITECH.EMBEDDING", "AITECH.RAG"]
+
+
+def test_all_missing_learned_returns_empty_path_with_note():
+    path = build_learning_path([_gap("PROG.PYTHON", "Python", "P0", diff=1)],
+                               learned={"PROG.PYTHON"})
+    assert path.stages == [] and path.total_hours == 0 and path.total_weeks == 0
+    assert path.skipped == ["Python"]
+    md = format_path_markdown(path)
+    assert "已学进度" in md and "Python" in md
+
+
+def test_learned_unknown_or_blank_ids_are_ignored():
+    path = build_learning_path([_gap("PROG.PYTHON", "Python", "P0", diff=1)],
+                               learned={"NOPE.X", "  ", None})
+    assert [s.skill_id for s in path.stages[0].steps] == ["PROG.PYTHON"]
+    assert path.skipped == []

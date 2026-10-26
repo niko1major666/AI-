@@ -69,6 +69,14 @@ def test_quantization_aliases():
     assert "量化" in t.by_id("ML.QUANT").skip_extract
 
 
+def test_unittest_alias_only_for_user_input():
+    """裸「测试」保留给简历/手输解析，但不参与 JD 抽取（JD 里多为 A/B 测试等噪声）。"""
+    t = _tax()
+    assert t.resolve("测试").id == "ENGINEERING.UNITTEST"
+    assert t.resolve("单元测试").id == "ENGINEERING.UNITTEST"
+    assert "测试" in t.by_id("ENGINEERING.UNITTEST").skip_extract
+
+
 def test_resolve_exact_name():
     t = _tax()
     assert t.resolve("Python").id == "PROG.PYTHON"

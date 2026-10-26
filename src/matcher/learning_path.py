@@ -115,11 +115,14 @@ class LearningPath:
     stages: list = field(default_factory=list)
     total_hours: int = 0
     total_weeks: int = 0
+    # 用户已标记「已学完」而跳过的技能名（保持缺失清单原顺序，便于页面说明）
+    skipped: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
             "total_hours": self.total_hours,
             "total_weeks": self.total_weeks,
+            "skipped": list(self.skipped),
             "stages": [
                 {
                     "phase": s.phase, "goal": s.goal, "weeks": s.weeks, "hours": s.hours,
@@ -180,22 +183,30 @@ def _order_by_prereq(items: list) -> list:
 
 
 def build_learning_path(missing: list, *, hours_per_week: int = 10,
-                        taxonomy=None) -> LearningPath:
+                        taxonomy=None, learned=()) -> LearningPath:
     """把差距报告里的缺失项排成可执行的学习路径。
 
     missing: list[GapItem]（需含 skill_id/name/priority/difficulty/priority_score/resources）
     hours_per_week: 每周可投入学时（<=0 时按 10 计）
     taxonomy: 可选，用于把「不在缺口内」的前置技能翻成可读名称
+    learned: 已标记「已学完」的 skill_id 集合。命中的技能不再进入路径（计入
+             `path.skipped`），并且视为已具备先修——不再提示「前置技能不在缺口内」。
     """
     weekly = int(hours_per_week) if int(hours_per_week or 0) > 0 else 10
+    learned_ids = {str(x).strip() for x in (learned or ()) if str(x).strip()}
+    path = LearningPath()
     items = []
     for m in missing or []:
         sid = getattr(m, "skill_id", None)
         if not sid:
             continue
+        name = getattr(m, "name", sid) or sid
+        if sid in learned_ids:          # 已学完 → 从剩余计划里移除
+            path.skipped.append(name)
+            continue
         items.append({
             "skill_id": sid,
-            "name": getattr(m, "name", sid) or sid,
+            "name": name,
             "priority": getattr(m, "priority", "P2") or "P2",
             "difficulty": int(getattr(m, "difficulty", 3) or 3),
             "priority_score": float(getattr(m, "priority_score", 0.0) or 0.0),
@@ -218,12 +229,11 @@ def build_learning_path(missing: list, *, hours_per_week: int = 10,
         it["priority"] = next(p for p, i in stage_idx.items()
                               if i == stage_of[it["skill_id"]])
 
-    path = LearningPath()
+    present = {g["skill_id"] for g in items} | learned_ids
     for p in ("P0", "P1", "P2"):
         group = [it for it in items if it["priority"] == p]
         if not group:
             continue
-        present = {g["skill_id"] for g in items}
         steps = []
         for it in _order_by_prereq(group):
             prereqs = SKILL_PREREQS.get(it["skill_id"], [])
@@ -261,9 +271,15 @@ def build_learning_path(missing: list, *, hours_per_week: int = 10,
 def format_path_markdown(path: LearningPath, *, hours_per_week: int = 10) -> str:
     """学习路径 -> Markdown（页面与导出复用，纯函数）。"""
     if not path.stages:
+        if path.skipped:
+            return (f"已按「已学进度」跳过 {len(path.skipped)} 个已掌握技能"
+                    f"（{'、'.join(path.skipped)}），暂无需要学习的技能。")
         return "暂无缺失技能，无需学习路径。"
     lines = [f"**总计**：{path.total_hours} 学时，约 {path.total_weeks} 周"
              f"（按每周 {hours_per_week} 小时估算）", ""]
+    if path.skipped:
+        lines[0:0] = [f"> 已按「已学进度」跳过 {len(path.skipped)} 个已掌握技能："
+                      f"{'、'.join(path.skipped)}", ""]
     for st in path.stages:
         lines.append(f"### {st.phase}（{st.hours} 学时 / 约 {st.weeks} 周）")
         lines.append(f"> {st.goal}")

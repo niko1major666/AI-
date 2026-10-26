@@ -44,6 +44,21 @@ def test_skip_extract_ignores_noisy_cjk_token():
     assert "ML.QUANT" in real
 
 
+def test_skip_extract_ignores_generic_testing_words():
+    """裸「测试」在 JD 里多是 A/B 测试、渗透测试、测试团队等泛化语境，不代表单元测试。
+
+    4582 条语料实测：收紧前 ENGINEERING.UNITTEST 命中 521 条（11.37%），
+    其中 508 条（11.09%）只靠裸「测试」；收紧后降到 13 条（0.28%）。
+    真正的「单元测试 / unit-test」仍须抽到。
+    """
+    ex = _extractor()
+    noise = "负责 A/B 测试、渗透测试与性能测试，配合测试团队做测试方案设计"
+    assert all(s.skill_id != "ENGINEERING.UNITTEST" for s in ex.extract_spans("j8", noise))
+
+    real = {s.skill_id for s in ex.extract_spans("j9", "掌握单元测试与CI/CD，熟悉 unit-test 实践")}
+    assert "ENGINEERING.UNITTEST" in real
+
+
 def test_rule_baseline_no_overlap_dup():
     ex = _extractor()
     spans = ex.extract_spans("j3", "熟悉PyTorch")

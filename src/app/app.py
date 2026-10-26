@@ -481,6 +481,160 @@ def _render_strength_and_jobs(taxonomy, analyzer, rows):
 
 
 
+def _render_learning_path(taxonomy, rep, meta):
+    """规则版学习路径 + 「已学进度」：勾选已掌握技能后立即重排（纯规则，rerun 即生效）。"""
+    from src.matcher.learning_path import build_learning_path, format_path_markdown
+
+    st.subheader("📅 学习路径（规则版 · 无需 AI）")
+    options = {m.skill_id: f"{m.name} · {m.priority}" for m in rep.missing}
+    learned = st.multiselect(
+        "✅ 已学进度：勾选已掌握 / 已学完的技能，勾选后会从学习路径移除并重排",
+        options=list(options),
+        format_func=lambda sid: options[sid],
+        key=f"gap_learned_{meta.get('job_id')}",
+        help="选项来自本次差距报告的缺失清单；换岗位或重新生成报告后需重新勾选",
+    )
+    path = build_learning_path(rep.missing, taxonomy=taxonomy, learned=learned)
+    st.session_state["gap_path"] = path        # 导出用最新（已重排）的路径
+    st.markdown(format_path_markdown(path))
+    if path.stages:
+        st.caption(
+            f"已标记 {len(learned)} 项已掌握，剩余 {path.total_hours} 学时 / 约 "
+            f"{path.total_weeks} 周（按每周 10 小时）；学时按技能难度估算，顺序已考虑先修关系。"
+            if learned else
+            "学时按技能难度估算，顺序已考虑先修关系；更贴合个人情况的版本见下方「AI 解读」。"
+        )
+    return path
+
+
+def _render_ai_plan(rep, meta):
+    """AI 解读（按「岗位 + 技能」缓存：勾选已学进度触发的 rerun 不会重复调 LLM）。"""
+    st.subheader("🤖 AI 解读 + 学习计划")
+    key = (meta.get("job_id"), tuple(meta.get("skills") or []))
+    if st.session_state.get("gap_interp_key") != key:
+        with st.spinner("正在生成 AI 解读与学习计划…"):
+            from src.matcher.report_interpreter import interpret_report
+            st.session_state["gap_interp"] = interpret_report(
+                rep, target_job=meta.get("job_title", ""),
+                user_skills=meta.get("skills") or [],
+                user_majors=st.session_state.get("user_majors", []),
+            )
+        st.session_state["gap_interp_key"] = key
+    interp = st.session_state.get("gap_interp") or {}
+    if interp.get("overview"):
+        st.markdown(interp["overview"])
+    for stage in interp.get("plan", []):
+        st.markdown(f"#### 📅 {stage.get('phase', '')}")
+        if stage.get("goal"):
+            st.markdown(f"**目标**：{stage['goal']}")
+        if stage.get("skills"):
+            st.markdown("**技能**：" + "、".join(f"`{s}`" for s in stage["skills"]))
+        for act in stage.get("actions", []):
+            st.markdown(f"- {act}")
+    if interp.get("tips"):
+        st.info(interp["tips"])
+
+
+def _render_gap_export(rep, meta):
+    """报告导出（C2）：读 session 中的最新路径，rerun 后按钮仍在。"""
+    st.subheader("⬇️ 导出报告")
+    from src.app.report_export import report_docx, report_markdown, safe_filename
+    cached_path = st.session_state.get("gap_path")
+    company_name = meta.get("company", "")
+    job_name = meta.get("job_title", "")
+    md = report_markdown(rep, company=company_name, job_title=job_name,
+                         user_skills=meta.get("skills") or [], learning_path=cached_path)
+    col_md, col_docx = st.columns(2)
+    col_md.download_button("下载 Markdown（.md）", md,
+                           file_name=safe_filename(company_name, job_name, "md"),
+                           mime="text/markdown", key="dl_gap_md")
+    try:
+        docx_bytes = report_docx(rep, company=company_name, job_title=job_name,
+                                 user_skills=meta.get("skills") or [],
+                                 learning_path=cached_path)
+    except ImportError:
+        col_docx.caption("未安装 python-docx，暂不支持 Word 导出")
+    else:
+        col_docx.download_button(
+            "下载 Word（.docx）", docx_bytes,
+            file_name=safe_filename(company_name, job_name, "docx"),
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            key="dl_gap_docx",
+        )
+
+
+def _render_gap_report(taxonomy, rep, meta):
+    """渲染已生成的差距报告（从 session 读取：rerun 后报告不再消失，只做规则计算）。"""
+    st.metric("匹配度", f"{rep.match_score}%")
+    st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项"
+                f" ｜ JD 硬性要求 **{meta.get('jd_must', 0)}** 项")
+    user_majors = st.session_state.get("user_majors", [])
+    if user_majors:
+        st.caption(f"🎓 已结合简历解析出的专业：{'、'.join(user_majors)}")
+
+    if not rep.missing:
+        st.success(f"🎉 该岗位要求的 {meta.get('jd_total', 0)} 项技能你已全部覆盖，暂无差距")
+        return
+
+    p0 = [m for m in rep.missing if m.priority == "P0"]
+    p1 = [m for m in rep.missing if m.priority == "P1"]
+    p2 = [m for m in rep.missing if m.priority == "P2"]
+
+    # ---- 优先补充建议 ----
+    st.subheader("🎯 优先补充建议")
+    top = rep.missing[:3]
+    if top:
+        names = "、".join(f"<b>{m.name}</b>" for m in top)
+        st.markdown(
+            f'<div style="background:#e8f4fd; border:1px solid #b6d9f2; border-radius:8px;'
+            f'padding:12px 16px; margin:8px 0;">'
+            f'<div style="font-weight:700; color:#1f6feb;">💡 建议优先补充</div>'
+            f'<div style="margin-top:4px; color:#333;">{names}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    for emoji, group_label, items, desc in [
+        ("🔴", "P0 先学", p0, "硬性门槛 / 高频需求，最优先补齐"),
+        ("🟠", "P1 进阶", p1, "重要且常用，补上后竞争力明显提升"),
+        ("🔵", "P2 可选", p2, "加分项，有余力再补"),
+    ]:
+        if items:
+            st.markdown(f"#### {emoji} {group_label} · {desc}（{len(items)} 项）")
+            for m in items:
+                st.markdown(_gap_card(m), unsafe_allow_html=True)
+
+    # ---- 完整缺失技能清单 ----
+    st.subheader(f"📋 缺失技能清单（共 {rep.missing_total} 项）")
+    for m in rep.missing:
+        header = f"{m.name} · {m.priority} · 重要度{_stars(m.importance, 5)} 难度{_stars(m.difficulty, 4)}"
+        with st.expander(header):
+            st.markdown(_priority_badge(m.priority) + f" **{m.name}**", unsafe_allow_html=True)
+            st.write(m.why)
+            st.caption(f"行业重要度：{_stars(m.importance, 5)}（5 为最核心） ｜ 学习难度：{_stars(m.difficulty, 4)}（4 为最难）")
+            for r in m.resources:
+                st.markdown(f"- [{r.get('title')}]({r.get('url')})")
+
+    # ---- 简历补强建议（C5，仅当本次会话上传过简历）----
+    resume_text = st.session_state.get("resume_text") or ""
+    if resume_text:
+        from src.data.resume_advice import build_advice
+        advice = build_advice(p0 or rep.missing, taxonomy, resume_text, limit=3)
+        if advice:
+            st.subheader("✍️ 简历补强建议（针对 P0）")
+            for a in advice:
+                mark = "✅" if a["status"] == "已有相关经历" else "➕"
+                st.markdown(f"{mark} **{a['name']}** · {a['status']}")
+                st.caption(a["suggestion"])
+                st.caption("项目建议：" + a["project_idea"])
+
+    # ---- 规则版学习路径（C1，不依赖 LLM）+ 已学进度联动 ----
+    _render_learning_path(taxonomy, rep, meta)
+
+    # ---- AI 解读 + 学习计划（LLM 优先、模板兜底）----
+    _render_ai_plan(rep, meta)
+
+
 def page_gap(taxonomy, analyzer, rows):
     st.header("差距报告")
     if not rows:
@@ -514,7 +668,7 @@ def page_gap(taxonomy, analyzer, rows):
 
     jd_skills = _build_jd_skills(taxonomy, target, demand)
     if not jd_skills:
-        # 零技能岗位（列表式短 JD，全语料 24.1%）：用同公司相似岗位兜底，并明确标注来源
+        # 零技能岗位（列表式短 JD，全语料 25.4%）：用同公司相似岗位兜底，并明确标注来源
         jd_skills, sources = _proxy_jd_skills(taxonomy, target, rows, demand)
         if sources:
             listed = "、".join(sources[:3]) + ("…" if len(sources) > 3 else "")
@@ -524,7 +678,6 @@ def page_gap(taxonomy, analyzer, rows):
         return
 
     user_skills = st.session_state.get("user_skills", [])
-    user_majors = st.session_state.get("user_majors", [])
     user_input = st.text_input("或直接输入技能（逗号分隔，留空则用「简历匹配」结果）", "")
     if user_input:
         user_skills = [x.strip() for x in user_input.replace("，", ",").split(",") if x.strip()]
@@ -534,130 +687,27 @@ def page_gap(taxonomy, analyzer, rows):
             st.warning("请先在「简历匹配」提取技能，或在上方输入技能")
             return
         rep = analyzer.analyze(user_skills, jd_skills, demand=demand)
-        from src.matcher.learning_path import build_learning_path
-        path = build_learning_path(rep.missing, taxonomy=taxonomy)
-        # 报告与导出信息存 session：download_button 点击会 rerun，按钮块本身会消失
+        # 报告与导出信息存 session：download_button / 已学进度勾选都会 rerun、按钮块会消失；
+        # 下面的渲染统一从 session 读，保证交互后报告与学习路径仍然完整可见。
         st.session_state["gap_report"] = rep
-        st.session_state["gap_path"] = path
+        st.session_state.pop("gap_path", None)
+        st.session_state.pop("gap_interp", None)
+        st.session_state.pop("gap_interp_key", None)
         st.session_state["gap_export"] = {
-            "company": company, "job_title": label, "skills": list(user_skills),
+            "company": company, "job_title": label, "job_id": target.get("job_id"),
+            "skills": list(user_skills),
+            "jd_must": sum(1 for s in jd_skills if s["is_must"]),
+            "jd_total": len(jd_skills),
         }
-        st.metric("匹配度", f"{rep.match_score}%")
-        must_n = sum(1 for s in jd_skills if s["is_must"])
-        st.markdown(f"命中 **{rep.matched_total}** 项 / 缺失 **{rep.missing_total}** 项"
-                    f" ｜ JD 硬性要求 **{must_n}** 项")
-        if user_majors:
-            st.caption(f"🎓 已结合简历解析出的专业：{'、'.join(user_majors)}")
 
-        if not rep.missing:
-            st.success(f"🎉 该岗位要求的 {len(jd_skills)} 项技能你已全部覆盖，暂无差距")
-            return
-
-        p0 = [m for m in rep.missing if m.priority == "P0"]
-        p1 = [m for m in rep.missing if m.priority == "P1"]
-        p2 = [m for m in rep.missing if m.priority == "P2"]
-
-        # ---- 优先补充建议 ----
-        st.subheader("🎯 优先补充建议")
-        top = rep.missing[:3]
-        if top:
-            names = "、".join(f"<b>{m.name}</b>" for m in top)
-            st.markdown(
-                f'<div style="background:#e8f4fd; border:1px solid #b6d9f2; border-radius:8px;'
-                f'padding:12px 16px; margin:8px 0;">'
-                f'<div style="font-weight:700; color:#1f6feb;">💡 建议优先补充</div>'
-                f'<div style="margin-top:4px; color:#333;">{names}</div>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-        for emoji, group_label, items, desc in [
-            ("🔴", "P0 先学", p0, "硬性门槛 / 高频需求，最优先补齐"),
-            ("🟠", "P1 进阶", p1, "重要且常用，补上后竞争力明显提升"),
-            ("🔵", "P2 可选", p2, "加分项，有余力再补"),
-        ]:
-            if items:
-                st.markdown(f"#### {emoji} {group_label} · {desc}（{len(items)} 项）")
-                for m in items:
-                    st.markdown(_gap_card(m), unsafe_allow_html=True)
-
-        # ---- 完整缺失技能清单 ----
-        st.subheader(f"📋 缺失技能清单（共 {rep.missing_total} 项）")
-        for m in rep.missing:
-            header = f"{m.name} · {m.priority} · 重要度{_stars(m.importance, 5)} 难度{_stars(m.difficulty, 4)}"
-            with st.expander(header):
-                st.markdown(_priority_badge(m.priority) + f" **{m.name}**", unsafe_allow_html=True)
-                st.write(m.why)
-                st.caption(f"行业重要度：{_stars(m.importance, 5)}（5 为最核心） ｜ 学习难度：{_stars(m.difficulty, 4)}（4 为最难）")
-                for r in m.resources:
-                    st.markdown(f"- [{r.get('title')}]({r.get('url')})")
-
-        # ---- 简历补强建议（C5，仅当本次会话上传过简历）----
-        resume_text = st.session_state.get("resume_text") or ""
-        if resume_text:
-            from src.data.resume_advice import build_advice
-            advice = build_advice(p0 or rep.missing, taxonomy, resume_text, limit=3)
-            if advice:
-                st.subheader("✍️ 简历补强建议（针对 P0）")
-                for a in advice:
-                    mark = "✅" if a["status"] == "已有相关经历" else "➕"
-                    st.markdown(f"{mark} **{a['name']}** · {a['status']}")
-                    st.caption(a["suggestion"])
-                    st.caption("项目建议：" + a["project_idea"])
-
-        # ---- 规则版学习路径（C1，不依赖 LLM；无 API key 时也能出计划）----
-        st.subheader("📅 学习路径（规则版 · 无需 AI）")
-        from src.matcher.learning_path import format_path_markdown
-        st.markdown(format_path_markdown(path))
-        st.caption("学时按技能难度估算，顺序已考虑先修关系；更贴合个人情况的版本见下方「AI 解读」。")
-
-        # ---- AI 解读 + 学习计划 ----
-        st.subheader("🤖 AI 解读 + 学习计划")
-        with st.spinner("正在生成 AI 解读与学习计划…"):
-            from src.matcher.report_interpreter import interpret_report
-            interp = interpret_report(rep, target_job=label, user_skills=user_skills,
-                                       user_majors=user_majors)
-        if interp.get("overview"):
-            st.markdown(interp["overview"])
-        for stage in interp.get("plan", []):
-            st.markdown(f"#### 📅 {stage.get('phase', '')}")
-            if stage.get("goal"):
-                st.markdown(f"**目标**：{stage['goal']}")
-            if stage.get("skills"):
-                st.markdown("**技能**：" + "、".join(f"`{s}`" for s in stage["skills"]))
-            for act in stage.get("actions", []):
-                st.markdown(f"- {act}")
-        if interp.get("tips"):
-            st.info(interp["tips"])
-
-    # ---- 报告导出（C2）：读 session 中的最近一次报告，rerun 后按钮仍在 ----
     rep_cached = st.session_state.get("gap_report")
     meta = st.session_state.get("gap_export") or {}
-    if rep_cached is not None and meta:
-        st.subheader("⬇️ 导出报告")
-        from src.app.report_export import report_docx, report_markdown, safe_filename
-        cached_path = st.session_state.get("gap_path")
-        company_name = meta.get("company", "")
-        job_name = meta.get("job_title", "")
-        md = report_markdown(rep_cached, company=company_name, job_title=job_name,
-                             user_skills=meta.get("skills") or [], learning_path=cached_path)
-        col_md, col_docx = st.columns(2)
-        col_md.download_button("下载 Markdown（.md）", md,
-                               file_name=safe_filename(company_name, job_name, "md"),
-                               mime="text/markdown", key="dl_gap_md")
-        try:
-            docx_bytes = report_docx(rep_cached, company=company_name, job_title=job_name,
-                                     user_skills=meta.get("skills") or [],
-                                     learning_path=cached_path)
-        except ImportError:
-            col_docx.caption("未安装 python-docx，暂不支持 Word 导出")
-        else:
-            col_docx.download_button(
-                "下载 Word（.docx）", docx_bytes,
-                file_name=safe_filename(company_name, job_name, "docx"),
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                key="dl_gap_docx",
-            )
+    # 换了岗位但还没重新生成：不展示上一份岗位的报告
+    if rep_cached is None or not meta or meta.get("job_id") != target.get("job_id"):
+        return
+
+    _render_gap_report(taxonomy, rep_cached, meta)
+    _render_gap_export(rep_cached, meta)
 
 
 def page_gap_compare(taxonomy, analyzer, rows, demand):

@@ -1,13 +1,13 @@
 # 进度（Progress）
 
 ## 什么能用（已完成）
-- ✅ 数据采集：4776 条真实 JD / 79 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书/哔哩哔哩 + 英文科技岗位），含部门/发布时间等字段
+- ✅ 数据采集：5163 条真实 JD / 80 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书/滴滴/哔哩哔哩 + 英文科技岗位），含部门/发布时间等字段
 - ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），161 技能（难度+重要度）
 - ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24（147 技能词表时期；161 技能下 TF-IDF 当前基线 0.2200，见 `docs/metrics.md`）
 - ✅ 差距诊断：匹配度 + 缺失技能全清单 + P0/P1/P2 优先级 + 重要度（数据驱动）+ 难度 + 学习资源；AI 解读按简历专业生成迁移建议（无专业不展示）
 - ✅ 简历解析：正则 + DeepSeek LLM 增强（姓名/工作经历/完整专业名）+ ATS 改进建议
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
-- ✅ 工程：207 测试全通过（205 快测 + 2 slow；含保活脚本纯函数测试 + 小红书爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
+- ✅ 工程：250 测试全通过（248 快测 + 2 slow；含保活脚本纯函数测试 + 小红书/哔哩哔哩/滴滴爬虫解析测试 + 岗位标题过滤）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
@@ -32,29 +32,30 @@
   - C6 反向岗位推荐 `src/matcher/job_recommender.py`（按「公司+标题」去重，must/nice 加权，Top 10 + 最该补 3 项，`st.cache_data` 缓存）
   - C7 技能画像 `src/matcher/strength_profile.py`（按类别的需求加权覆盖率 + 最大短板）
   - D1/D2 指标回归测试：抽取 F1（test 0.9565 / 全量 0.9123，容差 1pt）、TF-IDF Recall@5（skill_pair 0.9750 / resume_sentence 0.2200，容差 2pt）
-  - D3 语料快照：4776 条 / 79 家 / 4664 唯一「公司+标题」/ 字段与 job_id 唯一（slow 用例校验全语料 160/161 覆盖、零技能占比 20~28%）
+  - D3 语料快照：5163 条 / 80 家 / 4988 唯一「公司+标题」/ 字段与 job_id 唯一（slow 用例校验全语料 160/161 覆盖、零技能占比 20~28%）
   - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
   - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
   - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
-  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（迭代 5）→ 213（迭代 6：211 快测 + 2 slow）→ 222（数据扩充工具化：220 快测 + 2 slow）；快测约 35s
+  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（迭代 5）→ 213（迭代 6：211 快测 + 2 slow）→ 222（数据扩充工具化：220 快测 + 2 slow）→ 236（哔哩哔哩：234 快测 + 2 slow）→ 250（滴滴：248 快测 + 2 slow）；快测约 38s
 - ✅ README 界面预览补两张「区域截图」（`scripts/capture_screenshots.py --page company_matrix|gap_compare`）：**公司 × Top 12 技能**（技能图谱页 ProgressColumn 矩阵，行=公司按 JD 数降序、值=该公司 JD 命中比例；`demand_matrix` 由公司名字母序改为 JD 数降序，避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`）与**多岗位对比初始界面**（差距报告页第二种模式：选公司 → 勾 2~4 岗 → 技能留空沿用简历匹配结果 → 开始对比）；脚本新增区域裁剪（`stMainBlockContainer` 定宽 + 内层 `stMain` 滚动，因为 Streamlit 不滚 window）、模式切换与公司下拉选择，`--page all` 一次出 3 整屏 + 2 区域共 5 张；两段介绍改用实测数字（Top 12 需求占比、跨公司对比、31/78 家 JD≤2 的读图提示）
 - ✅ 迭代 6（抽取口径 + 学习路径联动）：`ENGINEERING.UNITTEST` 加 `skip_extract: [测试]`（JD 命中 521 条 / 11.37% → 13 条 / 0.28%，其中 508 条只靠裸「测试」；`recalc_importance` 后 importance 5→1；gold F1 三项零变化，新增 `test_skip_extract_ignores_generic_testing_words` / `test_unittest_alias_only_for_user_input`）；`build_learning_path(..., learned=...)` 支持「已学进度」——命中的技能移出路径并计入 `path.skipped`、视作已具备先修（不再提示前置缺口），页面差距报告改为 session 渲染（勾选即时重排、报告不再因 rerun 消失），AI 解读按「岗位 + 技能」缓存避免重复调用；新增 4 个 `test_learning_path` 用例 + AppTest 勾选回归，测试 207 → 213
 - ✅ 数据扩充工具化（未发版）：`scripts/preflight_new_source.py` 只读体检——把「加数据 → 常量/阈值/文档同时红」的判断前移：清洗结构、job_id 冲突（`merge_jobs` keep=first 静默丢行）、正文跨源重复（`build_dataset` text_hash keep=first，公司归属看 FILES 顺序）、公司写法分裂（无别名表）、新源零技能率、**合并后**零技能占比与技能覆盖、must 占比偏移（±3pt），并可选比对 CSV 自带 skills 列找词表缺口；退出码有 FAIL 即 1，可作为合并前的闸门。现有语料自检复现 4582/78/1162/160/56.5%/1.49 项每岗/句内 4830·章节 175·兜底 1804（与 `docs/metrics.md` 一致）。新增 `tests/test_preflight_new_source.py`（9 用例，含「把已在语料里的源当新数据 → 全量重复、规模不变」回归）；新增 `memory-bank/dataOnboarding.md` 作为加数据的唯一 SOP（摄入格式 / 双处注册 / 体检判定表 / 四处常量清单 / 五个静默坑 / 当前基线 / 单公司零技能率 / 成本 / PR 自检清单）
 - ✅ 接入哔哩哔哩（未发版）：`src/crawler/bilibili.py` 走匿名 CSRF（`X-AppKey` + `X-CSRF`，token 由 `api/auth/apply/csrf/token` 签发，`code=-3` 自动刷新重试一次），社招 87 + 校招 117 = 204 条（响应自带全文 JD）。全站 876 条里技术类 184（零技能 2.2%）+ AI类 20（0%），其余运营/内容/设计岗 42%~82% 零技能 → 默认只落技术/AI（`--all` 全量），体检预演全绿；合并构建后语料 4582→4776 条 / 79 家（零技能 25.4%→24.4%、must 56.5%→57.5% / 1.66 项每岗、tf≥2 45.3%、覆盖仍 160/161），`recalc_importance` 6 项微调；新增 `tests/test_bilibili.py`（14 用例），测试 222→236
+- ✅ 接入滴滴（未发版）：`src/crawler/didi.py` 用公开 GET（`recruit-portal-service/api/job/front/list`，无 token / 无签名）抓社招 1081 条，`items[]` 自带 `jobDuty` + `jobQualification` 全文。**坑：`size` 上限 100**——传 200 返回 `meta.code=10039`「拦截返回」+ `data=null`（HTTP 仍 200，只看状态码像「没岗位」），爬虫校验业务码并对「空页但只拿到 N/total」显式抛错；SPA 入口 bundle 无 `/api` 字符串，接口靠 Playwright 抓 XHR 定位（`scripts/probe_didi.py`）。技术类 423 条（零技能 11.8%、平均 5.3 项技能），运营 53.7% / 产品 65.6% / 安全 75.0% 零技能 → 默认只落技术（`--all` 全量），入语料 387 条（源内重复 35 条被去重）；校招在 Moka（列表接口返回 AES 密文）未接入。合并构建后语料 4776→5163 条 / 80 家（零技能 24.4%→23.5%、must 57.5%→57.7% / 1.69 项每岗、tf≥2 45.7%、覆盖仍 160/161），`recalc_importance` 6 项微调；新增 `tests/test_didi.py`（14 用例），测试 236→250
 - ✅ 文档数字统一（以 `docs/metrics.md` 为准，`eval_all.py` 重跑零 diff）：零技能 1085→1104（24.1%）、代理 98.7%→98.1%（中位 3 项）、must 57.0%→56.8%（1.50 项/岗）、最高需求占比 36.2%→36.1%；`PROJECT_REPORT.md` 1799 条/74 家/147 技能/56 用例 → 4582/78/161/207，数据源表改「去重后」口径并补快手/小红书/Kimi/MiniMax；`techContext` 66→207 测试、8→11 源
 
 ## 量化指标（当前）
 | 项 | 值 |
 |---|---|
-| 数据规模 | 4776 条 / 79 家公司（原始 5217 → 过短 7 + 非 AI 工程岗 4 + 重复 430） |
+| 数据规模 | 5163 条 / 80 家公司（原始 5640 → 过短 7 + 非 AI 工程岗 5 + 重复 465） |
 | 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子，147 技能词表时期）；161 技能下 TF-IDF 当前基线 0.2200 |
-| 需求强度判定 | 57.5% 岗位识别出 ≥1 项硬性要求（平均 1.66 项/岗；句内 5227 / 章节 896 / 兜底 1804） |
-| 零技能兜底 | 1166 条零技能岗位（24.4%）中 97.9% 可代理，中位 3 项技能 |
+| 需求强度判定 | 57.7% 岗位识别出 ≥1 项硬性要求（平均 1.69 项/岗；句内 5899 / 章节 939 / 兜底 1873） |
+| 零技能兜底 | 1212 条零技能岗位（23.5%）中 98.0% 可代理，中位 3 项技能 |
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
-| 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 78 项 |
+| 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 76 项 |
 | 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |
-| 测试 | 236 用例（234 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
+| 测试 | 250 用例（248 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）

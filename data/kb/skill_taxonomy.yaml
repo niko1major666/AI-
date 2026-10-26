@@ -61,7 +61,7 @@ skills:
   - {id: ML.GNN, name: 图神经网络, category: ML, aliases: [gnn, graph-neural-network], difficulty: 3, importance: 1}
   - {id: ML.REC, name: 推荐系统, category: ML, aliases: [recommendation, 推荐算法, recommendation-system], difficulty: 2, importance: 3}
   - {id: ML.NLP, name: NLP, category: ML, aliases: [nlp, 自然语言处理, natural-language-processing], difficulty: 2, importance: 4}
-  - {id: ML.CV, name: 计算机视觉, category: ML, aliases: [cv, computer-vision], difficulty: 2, importance: 4}
+  - {id: ML.CV, name: 计算机视觉, category: ML, aliases: [cv, computer-vision], difficulty: 2, importance: 3}
   - {id: ML.ASR, name: 语音识别, category: ML, aliases: [asr, speech-recognition], difficulty: 3, importance: 1}
   - {id: ML.OD, name: 目标检测, category: ML, aliases: [object-detection], difficulty: 3, importance: 1}
   - {id: ML.SEG, name: 图像分割, category: ML, aliases: [segmentation], difficulty: 3, importance: 1}
@@ -114,7 +114,7 @@ skills:
   - {id: BIGDATA.NUMPY, name: NumPy, category: BIGDATA, aliases: [numpy], difficulty: 1, importance: 1}
   - {id: BIGDATA.CLEAN, name: 数据清洗, category: BIGDATA, aliases: [data-cleaning], difficulty: 1, importance: 2}
   - {id: BIGDATA.MINING, name: 数据挖掘, category: BIGDATA, aliases: [data-mining], difficulty: 2, importance: 3}
-  - {id: BIGDATA.FE, name: 特征工程, category: BIGDATA, aliases: [feature-engineering], difficulty: 2, importance: 1}
+  - {id: BIGDATA.FE, name: 特征工程, category: BIGDATA, aliases: [feature-engineering], difficulty: 2, importance: 2}
   - {id: BIGDATA.FS, name: 特征选择, category: BIGDATA, aliases: [feature-selection], difficulty: 2, importance: 1}
   - {id: BIGDATA.VIZ, name: 数据可视化, category: BIGDATA, aliases: [visualization, 可视化], difficulty: 1, importance: 3}
   - {id: BIGDATA.AIRFLOW, name: Airflow, category: BIGDATA, aliases: [airflow], difficulty: 3, importance: 1}
@@ -146,7 +146,7 @@ skills:
   - {id: ENGINEERING.DISTSTORAGE, name: 分布式存储, category: ENGINEERING, aliases: [distributed-storage], difficulty: 3, importance: 2}
   - {id: ENGINEERING.REDIS, name: Redis, category: ENGINEERING, aliases: [redis], difficulty: 2, importance: 3}
   - {id: ENGINEERING.MYSQL, name: MySQL, category: ENGINEERING, aliases: [mysql], difficulty: 1, importance: 3}
-  - {id: ENGINEERING.ES, name: Elasticsearch, category: ENGINEERING, aliases: [es, elasticsearch], difficulty: 2, importance: 2}
+  - {id: ENGINEERING.ES, name: Elasticsearch, category: ENGINEERING, aliases: [es, elasticsearch], difficulty: 2, importance: 3}
   - {id: ENGINEERING.GRAPHDB, name: 图数据库, category: ENGINEERING, aliases: [graph-database], difficulty: 3, importance: 1}
 
   # ---- 扩充：真实数据高频科技技能（2026-10 补充）----
@@ -176,14 +176,14 @@ skills:
   - {id: ML.DIFFUSION, name: 扩散模型, category: ML, aliases: [diffusion-model, diffusion, ddpm, stable-diffusion, 扩散模型], difficulty: 3, importance: 3}
   - {id: ML.VLM, name: 视觉语言模型, category: ML, aliases: [vlm, vision-language-model, mllm, 多模态大模型], difficulty: 4, importance: 4}
   - {id: AITECH.MCP, name: MCP, category: AITECH, aliases: [mcp, model-context-protocol, 模型上下文协议], difficulty: 3, importance: 3}
-  - {id: AITECH.FUNCALL, name: Function Calling, category: AITECH, aliases: [function-calling, function calling, functioncall, 函数调用, 工具调用, tool-calling], difficulty: 3, importance: 3}
+  - {id: AITECH.FUNCALL, name: Function Calling, category: AITECH, aliases: [function-calling, function calling, functioncall, 函数调用, 工具调用, tool-calling], difficulty: 3, importance: 4}
   - {id: AITECH.EMBODIED, name: 具身智能, category: AITECH, aliases: [embodied-ai, embodied ai, 具身], difficulty: 4, importance: 1}
   - {id: AITECH.WORLDMODEL, name: 世界模型, category: AITECH, aliases: [world-model, world model], difficulty: 4, importance: 1}
   - {id: AITECH.QWEN, name: Qwen, category: AITECH, aliases: [qwen, 通义千问, 千问], difficulty: 2, importance: 1}
-  - {id: AITECH.DEEPSEEK, name: DeepSeek, category: AITECH, aliases: [deepseek-v3, deepseek-r1, deepseek模型], difficulty: 3, importance: 2}
+  - {id: AITECH.DEEPSEEK, name: DeepSeek, category: AITECH, aliases: [deepseek-v3, deepseek-r1, deepseek模型], difficulty: 3, importance: 1}
   - {id: AITECH.LLAMA, name: Llama, category: AITECH, aliases: [llama, llama3, llama2], difficulty: 2, importance: 1}
   - {id: AITECH.GLM, name: GLM, category: AITECH, aliases: [chatglm, glm-4, 智谱清言], difficulty: 2, importance: 1}
-  - {id: AITECH.DPO, name: 偏好对齐, category: AITECH, aliases: [dpo, ppo, grpo, 偏好对齐], difficulty: 4, importance: 3}
+  - {id: AITECH.DPO, name: 偏好对齐, category: AITECH, aliases: [dpo, ppo, grpo, 偏好对齐], difficulty: 4, importance: 2}
   - {id: AITECH.VIDEOGEN, name: 视频生成, category: AITECH, aliases: [video-generation, text-to-video, 文生视频], difficulty: 4, importance: 3}
   - {id: AITECH.LONGCONTEXT, name: 长上下文, category: AITECH, aliases: [long-context, 长文本, 长上下文], difficulty: 3, importance: 2}
   - {id: FRAMEWORK.LANGGRAPH, name: LangGraph, category: FRAMEWORK, aliases: [langgraph], difficulty: 3, importance: 1}

@@ -8,14 +8,16 @@
 
 ## 权威数字（以 `docs/metrics.md` 为准；2026-10-26 重跑 `eval_all.py` 零 diff）
 
-- 语料 **4776 条 / 79 家公司 / 4664 个唯一「公司+标题」**（原始 5217 → 过短 7 + 非 AI 工程岗 4 + 重复 430）
-- 零技能岗位 **1166 条（24.4%）**，其中 **1140 条（97.9%）** 可用同公司相似岗位代理（中位 3 项）
+- 语料 **5163 条 / 80 家公司 / 4988 个唯一「公司+标题」**（原始 5640 → 过短 7 + 非 AI 工程岗 5 + 重复 465）
+- 零技能岗位 **1212 条（23.5%）**，其中 **1188 条（98.0%）** 可用同公司相似岗位代理（中位 3 项）
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
-- 硬性要求 **57.5% 岗位 / 平均 1.66 项**（句内触发词 5227 / 章节归属 896 / 占比兜底 1804）；最高技能需求占比 **36.6%**（Python）
+- 硬性要求 **57.7% 岗位 / 平均 1.69 项**（句内触发词 5899 / 章节归属 939 / 占比兜底 1873）；最高技能需求占比 **36.3%**（Python）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **236**（234 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
+- 测试 **250**（248 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
 
 ## 近期变更（按时间倒序）
+
+- **本轮（接入滴滴，未发版）**：新增 `src/crawler/didi.py`——`talent.didiglobal.com` 是 Vue SPA（入口 bundle 里没有 `/api` 字符串），用 Playwright 抓 XHR 才定位到 `recruit-portal-service/api/job/front/list`；接口**公开无鉴权**（无 token / 无签名），`items[]` 自带 `jobDuty` + `jobQualification` 全文，社招 1081 条。**`size` 上限 100**（传 200 返回 `meta.code=10039`「拦截返回」+ `data=null`，HTTP 仍 200）→ 爬虫校验业务码并对「空页但只拿到 N/total」显式抛错。全站技术类 423 条（零技能 11.8%、平均 5.3 项技能），运营 53.7% / 产品 65.6% / 安全 75.0% 零技能 → 默认只落「技术」（`--all` 全量 1081）。校招在 Moka（`/api/outer/ats-apply/website/jobs` 返回 AES 密文）未接入。体检预演全绿（零技能 23.4%、must +0.3pt），合并构建后语料 4776→5163 条 / 80 家（零技能 24.4%→23.5%，must 57.5%→57.7% / 1.69 项每岗、tf≥2 45.7%、覆盖仍 160/161）；`recalc_importance` 6 项微调（计算机视觉 4→3、特征工程 1→2、Elasticsearch 2→3、Function Calling 3→4、DeepSeek 2→1、偏好对齐 3→2）；新增 `scripts/probe_didi.py` + `tests/test_didi.py`（14 用例，含分页拦截与类别过滤），测试 236→250
 
 - **本轮（接入哔哩哔哩，未发版）**：新增 `src/crawler/bilibili.py`——`jobs.bilibili.com` 岗位列表 POST 需要 `X-AppKey: ops.ehr-api.auth` + `X-CSRF`，token 由 `api/auth/apply/csrf/token` **匿名**签发（无需登录/验证码），过期返回 `code=-3` 自动刷新重试一次；社招（`/api/srs/...`，87 条）+ 校招（`/api/campus/...`，117 条）共抓 877 条，响应自带 `positionDescription` 全文 JD。全站 876 条可用岗位中技术类 184（零技能 2.2%）+ AI类 20（0%），其余运营/内容/设计岗 42%~82% 零技能 → 爬虫默认只落 `技术类 + AI类`（`--all` 保留全站）。体检预演全绿（零技能 24.4%、must +1.0pt），合并构建后语料 4582→4776 条 / 79 家，零技能 25.4%→24.4%，must 56.5%→57.5%（1.66 项/岗；句内 5227 / 章节 896 / 兜底 1804），tf≥2 45.3%，技能覆盖仍 160/161；`recalc_importance` 6 项微调（Go 4→5、Scala 1→2、模型部署 1→2、思维链 2→1、Embedding 1→2、偏好对齐 2→3）；新增 `tests/test_bilibili.py`（14 用例，含 CSRF 重试与类别过滤），测试 222→236
 
@@ -28,7 +30,7 @@
 1. 迭代 3（功能 + 评测/CI）：
    - 功能：`learning_path`（规则版学习路径：P0/P1/P2 三阶段、先修拓扑排序、难度→学时 2/4/8/16/24h、周数向上取整；先修若落在后续阶段自动提前并给 `prereq_note`）、`report_export`（Markdown + docx，`safe_filename` 清洗；报告写 `st.session_state` 以躲过 download_button 的 rerun）、`job_compare`（多岗匹配度/P0 数/共性缺口/独有缺口/优先投递）、`skill_stats`（公司×Top12 技能矩阵，Streamlit ProgressColumn 呈现，未引入 matplotlib）、`resume_advice`（简历原文命中 → 改写要点；未命中 → 小项目建议；数字全用 XXX 占位符）、`job_recommender`（「公司+标题」去重 + must/nice 加权 + Top10 + 最该补）、`strength_profile`（类别需求加权覆盖率 + 最大短板）
    - 页面：简历页新增技能画像 + Top10 岗位；差距页新增「分析模式」单岗/多岗切换、简历补强建议、规则学习路径、导出按钮；图谱页新增公司×Top12 技能表
-   - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4776/79/4664；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
+   - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（5163/80/4988；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
    - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201（当前 213：211 快测 + 2 slow），全量约 40s
    - 首屏冷启动优化：`rule_baseline._iter_matches()` 用 `str.find` + 手工词边界替代「每 token 一次 `re.finditer`」（全语料 4582 条 24.3s → 1.5s，逐条输出一致，`test_iter_matches_equivalent_to_regex_reference` 以旧正则作参照锁死语义）；`app.load_core()` 拆成轻核心（词表 + 抽取器）与 `load_engine()`（TF-IDF/差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏不再付该开销；本机 AppTest 首屏 32s → 3.9s；`scripts/bench_extract.py` 可复现
    - 发布 v1.3.0（Release「v1.3.0 求职闭环与评测加固」，正文 `docs/release-notes/v1.3.0.md`，由 push tag 的 `release.yml` 自动创建）
@@ -66,7 +68,7 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 阿里/智谱数据补充（需继续探查招聘渠道）
+1. 阿里/智谱数据补充（需继续探查招聘渠道）；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
 2. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 3. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
 4. 迭代 6 已收尾：UNITTEST 别名收紧 ✅、学习路径「已学进度」联动 ✅；剩余候选：岗位订阅/收藏、BGE 进 CI（模型缓存化）

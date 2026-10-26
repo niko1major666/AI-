@@ -2,7 +2,7 @@
 
 覆盖「扩充新数据最容易静默出错」的五处：job_id 撞车、正文跨源重复、公司写法分裂、
 列表式短 JD 的零技能率、CSV 自带 skills 列的词表缺口；另验证合并预测与 FAIL 闸门。
-真实语料口径（4776 / 79 / 1166 / 57.5%）由 `test_dataset_snapshot.py` 与
+真实语料口径（5163 / 80 / 1212 / 57.7%）由 `test_dataset_snapshot.py` 与
 `test_skillkb.py` 锁定，这里不重复硬编码，避免加数据时要改第四处常量。
 """
 import csv

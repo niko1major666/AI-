@@ -65,10 +65,10 @@ ai-skill-gap/
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析 / jd_requirements(must 判定) / job_neighbors(零技能代理)
 │   │                   / learning_path(规则学习路径) / job_compare(多岗对比) / job_recommender(反向推荐) / strength_profile(技能画像)
-│   ├── crawler/        11 源爬虫（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/华为 + 英文科技岗位）
+│   ├── crawler/        13 个爬虫模块 / 14 个数据源（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/哔哩哔哩/滴滴/美团/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面 + report_export（报告导出）
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / validate_kb(KB 校验)
-├── tests/              pytest（205 用例已通过，另有 2 个 slow 留给 nightly）
+├── tests/              pytest（267 用例已通过，其中 2 个 slow 留给 nightly）
 ├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -219,6 +219,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W14 | 数据扩充实践：接入哔哩哔哩（技术/AI 岗） | ✅ 236 测试通过（234 快测 + 2 slow）；新增 `src/crawler/bilibili.py`（`X-AppKey` + `X-CSRF` 匿名取数，社招 87 + 校招 117）+ `tests/test_bilibili.py`（14 用例）；全站 876 条中技术/AI 仅 204 条（其余岗位 42.4% 零技能），默认只入技术/AI，`--all` 可切全量；语料 4582→4776 条 / 78→79 家，零技能 25.4%→24.4%，must 56.5%→57.5%，importance 6 项微调 |
 | W15 | 数据扩充实践：接入滴滴（技术岗） | ✅ 250 测试通过（248 快测 + 2 slow）；新增 `src/crawler/didi.py`（公开 GET，无 token/签名，社招 1081 条 → 技术 423 条）+ `scripts/probe_didi.py` + `tests/test_didi.py`（14 用例）；全站运营 53.7% / 产品 65.6% / 安全 75.0% 零技能，默认只入「技术」（11.8%），`--all` 可切全量；校招在 Moka（响应 AES 密文）未接入；语料 4776→5163 条 / 79→80 家，零技能 24.4%→23.5%，must 57.5%→57.7%，importance 6 项微调 |
 | W16 | 数据扩充实践：接入美团（技术类） | ✅ 267 测试通过（265 快测 + 2 slow）；新增 `src/crawler/meituan.py`（移动端公开 POST，无 token/签名，社招 3231 条 → 技术类 681 条）+ `scripts/probe_meituan.py` + `tests/test_meituan.py`（17 用例）；全站零售 90.6% / 销售客服 97.0% / 职能 71.1% 零技能，技术类只 6.0%（平均 6.7 项技能），默认只入「技术类」，`--all` 可切全量；查询 token 必须整轮复用（每页换新会退回第 1 页）；语料 5163→5832 条 / 80→81 家，零技能 23.5%→21.5%，must 57.7%→60.0%，importance 16 项微调 |
+| W17 | 发布 v1.4.0：三源扩充（哔哩哔哩 / 滴滴 / 美团）+ 接入前体检工具化 | ✅ 267 测试全绿；语料 5832 条 / 81 家（零技能 21.5%、must 60.0%、覆盖 160/161）；`docs/release-notes/v1.4.0.md` + tag v1.4.0，`release.yml` 自动建 Release；CI（metrics + test 3.10/3.12）绿 |
 
 ## 八、数据采集与爬虫
 

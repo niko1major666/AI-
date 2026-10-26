@@ -5,6 +5,7 @@
 真实语料口径（4582 / 78 / 1162 / 56.5%）由 `test_dataset_snapshot.py` 与
 `test_skillkb.py` 锁定，这里不重复硬编码，避免加数据时要改第四处常量。
 """
+import csv
 import json
 from pathlib import Path
 
@@ -178,17 +179,29 @@ def test_cli_main_exit_codes(tmp_path):
     assert rc == 1
 
 
-def test_run_on_existing_source_is_noop(tmp_path):
-    """把已在语料里的源当「新数据」：应识别为全量重复，合并后规模不变。"""
+def test_run_on_existing_corpus_is_noop(tmp_path):
+    """把语料里的若干条原样当「新数据」：应全量识别为重复，合并后规模不变。
+
+    注意不能用 `data/raw/*.csv`：raw 不入库（CI 上不存在），语料 `jobs.jsonl` 才是随仓库走的。
+    """
     jobs = ROOT / "data" / "processed" / "jobs.jsonl"
     if not jobs.exists():  # pragma: no cover - 只有代码没有语料时跳过
         pytest.skip("需要 data/processed/jobs.jsonl")
-    report = run([ROOT / "data" / "raw" / "huawei_ai_jobs.csv"], jobs=jobs)
-    pred = report["prediction"]
+    rows = [json.loads(line) for line in
+            jobs.read_text(encoding="utf-8").splitlines()[:8] if line.strip()]
+    copy = tmp_path / "copy.csv"
+    with copy.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["job_id", "company", "title", "jd_text"])
+        for row in rows:  # 标题换成中性岗名，避免被标题过滤掉
+            writer.writerow([row["job_id"], row["company"], "算法工程师", row["jd_clean"]])
+
+    report = run([copy], jobs=jobs)
+    pred, txt, ident = report["prediction"], report["text"], report["identity"]
+    assert txt["overlap_count"] == len(rows)
+    assert ident["collision_count"] == len(rows)
     assert pred["kept_new"] == 0
     assert pred["jobs_after"] == pred["jobs_before"]
-    assert report["text"]["overlap_count"] > 0
-    assert report["identity"]["collision_count"] > 0
     must = report["existing"]["must"]
     # 内部一致性：三项来源计数之和 == must 技能总数（= 项/岗 × 岗位数）
     assert sum(must["evidence"].values()) == pytest.approx(

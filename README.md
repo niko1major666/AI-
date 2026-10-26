@@ -215,6 +215,8 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W10 | 迭代 4：首屏冷启动与 CI 修复（v1.3.1 补丁） | ✅ 203 测试通过；全语料抽取 24.3s→1.5s、AppTest 首屏 32s→3.9s、3.10 恢复跑全量用例 |
 | W11 | 迭代 5：README 界面预览 + 文档数字校正 | ✅ 207 测试通过（205 快测 + 2 slow）；新增「公司×Top12 技能」「多岗对比初始界面」预览，矩阵行序改为 JD 数降序；`memory-bank` / 本报告 / 项目报告数字统一到 `docs/metrics.md` |
 | W12 | 迭代 6：抽取口径收紧 + 学习路径「已学进度」联动 | ✅ 213 测试通过（211 快测 + 2 slow）；裸「测试」噪声清理（命中 11.37%→0.28%，gold F1 不变）；差距报告改为 session 渲染，勾选已掌握技能即时重排学习路径，AI 解读按岗位缓存不重复调用 |
+| W12 | 迭代 6：抽取口径收紧 + 学习路径「已学进度」联动 | ✅ 213 测试通过（211 快测 + 2 slow）；裸「测试」噪声清理（命中 11.37%→0.28%，gold F1 不变）；差距报告改为 session 渲染，勾选已掌握技能即时重排学习路径，AI 解读按岗位缓存不重复调用 |
+| W13 | 数据扩充工具化：新源接入前体检 | ✅ 222 测试通过（220 快测 + 2 slow）；`scripts/preflight_new_source.py` 只读体检（~2s，FAIL 退出 1）覆盖 job_id 冲突 / 正文跨源重复 / 公司写法分裂 / 合并后零技能占比与技能覆盖 / must 偏移；现有语料自检复现 4582·78·1162·160·56.5% 口径；SOP 见 `memory-bank/dataOnboarding.md` |
 
 ## 八、数据采集与爬虫
 
@@ -267,6 +269,10 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 
 # 语料变化后重算 161 技能重要度（JD 需求占比分档 → importance 1~5）
 .\.venv\Scripts\python.exe scripts/recalc_importance.py
+
+# 接入新公司 / 新数据源前先体检（只读，约 2 秒；有 FAIL 时退出码 1，venv 已激活）
+#   检查 job_id 冲突、正文跨源重复、公司写法分裂、合并后零技能占比/技能覆盖、must 偏移
+python scripts/preflight_new_source.py --source data/raw/ali_ai_jobs.csv
 ```
 
 > 合规：仅抓取官网公开岗位，请求带限速；数据仅供个人学习研究。

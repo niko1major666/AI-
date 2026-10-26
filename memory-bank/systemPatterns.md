@@ -49,6 +49,8 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 
 15. **版本元数据以 tag 为准，并用「最新发布说明」守护**：CI 浅克隆拿不到 tag，所以把 `docs/release-notes/vX.Y.Z.md` 当版本事实来源——`pyproject.toml` 的 `version` 必须等于该目录下最大的语义版本，标题行必须是 `# vX.Y.Z ...`（`release.yml` 取它作 Release 标题），由 `tests/test_release_metadata.py` 三条用例拦截漂移；README 用 shields.io 动态 Release 徽章（`img.shields.io/github/v/release/...`），不需要每版手改。发布流程写在 `docs/RELEASING.md`，含「重打 tag」路径：`release.yml` 对已存在 Release 走 `gh release edit --draft=false`，因此 `git tag -f` + `git push -f origin vX.Y.Z` 可把后续提交并入同一版本（v1.3.1 用过）。
 
+16. **扩充数据先过体检，再动语料**：加公司/数据源不是「爬完丢进 raw 就 merge」——`tests/test_dataset_snapshot.py` 的精确常量、slow 用例的零技能区间与技能覆盖、CI 的 `docs/metrics.md` 过期校验、`tests/test_skillkb.py` 的 importance 断言会同时红，而 `merge_jobs`（job_id keep=first）与 `build_dataset`（text_hash keep=first，公司归属看 `FILES` 顺序）失败时**不留日志**。所以新增 `scripts/preflight_new_source.py`：只读、~2s，把新 CSV 按构建同款口径清洗后**模拟合并**，输出 job_id 冲突、正文跨源重复（前后两种丢行数）、公司写法分裂、零技能率与技能覆盖、must 占比偏移，FAIL 即退出码 1。它能精确复现现有语料口径（4582/78/1162/160/56.5%），因此「体检数字对不对」本身就是一次链路自检。阈值（`ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`）故意与 snapshot 测试同值：加数据要改常量时，两处一起改，别让体检比测试松。完整 SOP 写在 `memory-bank/dataOnboarding.md`（含四处常量同步清单与五个静默坑）。
+
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测
 - **dataclass 数据模型**：`JobPosting`、`SkillSpan`、`GapItem`、`GapReport`、`ResumeProfile`、`LearningPath/Stage/Step`、`ComparedJob/CompareResult`、`JobSuggestion`

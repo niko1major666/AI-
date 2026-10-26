@@ -42,6 +42,11 @@ jobs.jsonl      skills_long         skill_id 匹配       GapReport         3 �
 | 华为 | requests 公开 GET + 51job 尝试 | 2 | 门户已枯竭，第三方 AI 岗极少 |
 | 英文科技岗位 | HuggingFace 数据集 | 448 | 标题需中文翻译 |
 
+> **新增数据源前先体检**：`python scripts/preflight_new_source.py --source data/raw/<company>_ai_jobs.csv`
+> （只读，约 2 秒）预演「合并后会发生什么」——job_id 冲突、正文跨源重复（公司归属由 `FILES` 顺序决定）、
+> 公司写法分裂、零技能占比是否仍在 20%~28%、技能覆盖是否仍 ≥159、must 占比偏移；有 FAIL 时退出码 1。
+> 完整流程与「构建后必改的四处常量」见 `memory-bank/dataOnboarding.md`。
+
 ## 五、关键量化指标
 
 ### 数据规模

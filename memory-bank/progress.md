@@ -36,9 +36,10 @@
   - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
   - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
   - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
-  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（迭代 5）→ 213（迭代 6：211 快测 + 2 slow）；快测约 35s
+  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（迭代 5）→ 213（迭代 6：211 快测 + 2 slow）→ 222（数据扩充工具化：220 快测 + 2 slow）；快测约 35s
 - ✅ README 界面预览补两张「区域截图」（`scripts/capture_screenshots.py --page company_matrix|gap_compare`）：**公司 × Top 12 技能**（技能图谱页 ProgressColumn 矩阵，行=公司按 JD 数降序、值=该公司 JD 命中比例；`demand_matrix` 由公司名字母序改为 JD 数降序，避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`）与**多岗位对比初始界面**（差距报告页第二种模式：选公司 → 勾 2~4 岗 → 技能留空沿用简历匹配结果 → 开始对比）；脚本新增区域裁剪（`stMainBlockContainer` 定宽 + 内层 `stMain` 滚动，因为 Streamlit 不滚 window）、模式切换与公司下拉选择，`--page all` 一次出 3 整屏 + 2 区域共 5 张；两段介绍改用实测数字（Top 12 需求占比、跨公司对比、31/78 家 JD≤2 的读图提示）
 - ✅ 迭代 6（抽取口径 + 学习路径联动）：`ENGINEERING.UNITTEST` 加 `skip_extract: [测试]`（JD 命中 521 条 / 11.37% → 13 条 / 0.28%，其中 508 条只靠裸「测试」；`recalc_importance` 后 importance 5→1；gold F1 三项零变化，新增 `test_skip_extract_ignores_generic_testing_words` / `test_unittest_alias_only_for_user_input`）；`build_learning_path(..., learned=...)` 支持「已学进度」——命中的技能移出路径并计入 `path.skipped`、视作已具备先修（不再提示前置缺口），页面差距报告改为 session 渲染（勾选即时重排、报告不再因 rerun 消失），AI 解读按「岗位 + 技能」缓存避免重复调用；新增 4 个 `test_learning_path` 用例 + AppTest 勾选回归，测试 207 → 213
+- ✅ 数据扩充工具化（未发版）：`scripts/preflight_new_source.py` 只读体检——把「加数据 → 常量/阈值/文档同时红」的判断前移：清洗结构、job_id 冲突（`merge_jobs` keep=first 静默丢行）、正文跨源重复（`build_dataset` text_hash keep=first，公司归属看 FILES 顺序）、公司写法分裂（无别名表）、新源零技能率、**合并后**零技能占比与技能覆盖、must 占比偏移（±3pt），并可选比对 CSV 自带 skills 列找词表缺口；退出码有 FAIL 即 1，可作为合并前的闸门。现有语料自检复现 4582/78/1162/160/56.5%/1.49 项每岗/句内 4830·章节 175·兜底 1804（与 `docs/metrics.md` 一致）。新增 `tests/test_preflight_new_source.py`（9 用例，含「把已在语料里的源当新数据 → 全量重复、规模不变」回归）；新增 `memory-bank/dataOnboarding.md` 作为加数据的唯一 SOP（摄入格式 / 双处注册 / 体检判定表 / 四处常量清单 / 五个静默坑 / 当前基线 / 单公司零技能率 / 成本 / PR 自检清单）
 - ✅ 文档数字统一（以 `docs/metrics.md` 为准，`eval_all.py` 重跑零 diff）：零技能 1085→1104（24.1%）、代理 98.7%→98.1%（中位 3 项）、must 57.0%→56.8%（1.50 项/岗）、最高需求占比 36.2%→36.1%；`PROJECT_REPORT.md` 1799 条/74 家/147 技能/56 用例 → 4582/78/161/207，数据源表改「去重后」口径并补快手/小红书/Kimi/MiniMax；`techContext` 66→207 测试、8→11 源
 
 ## 量化指标（当前）
@@ -52,7 +53,7 @@
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
 | 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
 | 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |
-| 测试 | 213 用例（211 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
+| 测试 | 222 用例（220 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）

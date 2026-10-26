@@ -1,7 +1,7 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- **迭代 3 已完成（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）**：规则学习路径、报告导出（md/docx）、多岗对比、反向岗位推荐、技能画像、公司×技能矩阵、简历补强建议；抽取/匹配回归基线 + 语料快照 + 覆盖率门槛（55%）+ 3.10/3.12 矩阵 + nightly + `docs/metrics.md`；测试 131→201 全绿（v1.3.1 后 203，当前 207：205 快测 + 2 slow）
+- **迭代 3 已完成（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）**：规则学习路径、报告导出（md/docx）、多岗对比、反向岗位推荐、技能画像、公司×技能矩阵、简历补强建议；抽取/匹配回归基线 + 语料快照 + 覆盖率门槛（55%）+ 3.10/3.12 矩阵 + nightly + `docs/metrics.md`；测试 131→201 全绿（v1.3.1 后 203，迭代 6 后 213：211 快测 + 2 slow）
 - 迭代 2 已交付（commit `5777ff9`）：技能 147→161、学习资源 11→106、`Skill.skip_extract` 修正「量化」噪声
 - 迭代 1 已交付（commit `427f271`）：must/nice 三级判定、零技能岗位代理兜底、岗位内 tf 加权、简历解析缓存
 - 线上：Streamlit 云端部署 + 每 6 小时保活（`/~/+/_stcore/health` 返回 200 `ok` 为唯一就绪判据）
@@ -9,13 +9,15 @@
 ## 权威数字（以 `docs/metrics.md` 为准；2026-10-26 重跑 `eval_all.py` 零 diff）
 
 - 语料 **4582 条 / 78 家公司 / 4472 个唯一「公司+标题」**（原始 5013 → 过短 7 + 非 AI 工程岗 4 + 重复 420）
-- 零技能岗位 **1104 条（24.1%）**，其中 **1083 条（98.1%）** 可用同公司相似岗位代理（中位 3 项）
+- 零技能岗位 **1162 条（25.4%）**，其中 **1138 条（97.9%）** 可用同公司相似岗位代理（中位 3 项）
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
-- 硬性要求 **56.8% 岗位 / 平均 1.50 项**（句内触发词 4868 / 章节归属 194 / 占比兜底 1804）；最高技能需求占比 **36.1%**（Python）
+- 硬性要求 **56.5% 岗位 / 平均 1.49 项**（句内触发词 4830 / 章节归属 175 / 占比兜底 1804）；最高技能需求占比 **36.1%**（Python）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **207**（205 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
+- 测试 **213**（211 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
 
 ## 近期变更（按时间倒序）
+
+- **本轮（迭代 6，未发版）**：`ENGINEERING.UNITTEST` 收紧（`skip_extract: [测试]`）：JD 命中 521 条（11.37%）→ 13 条（0.28%），其中 508 条原本只靠裸「测试」（A/B 测试、渗透测试、性能测试、测试团队）；`recalc_importance` 5→1，gold F1 三项零变化（0.9565 / 0.9011 / 0.9123）。连带指标：零技能 1104→1162（25.4%）、代理 98.1%→97.9%（1138 条，中位 3）、must 56.8%→56.5%（1.49 项/岗；句内 4830 / 章节 175 / 兜底 1804）、tf≥2 岗位 43.9%。学习路径新增「已学进度」：`build_learning_path(..., learned=...)` 跳过已掌握技能并视为已具备先修（`path.skipped` 记录），页面差距报告改为 session 渲染（勾选即时重排、报告不再因 rerun 消失），AI 解读按「岗位+技能」缓存；测试 207→213
 
 - **本轮（迭代 5，未发版）**：README 界面预览新增「公司×Top12 技能矩阵」「多岗对比初始界面」两张区域截图并重写介绍；`demand_matrix` 行序改为 JD 数降序（同数量按名称），避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`；按 `docs/metrics.md` 统一校正文档数字（零技能 1104 / 24.1%、代理 98.1% / 中位 3、must 56.8% / 1.50、PROJECT_REPORT 4582/78/161/207、techContext 8→11 源）；测试 207
 
@@ -23,7 +25,7 @@
    - 功能：`learning_path`（规则版学习路径：P0/P1/P2 三阶段、先修拓扑排序、难度→学时 2/4/8/16/24h、周数向上取整；先修若落在后续阶段自动提前并给 `prereq_note`）、`report_export`（Markdown + docx，`safe_filename` 清洗；报告写 `st.session_state` 以躲过 download_button 的 rerun）、`job_compare`（多岗匹配度/P0 数/共性缺口/独有缺口/优先投递）、`skill_stats`（公司×Top12 技能矩阵，Streamlit ProgressColumn 呈现，未引入 matplotlib）、`resume_advice`（简历原文命中 → 改写要点；未命中 → 小项目建议；数字全用 XXX 占位符）、`job_recommender`（「公司+标题」去重 + must/nice 加权 + Top10 + 最该补）、`strength_profile`（类别需求加权覆盖率 + 最大短板）
    - 页面：简历页新增技能画像 + Top10 岗位；差距页新增「分析模式」单岗/多岗切换、简历补强建议、规则学习路径、导出按钮；图谱页新增公司×Top12 技能表
    - 评测：`test_extraction_baseline`（F1 test 0.9565 / 全量 0.9123，容差 1pt）、`test_matcher_baseline`（Recall@5 0.975/0.22，容差 2pt）、`test_dataset_snapshot`（4582/78/4472；slow 用例校验 160/161 覆盖与零技能占比）、`test_validate_kb`
-   - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201（当前 207：205 快测 + 2 slow），全量约 40s
+   - 工程：`scripts/eval_all.py` → `docs/metrics.md`（无时间戳、可 diff，CI main 校验未过期）、`scripts/validate_kb.py`、CI 覆盖率门槛 55% + 3.10/3.12 矩阵 + pip 缓存 + concurrency、`.github/workflows/nightly.yml` 跑含 slow 的全量；测试 131→201（当前 213：211 快测 + 2 slow），全量约 40s
    - 首屏冷启动优化：`rule_baseline._iter_matches()` 用 `str.find` + 手工词边界替代「每 token 一次 `re.finditer`」（全语料 4582 条 24.3s → 1.5s，逐条输出一致，`test_iter_matches_equivalent_to_regex_reference` 以旧正则作参照锁死语义）；`app.load_core()` 拆成轻核心（词表 + 抽取器）与 `load_engine()`（TF-IDF/差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏不再付该开销；本机 AppTest 首屏 32s → 3.9s；`scripts/bench_extract.py` 可复现
    - 发布 v1.3.0（Release「v1.3.0 求职闭环与评测加固」，正文 `docs/release-notes/v1.3.0.md`，由 push tag 的 `release.yml` 自动创建）
    - 发布 v1.3.1（补丁：首屏冷启动 32s→3.9s、抽取 24.3s→1.5s、3.10 恢复跑全量且不再撞 240s 超时，测试 201→203；正文 `docs/release-notes/v1.3.1.md`，push tag 后由 `release.yml` 自动建 Release）
@@ -63,8 +65,7 @@
 1. 阿里/智谱数据补充（需继续探查招聘渠道）
 2. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 3. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
-4. `ENGINEERING.UNITTEST` 泛化别名「测试」收紧（需单独一轮 F1/占比回归）
-5. 迭代 4 候选：学习路径与「已学进度」联动（用户标记完成后重排）、岗位订阅/收藏、BGE 进 CI（模型缓存化）
+4. 迭代 6 已收尾：UNITTEST 别名收紧 ✅、学习路径「已学进度」联动 ✅；剩余候选：岗位订阅/收藏、BGE 进 CI（模型缓存化）
 
 ## 活跃决策与考量
 - 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）

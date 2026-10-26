@@ -36,8 +36,9 @@
   - D4/D5 CI：覆盖率门槛 55%（实测 58%）+ Python 3.10/3.12 矩阵 + pip 缓存 + concurrency；`slow` 标记（全语料遍历）由 nightly 全量跑
   - D6 `scripts/eval_all.py` → `docs/metrics.md`（抽取/匹配/覆盖/阈值四节，无时间戳可 diff），CI main 分支校验报告未过期
   - D7 `scripts/validate_kb.py`（词表 id/别名冲突/类别/难度 + 资源 skill_id/重复 title/非法 url）+ `compileall`，CI 前置拦截
-  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（当前：205 快测 + 2 slow）；快测约 35s
+  - 测试 131 → 201（迭代 3）→ 203（v1.3.1）→ 207（迭代 5）→ 213（迭代 6：211 快测 + 2 slow）；快测约 35s
 - ✅ README 界面预览补两张「区域截图」（`scripts/capture_screenshots.py --page company_matrix|gap_compare`）：**公司 × Top 12 技能**（技能图谱页 ProgressColumn 矩阵，行=公司按 JD 数降序、值=该公司 JD 命中比例；`demand_matrix` 由公司名字母序改为 JD 数降序，避免 1~2 条 JD 的小公司以 0%/100% 占满首屏，新增 `test_matrix_companies_sorted_by_job_count_desc`）与**多岗位对比初始界面**（差距报告页第二种模式：选公司 → 勾 2~4 岗 → 技能留空沿用简历匹配结果 → 开始对比）；脚本新增区域裁剪（`stMainBlockContainer` 定宽 + 内层 `stMain` 滚动，因为 Streamlit 不滚 window）、模式切换与公司下拉选择，`--page all` 一次出 3 整屏 + 2 区域共 5 张；两段介绍改用实测数字（Top 12 需求占比、跨公司对比、31/78 家 JD≤2 的读图提示）
+- ✅ 迭代 6（抽取口径 + 学习路径联动）：`ENGINEERING.UNITTEST` 加 `skip_extract: [测试]`（JD 命中 521 条 / 11.37% → 13 条 / 0.28%，其中 508 条只靠裸「测试」；`recalc_importance` 后 importance 5→1；gold F1 三项零变化，新增 `test_skip_extract_ignores_generic_testing_words` / `test_unittest_alias_only_for_user_input`）；`build_learning_path(..., learned=...)` 支持「已学进度」——命中的技能移出路径并计入 `path.skipped`、视作已具备先修（不再提示前置缺口），页面差距报告改为 session 渲染（勾选即时重排、报告不再因 rerun 消失），AI 解读按「岗位 + 技能」缓存避免重复调用；新增 4 个 `test_learning_path` 用例 + AppTest 勾选回归，测试 207 → 213
 - ✅ 文档数字统一（以 `docs/metrics.md` 为准，`eval_all.py` 重跑零 diff）：零技能 1085→1104（24.1%）、代理 98.7%→98.1%（中位 3 项）、must 57.0%→56.8%（1.50 项/岗）、最高需求占比 36.2%→36.1%；`PROJECT_REPORT.md` 1799 条/74 家/147 技能/56 用例 → 4582/78/161/207，数据源表改「去重后」口径并补快手/小红书/Kimi/MiniMax；`techContext` 66→207 测试、8→11 源
 
 ## 量化指标（当前）
@@ -46,17 +47,17 @@
 | 数据规模 | 4582 条 / 78 家公司（原始 5013 → 过短 7 + 非 AI 工程岗 4 + 重复 420） |
 | 技能抽取 F1 | 规则 0.957 / BERT-NER 0.636(exact) 0.909(overlap) |
 | 匹配 Recall@5 | BGE 0.54 vs TF-IDF 0.24（口语化句子，147 技能词表时期）；161 技能下 TF-IDF 当前基线 0.2200 |
-| 需求强度判定 | 56.8% 岗位识别出 ≥1 项硬性要求（平均 1.50 项/岗；句内 4868 / 章节 194 / 兜底 1804） |
-| 零技能兜底 | 1104 条零技能岗位（24.1%）中 98.1% 可代理，中位 3 项技能 |
+| 需求强度判定 | 56.5% 岗位识别出 ≥1 项硬性要求（平均 1.49 项/岗；句内 4830 / 章节 175 / 兜底 1804） |
+| 零技能兜底 | 1162 条零技能岗位（25.4%）中 97.9% 可代理，中位 3 项技能 |
 | KB 技能覆盖 | 160/161 技能可在 JD 中命中（未命中：联邦学习）；161 = 147 + 新增 16 - 合并 2 |
 | 学习资源覆盖 | 106/161 技能（65.8%），Top 80 需求技能覆盖 77 项 |
 | 回归基线 | 抽取 F1 0.9565(test)/0.9123(全量)、TF-IDF Recall@5 0.9750/0.2200；`docs/metrics.md` 自动生成 |
-| 测试 | 207 用例（205 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
+| 测试 | 213 用例（211 快测 + 2 slow nightly）；覆盖率 58%，CI 门槛 55% |
 
 ## 待构建（按价值）
 1. 阿里/智谱数据补充（需探查招聘渠道）
 2. 简历解析继续增强（工作经历 vs 项目经历分离标注，可选）
-3. `ENGINEERING.UNITTEST` 泛化别名「测试」收紧（会带动抽取 F1 与需求占比，需要单独一轮回归）
+3. 岗位订阅/收藏；BGE 进 CI（模型缓存化，可复现 0.54 vs 0.24 的对比）
 
 ## 当前状态
 - Streamlit 运行中：http://localhost:8501
@@ -77,7 +78,7 @@
 3. 阿里招聘分散在业务集团、智谱招聘渠道未公开，尚未打通
 4. DeepSeek（公司）详情接口 necromancer 加密未逆向，只抓列表
 5. importance 频率≠价值（如「数据标注」高频低门槛），已用难度加权修正
-6. `ENGINEERING.UNITTEST` 的 aliases 含泛化词「测试」→ 11.4% 命中（importance 5），高于真实水平；收紧别名会改变规则基线 F1，故暂未改动，仅记录为口径噪声（「量化」的同类问题已用 `skip_extract` 修正：6.31% → 1.07%，未影响 F1）
+6. ~~`ENGINEERING.UNITTEST` 的 aliases 含泛化词「测试」~~ **已修复（迭代 6）**：改用 `skip_extract: [测试]`，JD 命中 11.37% → 0.28%（521 → 13 条），importance 5→1，gold F1 三项不变（说明原命中不是金标真值，属纯口径噪声；「量化」同类问题 6.31% → 1.07%）
 
 ## 决策演进（关键）
 1. SiameseUIE 零样本对抽象技能 F1=0 → 弃用，保留「规则基线 + BERT-NER」双路

@@ -122,7 +122,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 | 读 `jobs.jsonl`（18.9MB） | 0.09s |
 | 全语料规则抽取 | 0.84s（0.18s/1000 行） |
 | preflight（抽取 + 合并预测 + must 判定） | ~2.0s |
-| 全量 pytest | ~50s（284 条后仍 < 1min） |
+| 全量 pytest | ~50s（285 条后仍 < 1min） |
 
 ## 10. 自检清单（复制到 PR / 提交说明里）
 

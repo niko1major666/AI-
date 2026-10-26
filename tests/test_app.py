@@ -123,3 +123,36 @@ def test_resume_page_strength_and_recommendations(monkeypatch):
     assert any("适合我的岗位" in s.value for s in at.subheader)
     assert any("覆盖率" in m.label for m in at.metric)
     assert at.dataframe, "岗位推荐应有表格"
+
+
+def test_load_jobs_cache_invalidates_when_data_file_changes(tmp_path, monkeypatch):
+    """数据文件更新后，长驻进程不应继续返回旧语料。
+
+    云端曾出现「代码是新版（有收藏夹）、JD 数量/公司却是旧版」：`@st.cache_data`
+    不会因为被读取的文件变化而失效。`load_jobs()` 现在把文件指纹放进缓存键，
+    本用例锁定该行为。
+    """
+    import json
+    import os
+
+    import src.app.app as app
+
+    data_dir = tmp_path / "data" / "processed"
+    data_dir.mkdir(parents=True)
+    jobs = data_dir / "jobs.jsonl"
+    jobs.write_text(json.dumps({"job_id": "a"}) + "\n", encoding="utf-8")
+    monkeypatch.setattr(app, "ROOT", tmp_path)
+    app._load_jobs_cached.clear()
+
+    try:
+        assert [j["job_id"] for j in app.load_jobs()] == ["a"]
+
+        jobs.write_text(
+            json.dumps({"job_id": "a"}) + "\n" + json.dumps({"job_id": "b"}) + "\n",
+            encoding="utf-8",
+        )
+        ts = 2_000_000_000_000_000_000
+        os.utime(jobs, ns=(ts, ts))
+        assert [j["job_id"] for j in app.load_jobs()] == ["a", "b"]
+    finally:
+        app._load_jobs_cached.clear()

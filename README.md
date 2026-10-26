@@ -69,7 +69,7 @@ ai-skill-gap/
 │   ├── crawler/        13 个爬虫模块 / 14 个数据源（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/哔哩哔哩/滴滴/美团/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面 + report_export（报告导出）
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / validate_kb(KB 校验)
-├── tests/              pytest（284 用例已通过，其中 2 个 slow 留给 nightly）
+├── tests/              pytest（285 用例已通过，其中 2 个 slow 留给 nightly）
 ├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -222,6 +222,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W16 | 数据扩充实践：接入美团（技术类） | ✅ 267 测试通过（265 快测 + 2 slow）；新增 `src/crawler/meituan.py`（移动端公开 POST，无 token/签名，社招 3231 条 → 技术类 681 条）+ `scripts/probe_meituan.py` + `tests/test_meituan.py`（17 用例）；全站零售 90.6% / 销售客服 97.0% / 职能 71.1% 零技能，技术类只 6.0%（平均 6.7 项技能），默认只入「技术类」，`--all` 可切全量；查询 token 必须整轮复用（每页换新会退回第 1 页）；语料 5163→5832 条 / 80→81 家，零技能 23.5%→21.5%，must 57.7%→60.0%，importance 16 项微调 |
 | W17 | 发布 v1.4.0：三源扩充（哔哩哔哩 / 滴滴 / 美团）+ 接入前体检工具化 | ✅ 267 测试全绿；语料 5832 条 / 81 家（零技能 21.5%、must 60.0%、覆盖 160/161）；`docs/release-notes/v1.4.0.md` + tag v1.4.0，`release.yml` 自动建 Release；CI（metrics + test 3.10/3.12）绿 |
 | W18 | 迭代 7：求职闭环（经历分类 + 岗位收藏） | ✅ 284 测试通过（282 快测 + 2 slow）；简历经历新增 `kind`（work/internship/project/other），LLM 判定 + 正则按章节标题/角色/组织兜底（教育经历跳过），简历页分组展示、ATS 分别提示缺工作/实习或项目；新增 `src/matcher/job_favorites.py`（公司+归一化标题去重、上限 20、URL 编解码、按 job_id 还原）+ 侧边栏收藏夹（跨页面查看/移除/导出 JSON），差距报告与简历推荐 Top10 一键收藏，`?fav=` 刷新不丢；新增 `tests/test_job_favorites.py`，语料与指标不变 |
+| W19 | 修复云端显示旧语料（Streamlit 缓存） | ✅ 285 测试通过（283 快测 + 2 slow）；线上代码已有收藏夹但首屏仍是旧版 4582 条 / 78 家 → `@st.cache_data` 不随 `data/processed/jobs.jsonl` 变化失效。新增 `app._file_fingerprint()`（路径 + mtime_ns + size）并接入 `load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 缓存键；注意 Streamlit 跳过下划线开头参数，首版 `_mtime_ns`/`_size` 实际未参与哈希，已改正常命名并加缓存失效回归；推送后线上验收 5832 条 / 81 家 |
 
 ## 八、数据采集与爬虫
 

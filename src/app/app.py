@@ -80,43 +80,78 @@ def _inject_css():
     """, unsafe_allow_html=True)
 
 
+def _file_fingerprint(rel_path: str) -> tuple[str, int, int]:
+    """文件指纹：路径 + mtime_ns + 大小，用作 Streamlit 缓存键的一部分。
+
+    `@st.cache_data` / `@st.cache_resource` 默认只按函数代码与显式参数缓存：
+    数据文件被替换后，长驻进程（尤其云端）仍会返回旧缓存，表现为
+    「代码是新版、JD 数量/公司/技能图谱却是旧版」。把指纹作为参数后，
+    文件一变缓存键就变，无需手动重启应用。
+
+    注意：参数名不能以下划线开头——Streamlit 会跳过这类参数、不参与哈希。
+    """
+    p = ROOT / rel_path
+    try:
+        s = p.stat()
+    except OSError:
+        return str(p), 0, 0
+    return str(p), s.st_mtime_ns, s.st_size
+
+
 @st.cache_resource
+def _load_core_cached(taxonomy_path: str, mtime_ns: int, size: int):
+    from src.extractor.rule_baseline import RuleBaselineExtractor
+    from src.skillkb.loader import Taxonomy
+
+    taxonomy = Taxonomy(taxonomy_path)
+    return taxonomy, RuleBaselineExtractor(taxonomy)
+
+
 def load_core():
     """轻量核心：词表 + 规则抽取器。
 
     刻意不在这里建 TfidfMatcher / SkillGapAnalyzer——它们要 import sklearn
     （冷启动 1.5–4.5s），而默认首屏「技能图谱」用不到。需要时用 load_engine()。
     """
-    from src.extractor.rule_baseline import RuleBaselineExtractor
-    from src.skillkb.loader import Taxonomy
-
-    taxonomy = Taxonomy(str(ROOT / "data" / "kb" / "skill_taxonomy.yaml"))
-    return taxonomy, RuleBaselineExtractor(taxonomy)
+    return _load_core_cached(*_file_fingerprint("data/kb/skill_taxonomy.yaml"))
 
 
 @st.cache_resource
-def load_engine():
-    """重量引擎：TF-IDF 匹配 + 差距分析（只有「简历匹配」「差距报告」页需要）。"""
+def _load_engine_cached(taxonomy_path: str, tax_mtime_ns: int, tax_size: int,
+                        resources_path: str, res_mtime_ns: int, res_size: int):
     import yaml
+
     from src.matcher.gap_analyzer import SkillGapAnalyzer
     from src.matcher.tfidf_matcher import TfidfMatcher
 
-    taxonomy, _rule = load_core()
+    taxonomy, _rule = _load_core_cached(taxonomy_path, tax_mtime_ns, tax_size)
     matcher = TfidfMatcher().fit([s.name for s in taxonomy.all_skills()])
-    resources = yaml.safe_load((ROOT / "data" / "kb" / "learning_resources.yaml").read_text(encoding="utf-8"))
+    resources = yaml.safe_load(Path(resources_path).read_text(encoding="utf-8"))
     return SkillGapAnalyzer(taxonomy, resources=resources, matcher=matcher)
 
 
+def load_engine():
+    """重量引擎：TF-IDF 匹配 + 差距分析（只有「简历匹配」「差距报告」页需要）。"""
+    return _load_engine_cached(
+        *_file_fingerprint("data/kb/skill_taxonomy.yaml"),
+        *_file_fingerprint("data/kb/learning_resources.yaml"),
+    )
+
+
 @st.cache_data
-def load_jobs():
-    p = ROOT / "data" / "processed" / "jobs.jsonl"
+def _load_jobs_cached(path: str, mtime_ns: int, size: int):
+    p = Path(path)
     if not p.exists():
         return []
     return [json.loads(x) for x in p.read_text(encoding="utf-8").split("\n") if x.strip()]
 
 
+def load_jobs():
+    return _load_jobs_cached(*_file_fingerprint("data/processed/jobs.jsonl"))
+
+
 @st.cache_data
-def extract_corpus():
+def _extract_corpus_cached(path: str, mtime_ns: int, size: int):
     """全语料抽取：技能集合 + JD 内强调度(tf) + must/nice 判定（结果缓存，冷启动只算一次）。
 
     判 must 不能再用「全语料需求占比 ≥ 40%」——实测最高只有 36.1%，恒为 False，
@@ -124,7 +159,7 @@ def extract_corpus():
     """
     taxonomy, rule = load_core()
     rows, texts = [], []
-    for j in load_jobs():
+    for j in _load_jobs_cached(path, mtime_ns, size):
         text = j.get("jd_clean") or j.get("jd_text", "")
         spans, counts = rule.extract(j["job_id"], text)
         rows.append({
@@ -143,6 +178,10 @@ def extract_corpus():
         r["must_evidence"] = {sid: info["evidence"] for sid, info in judged.items()
                               if info["is_must"] and info["evidence"]}
     return rows
+
+
+def extract_corpus():
+    return _extract_corpus_cached(*_file_fingerprint("data/processed/jobs.jsonl"))
 
 
 def compute_demand(rows):
@@ -505,9 +544,13 @@ def page_resume(taxonomy, rule, analyzer, rows=None):
     _render_strength_and_jobs(taxonomy, analyzer, rows or [])
 
 
-@st.cache_data(show_spinner=False, max_entries=16)
 def _recommendations(skill_ids: tuple):
-    """简历技能 -> Top 岗位（按技能 id 组合缓存；内部复用已缓存的全语料抽取结果）。"""
+    return _recommendations_cached(skill_ids, _file_fingerprint("data/processed/jobs.jsonl"))
+
+
+@st.cache_data(show_spinner=False, max_entries=16)
+def _recommendations_cached(skill_ids: tuple, jobs_fingerprint: tuple[str, int, int]):
+    """简历技能 -> Top 岗位（技能组合 + 语料指纹缓存；数据更新后自动重算）。"""
     taxonomy, _rule = load_core()
     analyzer = load_engine()
     from dataclasses import asdict

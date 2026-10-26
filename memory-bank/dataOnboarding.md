@@ -36,11 +36,11 @@
 ## 3. 体检（`scripts/preflight_new_source.py`，只读，约 2 秒）
 
 ```powershell
-# 单源
-.\\.venv\\Scripts\\python.exe scripts/preflight_new_source.py --source data\\raw\\ali_ai_jobs.csv
+# 单源（venv 已激活；也可写成 .\.venv 下的 python.exe 前缀）
+python scripts/preflight_new_source.py --source data/raw/ali_ai_jobs.csv
 
 # 多源一起看（模拟这一批一起进语料）+ 落 JSON 供后续比对
-.\\.venv\\Scripts\\python.exe scripts/preflight_new_source.py --source a.csv --source b.csv --json preflight.json
+python scripts/preflight_new_source.py --source a.csv --source b.csv --json preflight.json
 ```
 
 | 检查项 | FAIL / WARN 条件 | 处理 |

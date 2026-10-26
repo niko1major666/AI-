@@ -12,6 +12,12 @@ def test_app_runs_without_exception():
     at.run()
     assert not at.exception, f"app exceptions: {at.exception}"
 
+    # 收藏夹空态文案只讲用户能理解的行为，不暴露 ?fav= 这类链接参数
+    fav = next(e for e in at.sidebar.expander if "我的收藏" in e.label)
+    texts = [c.value for c in fav.caption] + [m.value for m in fav.markdown]
+    assert texts, "空收藏夹应有使用提示"
+    assert not any("?fav" in t or "fav=" in t for t in texts), texts
+
 
 def test_gap_page_interaction_has_no_exception(monkeypatch):
     """差距报告页交互回归：选公司 → 选岗位 → 输入技能 → 生成报告，不应抛异常。

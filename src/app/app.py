@@ -292,7 +292,7 @@ def _render_favorite_button(job: dict, key_prefix: str = "") -> None:
     key = f"{key_prefix}fav_{jid or token}"
     fav = is_favorited(_favorites(), job)
     label = "✅ 已收藏（点击取消）" if fav else "⭐ 收藏该岗位"
-    if st.button(label, key=key, help=f"收藏写入当前链接参数，最多 {FAVORITE_LIMIT} 个"):
+    if st.button(label, key=key, help=f"收藏会保存在当前页面链接，最多 {FAVORITE_LIMIT} 个"):
         _toggle_favorite(job)
 
 
@@ -302,7 +302,7 @@ def _render_favorites_sidebar() -> None:
     st.sidebar.markdown("---")
     with st.sidebar.expander(f"⭐ 我的收藏（{len(favs)}/{FAVORITE_LIMIT}）", expanded=False):
         if not favs:
-            st.caption("在「差距报告」或「简历匹配」页点「⭐ 收藏该岗位」。收藏写入当前链接（?fav=…），刷新/书签不丢。")
+            st.caption("在「差距报告」或「简历匹配」页点「⭐ 收藏该岗位」。收藏会保存在当前页面链接中，刷新或收藏书签都不会丢。")
             return
         for idx, f in enumerate(favs):
             name = _translate_title(str(f.get("title") or "")) or "未命名岗位"
@@ -316,7 +316,7 @@ def _render_favorites_sidebar() -> None:
             "导出收藏（JSON）", json.dumps(favs, ensure_ascii=False, indent=2),
             file_name="job_favorites.json", mime="application/json", key="fav_export",
         )
-        st.caption("收藏存在链接参数里，换设备/清缓存会丢；可导出 JSON 备份。")
+        st.caption("收藏会随当前页面链接保存；换设备或清空链接会丢失，可导出 JSON 备份。")
 
 
 def _build_jd_skills(taxonomy, target, demand):

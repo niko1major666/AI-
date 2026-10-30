@@ -22,7 +22,8 @@ uv_cache/
 # 原始/生成数据（仅 seed 样例入库）
 data/raw/*
 !data/raw/sample_jobs.csv
-data/processed/
+data/processed/*
+!data/processed/job_freshness.json
 data/gold/*.tmp
 
 # 系统

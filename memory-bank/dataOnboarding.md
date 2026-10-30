@@ -8,9 +8,9 @@
 
 ```
 爬取 → data/raw/<company>_ai_jobs.csv（10 列 / job_id 带源前缀 / 统一中文公司名）
-     → 双处注册（merge_jobs.FILES + recrawl_all.CRAWLERS）
+     → 三处注册（merge_jobs.FILES + merge_jobs.SOURCE_BY_FILE + recrawl_all.CRAWLERS）
      → 体检 python scripts/preflight_new_source.py --source <csv>   ← 唯一闸门
-     → merge_jobs.py → build_dataset --stats
+     → merge_jobs.py → build_dataset --stats → source_health.py
      → recalc_importance.py（占比有变化时）→ eval_all.py
      → 同步常量/文档 → 全量 pytest → 提交
 ```
@@ -28,7 +28,7 @@
 
 ## 2. 双处注册（漏一处就静默不进语料）
 
-- `scripts/merge_jobs.py` 的 `FILES`（合并顺序 = 去重时的保留优先级）
+- `scripts/merge_jobs.py` 的 `FILES`（合并顺序 = 去重时的保留优先级）与 `SOURCE_BY_FILE`（来源标识，写入 `source`）
 - `scripts/recrawl_all.py` 的 `CRAWLERS`（一键重爬能看到它）
 
 > 已知硬化债：`merge_jobs.py` / `analyze_skills.py` / `verify_real.py` 里仍是
@@ -76,6 +76,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 | `tests/test_skillkb.py` | 个别技能 importance 断言（如 `PROG.PYTHON=5`、`BIGDATA.FLINK=3`）——占比变了就要重跑 `recalc_importance.py` 再对齐 |
 | `scripts/preflight_new_source.py` | `ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`（与 snapshot 测试同步） |
 | `docs/metrics.md` | `python scripts/eval_all.py` 生成，CI 在 main 上 `git diff --exit-code` 校验是否过期 |
+| `docs/source_health.md` | `python scripts/source_health.py` 生成，CI 在 main 上 `git diff --exit-code` 校验是否过期 |
 | `README.md` | 数据源表「条数」+ 公司分布行 + 量化指标段 + 路线图新增 W 行 |
 | `PROJECT_REPORT.md` | §四 各源条数、§五 数据规模 / 零技能 / must 占比 |
 | `memory-bank/*` | `activeContext`（当前状态）、`progress`（本轮记录）、`techContext`（测试数）、`systemPatterns`（口径） |
@@ -111,7 +112,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 ## 8. 已知缺口（按优先级）
 
 1. `company_aliases` 配置 + 接进 `normalize_company()`——体检只能报「写法分裂」，不能自动合并。
-2. `merge_jobs.py` / `analyze_skills.py` / `verify_real.py` 的 `ROOT = Path("D:/ai-skill-gap")` 改仓库相对路径。
+2. `analyze_skills.py` / `verify_real.py` 的 `ROOT = Path("D:/ai-skill-gap")` 改仓库相对路径（`merge_jobs.py` 已在迭代 8 改为 `Path(__file__).parents[1]`）。
 3. `data/processed/jobs.jsonl`（18.9MB）入库而 `data/raw/*` 不入库 ⇒ **语料不可复现**，每次扩数据多一个二进制 blob；建议 raw 走 Release 附件或 Git LFS。
 4. 代理（`job_neighbors`）对「无可用相似岗位的公司」缺兜底文案，扩源后要复测。
 
@@ -122,16 +123,16 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 | 读 `jobs.jsonl`（18.9MB） | 0.09s |
 | 全语料规则抽取 | 0.84s（0.18s/1000 行） |
 | preflight（抽取 + 合并预测 + must 判定） | ~2.0s |
-| 全量 pytest | ~50s（285 条后仍 < 1min） |
+| 全量 pytest | ~50s（296 条后仍 < 1min） |
 
 ## 10. 自检清单（复制到 PR / 提交说明里）
 
 - [ ] 新 CSV 10 列齐全、`job_id` 带源前缀、公司名统一
-- [ ] `merge_jobs.FILES` + `recrawl_all.CRAWLERS` 双处注册
+- [ ] `merge_jobs.FILES` + `merge_jobs.SOURCE_BY_FILE` + `recrawl_all.CRAWLERS` 三处注册
 - [ ] preflight 无 FAIL（WARN 已逐条确认，正文重复/公司分裂已知情）
-- [ ] `build_dataset --stats` 的 `cleaned_rows` 与体检预测吻合
+- [ ] `build_dataset --stats` 的 `cleaned_rows` 与体检预测吻合；`job_freshness.json` 与 `jobs.jsonl` 一起提交
 - [ ] `validate_kb.py` 通过；补过技能则 `recalc_importance.py` 后无差异
-- [ ] `eval_all.py` 生成新 `docs/metrics.md` 并一起提交
+- [ ] `eval_all.py` + `source_health.py` 生成新 `docs/metrics.md` / `docs/source_health.md` 并一起提交
 - [ ] 四处常量（snapshot / skillkb / preflight / metrics）已同步，三处 docstring 已改
 - [ ] README / PROJECT_REPORT / memory-bank 数字已改
 - [ ] 全量 pytest 通过；CI（`metrics` + `test (3.10)` + `test (3.12)`）绿

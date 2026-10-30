@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.data import freshness
+from src.data.source_health import source_label as _source_label
 from src.data.translate import translate_title as _translate_title
 from src.matcher.jd_requirements import judge_requirements
 from src.matcher.job_favorites import (
@@ -167,6 +169,10 @@ def _extract_corpus_cached(path: str, mtime_ns: int, size: int,
             "job_id": j["job_id"], "title": j.get("title", ""),
             "company": j.get("company", ""), "location": j.get("location", ""),
             "department": j.get("department", ""), "publish_time": j.get("publish_time", ""),
+            "source": j.get("source", ""),
+            "first_seen_at": j.get("first_seen_at", ""),
+            "last_seen_at": j.get("last_seen_at", ""),
+            "is_active": j.get("is_active", True),
             "skills": [s.skill_id for s in spans],
             "skill_tf": counts,
             "_spans": [(s.skill_id, s.start) for s in spans],
@@ -235,15 +241,41 @@ def _fmt_time(pt):
 
 
 def _job_label(r):
-    """岗位下拉显示标签：标题 · 地点 · 部门 · 发布时间。"""
+    """岗位下拉显示标签：标题 · 地点 · 部门 · 新鲜度 · 发布时间。"""
     parts = [_translate_title(r["title"]), r.get("location") or ""]
     dep = r.get("department") or ""
     if dep:
         parts.append(dep)
+    fresh = freshness.freshness_label(r.get("last_seen_at") or "")
+    if fresh:
+        parts.append(fresh)
     pt = _fmt_time(r.get("publish_time") or "")
     if pt:
         parts.append(pt)
     return " · ".join([p for p in parts if p])
+
+
+_FRESHNESS_CHOICES = {"全部": None, "近 7 天": 7, "近 30 天": 30}
+
+
+def _filter_by_freshness(rows, max_age_days):
+    """按最近抓取时间筛选；缺时间字段的旧数据保留（避免升级后列表突然为空）。"""
+    return freshness.filter_by_age(rows, max_age_days)
+
+
+def _render_freshness_note(job):
+    """岗位卡片的新鲜度提示：正常显示抓取时间，超 30 天提示“可能已下线”。"""
+    last = job.get("last_seen_at") or ""
+    if not last:
+        return
+    label = freshness.freshness_label(last)
+    source = job.get("source") or ""
+    src = f" · 来源 {_source_label(source)}" if source else ""
+    if freshness.is_stale(last):
+        st.warning(f"⚠️ 该岗位最近一次抓取于 {_fmt_time(last)}（{label}），"
+                   f"超过 30 天未再抓到，可能已下线；投递前请到官网确认{src}")
+    else:
+        st.caption(f"🕒 最近抓取：{_fmt_time(last)}（{label}）{src}")
 
 
 # ---- 岗位收藏（求职短名单）----
@@ -619,6 +651,7 @@ def _render_strength_and_jobs(taxonomy, analyzer, rows):
             "地点": s["location"],
             "匹配度": f"{s['match_score']:.0f}%",
             "缺口数": s["missing_total"],
+            "更新": freshness.freshness_label(s.get("last_seen_at") or "") or "-",
             "最该补": "、".join(s["top_missing"]),
         }
         for s in sugs
@@ -796,6 +829,13 @@ def page_gap(taxonomy, analyzer, rows):
         st.warning("暂无数据，请先运行 `python -m src.data.build_dataset`")
         return
 
+    fresh_choice = st.radio("🕒 岗位更新时间", list(_FRESHNESS_CHOICES),
+                            horizontal=True, key="gap_freshness")
+    rows = _filter_by_freshness(rows, _FRESHNESS_CHOICES[fresh_choice])
+    if not rows:
+        st.warning("该时间范围内没有岗位，换一个更新时间范围试试")
+        return
+
     demand = compute_demand(rows)
     mode = st.radio("分析模式", ["单岗位报告", "多岗位对比"], horizontal=True, key="gap_mode")
     if mode == "多岗位对比":
@@ -821,6 +861,7 @@ def page_gap(taxonomy, analyzer, rows):
     label = st.selectbox("📋 选择岗位", list(options))
     target = options[label]
     _render_favorite_button(target, key_prefix="gap_")
+    _render_freshness_note(target)
 
     jd_skills = _build_jd_skills(taxonomy, target, demand)
     if not jd_skills:
@@ -883,6 +924,9 @@ def page_gap_compare(taxonomy, analyzer, rows, demand):
     picked = st.multiselect("📋 选择 2~4 个岗位", list(labels),
                             default=list(labels)[:2],
                             key=f"cmp_jobs_{company}")
+    stale = [labels[lab] for lab in picked if freshness.is_stale(labels[lab].get("last_seen_at") or "")]
+    if stale:
+        st.warning(f"所选岗位中有 {len(stale)} 个超过 30 天未再抓到，可能已下线；对比结果仅供参考")
     user_input = st.text_input("技能（逗号分隔，留空则用「简历匹配」结果）", "", key="cmp_skills")
     typed = [x.strip() for x in user_input.replace("，", ",").split(",") if x.strip()]
     user_skills = typed or st.session_state.get("user_skills", [])
@@ -936,6 +980,9 @@ def main():
     _init_favorites(rows)
     st.sidebar.markdown("## 🎯 AI 岗位技能差距分析")
     st.sidebar.caption("面向非科班求职者的技能诊断与学习规划")
+    latest = max((r.get("last_seen_at") or "" for r in rows), default="")
+    if latest:
+        st.sidebar.caption(f"语料最近抓取：{latest[:10]}（{freshness.freshness_label(latest)}）")
     st.sidebar.markdown("---")
     page = st.sidebar.radio("页面", ["技能图谱", "简历匹配", "差距报告"])
     _render_favorites_sidebar()

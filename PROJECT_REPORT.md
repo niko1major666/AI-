@@ -15,6 +15,7 @@
 3. **语义匹配**：用户简历/技能列表 → 目标岗位技能，计算匹配度
 4. **差距诊断**：输出缺失技能、优先级（P0/P1/P2）、行业重要度、学习难度、学习资源；AI 解读结合简历解析出的专业给出迁移建议（未识别到专业时不展示）
 5. **前端**：Streamlit 三页面（技能图谱 / 简历匹配 / 差距报告）
+6. **数据新鲜度与来源健康**：岗位带 `first_seen_at` / `last_seen_at` / `is_active`，前端显示“N 天前更新”、支持近 7/30 天筛选、超 30 天提示可能下线；按 14 个来源生成 `docs/source_health.md`（规模 / 发布时间覆盖 / 零技能率 / 超期统计），CI 校验报告陈旧
 
 ## 三、系统架构与数据流
 
@@ -49,6 +50,10 @@ jobs.jsonl      skills_long         skill_id 匹配       GapReport         3 �
 > （只读，约 2 秒）预演「合并后会发生什么」——job_id 冲突、正文跨源重复（公司归属由 `FILES` 顺序决定）、
 > 公司写法分裂、零技能占比是否仍在 20%~28%、技能覆盖是否仍 ≥159、must 占比偏移；有 FAIL 时退出码 1。
 > 完整流程与「构建后必改的四处常量」见 `memory-bank/dataOnboarding.md`。
+>
+> **新鲜度字段**：`merge_jobs.py` 写入 `source` 与源 CSV 抓取时间 `crawl_time`；`build_dataset` 维护
+> `data/processed/job_freshness.json`（`first_seen_at` 跨构建保留，历史未出现 job_id 标 `active=false`），
+> `jobs.jsonl` 新增 `first_seen_at` / `last_seen_at` / `is_active`；来源健康见 `docs/source_health.md`。
 
 ## 五、关键量化指标
 
@@ -126,4 +131,4 @@ jobs.jsonl      skills_long         skill_id 匹配       GapReport         3 �
 - **匹配**：TF-IDF（char n-gram）+ BGE-base-zh-v1.5（sentence-transformers）
 - **前端**：Streamlit + pyvis（图谱可视化）
 - **爬虫**：requests + Playwright
-- **工程**：pytest（213 用例 = 211 快测 + 2 slow；覆盖率 58%，CI 门槛 55%）、Docker、GitHub Actions（3.10/3.12 矩阵 + nightly 全量）、yaml 配置化
+- **工程**：pytest（296 用例 = 294 快测 + 2 slow；覆盖率 64.65%，CI 门槛 55%）、Docker、GitHub Actions（3.10/3.12 矩阵 + nightly 全量）、yaml 配置化

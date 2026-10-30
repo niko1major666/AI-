@@ -25,6 +25,9 @@ class JobPosting:
     text_hash: str
     department: str = ""
     publish_time: str = ""
+    first_seen_at: str = ""
+    last_seen_at: str = ""
+    is_active: bool = True
 
     def to_dict(self) -> dict:
         return asdict(self)

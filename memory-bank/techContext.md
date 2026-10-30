@@ -7,7 +7,7 @@
 - **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）
 - **前端**：Streamlit + pyvis（图谱可视化）
 - **爬虫**：requests + Playwright（chromium headless）
-- **工程**：pytest（285 用例 = 283 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`
+- **工程**：pytest（296 用例 = 294 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`；来源健康 `scripts/source_health.py`
 
 ## 开发设置
 - 项目根目录：`D:\ai-skill-gap`
@@ -19,7 +19,7 @@
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
 - 当前版本：**v1.5.0**（tag，2026-10-29；发布说明 `docs/release-notes/v1.5.0.md`）
-- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，285 测试；3.10 只跑用例、3.12 加覆盖率门槛）
+- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，296 测试；3.10 只跑用例、3.12 加覆盖率门槛；metrics job 同时校验 `docs/metrics.md` 与 `docs/source_health.md`）
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）
@@ -28,6 +28,7 @@
 - **国内镜像**：`HF_ENDPOINT=https://hf-mirror.com`
 - **Windows**：无 symlink（HF 缓存降级警告无害）；PowerShell 环境
 - **Streamlit 缓存**：`@st.cache_data` / `@st.cache_resource` 不感知数据文件变化，数据类缓存统一把 `(_file_fingerprint)` 的 `(path, mtime_ns, size)` 作为参数；参数名**不要以下划线开头**（会被跳过、不进缓存键）
+- **新鲜度时间口径**：`last_seen_at` = 源 CSV mtime（不是构建时间），构建不会刷新；`first_seen_at` 由 `data/processed/job_freshness.json` 跨构建保留。该状态文件已加入 `.gitignore` 白名单，需与 `jobs.jsonl` 一起提交。
 
 ## 依赖要点
 - 依赖分层：`requirements.txt`（轻量运行依赖，云端部署用）；`requirements-ml.txt`（重模型依赖 BERT-NER/BGE/SiameseUIE，本地 `pip install -r requirements.txt -r requirements-ml.txt`）
@@ -37,7 +38,8 @@
 ## 工具使用模式
 - 跑测试：`.\.venv\Scripts\python.exe -m pytest -q`
 - 重爬：`python scripts/recrawl_all.py`（13 个爬虫模块 / 14 个数据源，约 20+ 分钟）
-- 合并+构建：`merge_jobs.py` → `python -m src.data.build_dataset --stats`
+- 合并+构建：`merge_jobs.py` → `python -m src.data.build_dataset --stats`（前者补 `source` / `crawl_time`，后者维护 `data/processed/job_freshness.json`）
+- 来源健康：`python scripts/source_health.py`（生成 `docs/source_health.md`，约 2s；`--skip-extract` 可跳过零技能统计）
 - 重要度重算：`python scripts/recalc_importance.py`
 - 匹配评测：`python scripts/eval_resume_match.py`（需 BGE 缓存）
 - 报告导出 Word：`python scripts/export_report_docx.py`

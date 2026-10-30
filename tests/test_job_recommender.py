@@ -81,5 +81,7 @@ def test_must_weight_affects_score():
 def test_suggestion_carries_job_id_for_favorites():
     rows = _rows()
     rows[0]["job_id"] = "tx-1"
+    rows[0]["last_seen_at"] = "2026-10-26T00:00:00+00:00"
     res = recommend_jobs(["Python", "大模型"], rows, _analyzer(), min_score=0)
     assert res[0].job_id == "tx-1"
+    assert res[0].last_seen_at == "2026-10-26T00:00:00+00:00"

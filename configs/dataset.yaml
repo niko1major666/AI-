@@ -40,3 +40,4 @@ output:
   jobs_parquet: data/processed/jobs.parquet
   skills_csv: data/processed/skills_long.csv
   stats_path: data/processed/build_stats.json
+  freshness_path: data/processed/job_freshness.json

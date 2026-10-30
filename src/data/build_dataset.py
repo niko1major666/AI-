@@ -14,10 +14,11 @@ from typing import Any
 
 import yaml
 
-from . import job_filter, load_kaggle, normalize, schema
+from . import freshness, job_filter, load_kaggle, normalize, schema
 
 CANON_COLS = ["job_id", "company", "title", "location", "salary",
-              "experience", "education", "jd_text", "department", "publish_time"]
+              "experience", "education", "jd_text", "department", "publish_time",
+              "source", "crawl_time"]
 
 
 def _root() -> Path:
@@ -104,12 +105,13 @@ def build(config_path, out_dir=None) -> dict:
     df = df.drop_duplicates(subset="text_hash", keep="first")
     stats["deduped_rows"] = before - len(df)
 
-    crawl_time = datetime.now(timezone.utc).isoformat()
+    build_time = datetime.now(timezone.utc).isoformat()
+    default_source = str(src_cfg.get("type", "local_csv"))
     records = []
     for _, row in df.iterrows():
         records.append(schema.JobPosting(
             job_id=str(row["job_id"]),
-            source=str(src_cfg.get("type", "local_csv")),
+            source=str(row.get("source") or default_source),
             company=str(row.get("company", "") or ""),
             company_norm=str(row.get("company_norm", "") or ""),
             title=str(row.get("title", "") or ""),
@@ -122,11 +124,21 @@ def build(config_path, out_dir=None) -> dict:
             education=str(row.get("education", "") or ""),
             jd_text=str(row.get("jd_text", "") or ""),
             jd_clean=str(row.get("jd_clean", "") or ""),
-            crawl_time=crawl_time,
+            crawl_time=str(row.get("crawl_time") or build_time),
             text_hash=str(row.get("text_hash", "") or ""),
             department=str(row.get("department", "") or ""),
             publish_time=str(row.get("publish_time", "") or ""),
         ).to_dict())
+
+    # 新鲜度状态跨构建保留：first_seen 固定、last_seen 取源抓取时间、未出现的历史岗位标 inactive
+    if out_dir is None:
+        state_path = _resolve(root, out_cfg.get(
+            "freshness_path", "data/processed/job_freshness.json"))
+    else:
+        state_path = Path(out_dir) / "job_freshness.json"
+    state = freshness.load_state(state_path)
+    records, state = freshness.annotate_jobs(records, state, observed_at=build_time)
+    freshness.save_state(state_path, state)
 
     out = _resolve(root, out_cfg["jobs_jsonl"]) if out_dir is None else Path(out_dir) / "jobs.jsonl"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -137,6 +149,9 @@ def build(config_path, out_dir=None) -> dict:
     stats["cleaned_rows"] = len(records)
     stats["company_count"] = int(df["company_norm"].nunique())
     stats["companies"] = sorted(set(df["company_norm"].astype(str).tolist()))
+    stats["source_count"] = len({r["source"] for r in records})
+    stats["inactive_history_rows"] = sum(1 for x in state["jobs"].values() if not x.get("active"))
+    stats["freshness_path"] = str(state_path)
     stats["output"] = str(out)
 
     if out_dir is None and out_cfg.get("stats_path"):

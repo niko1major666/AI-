@@ -20,6 +20,7 @@ class JobSuggestion:
     missing_total: int
     top_missing: list = field(default_factory=list)
     job_id: str = ""
+    last_seen_at: str = ""
 
 
 def _norm_title(title: str) -> str:
@@ -88,6 +89,7 @@ def recommend_jobs(user_skills, rows, analyzer, *, top_k: int = 10,
                          if analyzer.taxonomy.by_id(sid) else sid
                          for _w, sid in missing[:3]],
             job_id=str(r.get("job_id") or ""),
+            last_seen_at=str(r.get("last_seen_at") or ""),
         ))
 
     out.sort(key=lambda j: (-j.match_score, j.missing_total, j.company, j.title))

@@ -20,7 +20,8 @@ TAX = ROOT / "data" / "kb" / "skill_taxonomy.yaml"
 EXPECTED_ROWS = 5832
 EXPECTED_COMPANIES = 81
 EXPECTED_UNIQUE_COMPANY_TITLE = 5645
-REQUIRED_FIELDS = {"job_id", "title", "company", "jd_text"}
+REQUIRED_FIELDS = {"job_id", "title", "company", "jd_text", "source",
+                   "first_seen_at", "last_seen_at", "is_active"}
 
 
 @pytest.fixture(scope="module")
@@ -46,6 +47,7 @@ def test_job_count_snapshot(jobs, stats):
 def test_required_fields_and_unique_job_id(jobs):
     for j in jobs[:50]:
         assert REQUIRED_FIELDS <= set(j), f"缺字段：{REQUIRED_FIELDS - set(j)}"
+        assert j["is_active"] is True
     assert len({j["job_id"] for j in jobs}) == len(jobs)
 
 

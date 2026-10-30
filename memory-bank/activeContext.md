@@ -1,21 +1,26 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
+- **迭代 8 已交付（数据新鲜度 + 来源健康，待发版）**：岗位新增 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active`；`merge_jobs` 按文件名写来源、按源 CSV mtime 写抓取时间，`build_dataset` 用 `data/processed/job_freshness.json` 跨构建保留首次发现时间；差距报告支持「全部 / 近 7 天 / 近 30 天」筛选、显示“N 天前更新”、超 30 天提示可能下线；新增 `docs/source_health.md`（14 来源）并由 CI 校验不陈旧。测试 285→**296**（294 快测 + 2 slow），语料/指标保持 5832 条 / 81 家、160/161（`docs/metrics.md` 零 diff）。
 - **迭代 3 已完成（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）**：规则学习路径、报告导出（md/docx）、多岗对比、反向岗位推荐、技能画像、公司×技能矩阵、简历补强建议；抽取/匹配回归基线 + 语料快照 + 覆盖率门槛（55%）+ 3.10/3.12 矩阵 + nightly + `docs/metrics.md`；测试 131→201 全绿（v1.3.1 后 203，迭代 6 后 213；W13–W16 数据扩充后 267：265 快测 + 2 slow；迭代 7 后 284：282 快测 + 2 slow；v1.5.0 后 285：283 快测 + 2 slow）
 - 迭代 2 已交付（commit `5777ff9`）：技能 147→161、学习资源 11→106、`Skill.skip_extract` 修正「量化」噪声
 - 迭代 1 已交付（commit `427f271`）：must/nice 三级判定、零技能岗位代理兜底、岗位内 tf 加权、简历解析缓存
 - 线上：Streamlit 云端部署 + 每 6 小时保活（`/~/+/_stcore/health` 返回 200 `ok` 为唯一就绪判据）
 
-## 权威数字（以 `docs/metrics.md` 为准；2026-10-26 重跑 `eval_all.py` 零 diff）
+## 权威数字（以 `docs/metrics.md` 为准；2026-10-30 重跑 `eval_all.py` 零 diff）
 
 - 语料 **5832 条 / 81 家公司 / 5645 个唯一「公司+标题」**（原始 6321 → 过短 7 + 非 AI 工程岗 6 + 重复 476）
 - 零技能岗位 **1252 条（21.5%）**，其中 **1228 条（98.1%）** 可用同公司相似岗位代理（中位 3 项）
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
 - 硬性要求 **60.0% 岗位 / 平均 1.80 项**（句内触发词 7340 / 章节归属 974 / 占比兜底 2191）；最高技能需求占比 **38.6%**（大模型）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **285**（283 快测 + 2 slow）；覆盖率 58%（CI 门槛 55%）
+- 测试 **296**（294 快测 + 2 slow）；覆盖率 64.65%（CI 门槛 55%）
 
 ## 近期变更（按时间倒序）
+
+- **迭代 8：数据新鲜度 + 来源健康（2026-10-30，待发版）**：① `merge_jobs.py` 用文件名映射写入 `source`、用源 CSV mtime 写入 `crawl_time`（此前所有岗位被写成 `local_csv` + 构建时间）；② 新增 `src/data/freshness.py`：`first_seen_at` 跨构建保留、`last_seen_at` 取源抓取时间、历史未出现 job_id 标记 `active=false`，状态落 `data/processed/job_freshness.json`；③ `build_dataset` 输出新字段并保持向后兼容；④ 差距报告下拉显示“N 天前更新”，新增「全部 / 近 7 天 / 近 30 天」筛选，超 30 天岗位提示“可能已下线”，简历 Top10 增加“更新”列；⑤ 新增 `src/data/source_health.py` + `scripts/source_health.py` 生成 `docs/source_health.md`（14 来源：岗位/公司/最新抓取/发布覆盖/零技能/超期/已消失/状态），CI main 分支重跑并 `git diff --exit-code` 防陈旧；⑥ 新增 `test_freshness.py` / `test_source_health.py` / `test_merge_jobs.py`，测试 285→**296**；重跑 `docs/metrics.md` 零 diff。
+  - 诚实限制：源 CSV 本身不含抓取时间，`crawl_time` 用文件 mtime 近似；状态文件首次启用时 `first_seen_at` 以当前各源抓取时间为准，之后增量维护。
+  - 新增 `data/processed/job_freshness.json` 为新鲜度状态文件（已加入 `.gitignore` 白名单），需与 `jobs.jsonl` 一起提交。
 
 - **v1.5.0 已发布（2026-10-29，tag `v1.5.0`）**：把 v1.4.0 之后的 W18/W19 一并发版（`pyproject` 1.4.0→1.5.0、`docs/release-notes/v1.5.0.md`）——简历经历分类（work/internship/project/other）、岗位收藏夹（去重/上限 20/`?fav=`/JSON 导出）、Streamlit 缓存指纹修复（`086602a`/`d5b8936`）与收藏夹文案修复（`771084c`）。语料/指标保持 5832 条 / 81 家、160/161；测试 267→285（283 快测 + 2 slow）。发版后 main 与远程一致，tag 推送触发 Release 工作流。
 
@@ -81,10 +86,11 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
-2. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
-3. 岗位订阅（邮件/站内提醒，收藏夹已交付）
-4. BGE 进 CI（模型缓存化）
+1. 发布 v1.6.0（数据新鲜度 + 来源健康）：提交/CI 绿后补 `docs/release-notes/v1.6.0.md`、`pyproject` 1.5.0→1.6.0、tag；重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
+2. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
+3. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
+4. 岗位订阅（邮件/站内提醒，收藏夹已交付）
+5. BGE 进 CI（模型缓存化）
 
 ## 活跃决策与考量
 - 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）

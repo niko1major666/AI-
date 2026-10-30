@@ -97,6 +97,10 @@ jobs:
         run: python scripts/eval_all.py
       - name: Fail if metrics report is stale
         run: git diff --exit-code docs/metrics.md
+      - name: Regenerate docs/source_health.md
+        run: python scripts/source_health.py
+      - name: Fail if source health report is stale
+        run: git diff --exit-code docs/source_health.md
       - uses: actions/upload-artifact@v4
         with:
           name: metrics

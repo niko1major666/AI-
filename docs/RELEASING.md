@@ -35,6 +35,7 @@ https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
 .venv\Scripts\python.exe -m pytest -m "not slow"
 .venv\Scripts\python.exe scripts\validate_kb.py
 .venv\Scripts\python.exe scripts\eval_all.py; git diff --exit-code docs/metrics.md   # 指标/语义有变化时必须一并提交
+.venv\Scripts\python.exe scripts\source_health.py; git diff --exit-code docs/source_health.md  # 来源/新鲜度变化时必须一并提交
 ```
 
 ## 4. 提交、打 tag、推送

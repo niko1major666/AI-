@@ -87,7 +87,7 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 观察 v1.6.0 的 CI（3.10/3.12 + metrics）结果；Release 已发布（tag `v1.6.0` / commit `01aae4f`）。重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
+1. v1.6.0 已发布（tag `v1.6.0` / commit `01aae4f`），CI 3.10/3.12 + metrics 全绿；重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
 2. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
 3. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 4. 岗位订阅（邮件/站内提醒，收藏夹已交付）

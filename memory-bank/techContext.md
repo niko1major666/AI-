@@ -18,7 +18,7 @@
 - SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
-- 当前版本：**v1.4.0**（tag，2026-10-26；发布说明 `docs/release-notes/v1.4.0.md`）
+- 当前版本：**v1.5.0**（tag，2026-10-29；发布说明 `docs/release-notes/v1.5.0.md`）
 - CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，285 测试；3.10 只跑用例、3.12 加覆盖率门槛）
 
 ## 技术约束（★ 关键，防崩）

@@ -12,6 +12,7 @@
 - ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
 - ✅ 发行 v1.4.0（2026-10-26）：数据源扩充三家（哔哩哔哩 194 + 滴滴 387 + 美团 669），语料 4582→5832 条 / 81 家、零技能 25.4%→21.5%、must 56.5%→60.0%、测试 203→267；`docs/release-notes/v1.4.0.md` + 附注 tag，`release.yml` 自动建 Release；README 目录结构两处过期数字（13 爬虫模块 / 14 数据源、267 用例）同时修
+- ✅ 发行 v1.5.0（2026-10-29）：把 v1.4.0 之后的 W18/W19 一并发版——简历经历分类、岗位收藏夹、云端缓存指纹、收藏夹文案修复；`pyproject` 1.4.0→1.5.0、`docs/release-notes/v1.5.0.md` + 附注 tag；语料/指标保持 5832 条 / 81 家、160/161，测试 267→285
 - ✅ LLM 生成式报告解读 + 学习计划：report_interpreter（DeepSeek，LLM 优先/模板兜底），差距报告页新增「AI 解读 + 学习计划」区块
 - ✅ 快手爬虫：社招（逆向 sign HMAC-SHA256）+ 校招（POST 无 sign），共 1396 条完整 JD
 - ✅ DeepSeek 详情：33 条从列表升级为完整 JD（平均 1267 字）
@@ -74,7 +75,7 @@
 - DeepSeek API key 已配置到用户环境变量
 - 首屏冷启动（v1.3.1）：全语料抽取 24.3s → 1.5s（`str.find` 替代逐 token `re.finditer`，输出逐条一致），默认首屏不再 import sklearn；本机 AppTest 首屏 32s → 3.9s
 - 版本元数据（v1.3.1）：`pyproject.toml` 的 `version` 由 `0.1.0` 对齐为 `1.3.1`；README 加动态 Release 徽章 + 「版本与发布」章节 + 路线图 W10；新增 `docs/RELEASING.md`（含重打 tag 路径）与 `tests/test_release_metadata.py`（pyproject 版本必须等于最新 `docs/release-notes/vX.Y.Z.md`，漏改即红）
-- git 工作区干净，main 与远程一致；tag **v1.4.0** 已发布（数据源扩充：哔哩哔哩 / 滴滴 / 美团，正文 `docs/release-notes/v1.4.0.md`；上一版本 v1.3.1「首屏冷启动 + 3.10 CI 修复」）
+- git 工作区干净，main 与远程一致；tag **v1.5.0** 已发布（求职闭环：经历分类 + 岗位收藏夹 + 云端缓存修复，正文 `docs/release-notes/v1.5.0.md`；上一版本 v1.4.0「数据源扩充：哔哩哔哩 / 滴滴 / 美团」）
 - CI 绿：GitHub Actions 全绿（`metrics` + `test (3.10)` + `test (3.12)`；`-m "not slow"`，nightly 跑含 slow 的全量）；**3.10 与 3.12 都跑快测 283 用例（含 3 个 AppTest；本地全量 285 含 2 个 slow）**，覆盖率门槛 55% 只在 3.12 上统计（实测 3.10 全套 88s / 3.12 含覆盖率 76s）
 - AppTest「3.10 超时」根因（已定位并修复）：不是 AppTest 挂起，而是 `pytest --cov` 在 3.10 上走 `sys.settrace` 逐行追踪，把首屏「全语料抽取」的约 160 万次 Python 层 `re.finditer` 放慢约 15 倍（实测正则调用 5.8k/s；3.12 用 PEP 669 `sys.monitoring` 为 80k/s，只慢 1.3 倍）→ 首屏 14.5s 膨胀到 ~240s，正好撞 `default_timeout=240`。修复：CI 在 3.10 上不传 `--cov`（用例全跑），覆盖率门槛保留在 3.12；`tests/test_app.py` 的版本 skip 已删除
 - 首屏冷启动优化：`RuleBaselineExtractor._iter_matches()` 不再「每 token 一次 `re.finditer`」，改为 `str.find` + 手工词边界（CJK token 的 pattern 本来就是 `re.escape`，ASCII token 只多「前后非字母数字」断言，步进规则与 `finditer` 对齐）→ 全语料 4582 条（v1.3.1 时口径）抽取 **24.3s → 1.5s**（同机 3.12）；`tests/test_rule_baseline.py::test_iter_matches_equivalent_to_regex_reference` 用旧正则做参照逐位置比对，全语料输出逐条一致。同时 `src/app/app.py` 把 `load_core()` 拆成「轻核心（词表 + 抽取器）」+ `load_engine()`（TF-IDF / 差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏「技能图谱」不再付 sklearn 开销 → AppTest 首屏 **32s → 3.9s**（本机；仅抽优化后是 8.8s）；新增 `scripts/bench_extract.py` 复现抽取耗时

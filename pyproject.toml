@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-skill-gap"
-version = "1.4.0"
+version = "1.5.0"
 description = "AI 岗位技能差距分析系统：面向非科班求职者的技能抽取、语义匹配与差距诊断"
 requires-python = ">=3.10,<3.13"
 readme = "README.md"

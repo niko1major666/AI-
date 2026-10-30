@@ -223,6 +223,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W17 | 发布 v1.4.0：三源扩充（哔哩哔哩 / 滴滴 / 美团）+ 接入前体检工具化 | ✅ 267 测试全绿；语料 5832 条 / 81 家（零技能 21.5%、must 60.0%、覆盖 160/161）；`docs/release-notes/v1.4.0.md` + tag v1.4.0，`release.yml` 自动建 Release；CI（metrics + test 3.10/3.12）绿 |
 | W18 | 迭代 7：求职闭环（经历分类 + 岗位收藏） | ✅ 284 测试通过（282 快测 + 2 slow）；简历经历新增 `kind`（work/internship/project/other），LLM 判定 + 正则按章节标题/角色/组织兜底（教育经历跳过），简历页分组展示、ATS 分别提示缺工作/实习或项目；新增 `src/matcher/job_favorites.py`（公司+归一化标题去重、上限 20、URL 编解码、按 job_id 还原）+ 侧边栏收藏夹（跨页面查看/移除/导出 JSON），差距报告与简历推荐 Top10 一键收藏，`?fav=` 刷新不丢；新增 `tests/test_job_favorites.py`，语料与指标不变 |
 | W19 | 修复云端显示旧语料（Streamlit 缓存） | ✅ 285 测试通过（283 快测 + 2 slow）；线上代码已有收藏夹但首屏仍是旧版 4582 条 / 78 家 → `@st.cache_data` 不随 `data/processed/jobs.jsonl` 变化失效。新增 `app._file_fingerprint()`（路径 + mtime_ns + size）并接入 `load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 缓存键；注意 Streamlit 跳过下划线开头参数，首版 `_mtime_ns`/`_size` 实际未参与哈希，已改正常命名并加缓存失效回归；推送后线上验收 5832 条 / 81 家 |
+| W20 | 发布 v1.5.0：求职闭环 + 云端缓存修复 | ✅ 285 测试全绿；`docs/release-notes/v1.5.0.md` + tag v1.5.0，`release.yml` 自动建 Release；包含经历分类、岗位收藏夹、缓存指纹与收藏夹文案修复；语料/指标保持 5832 条 / 81 家、160/161 |
 
 ## 八、数据采集与爬虫
 

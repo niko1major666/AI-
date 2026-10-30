@@ -1,7 +1,7 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- **v1.6.0 已交付（数据新鲜度 + 来源健康 + 简历隐私边界，待提交/推送）**：迭代 8 的 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active`、跨构建 `job_freshness.json`、近 7/30 天筛选与 14 来源健康报告全部带上；新增 `src/data/privacy.py`（上传前隐私确认、AI 增强默认关闭、外发前 PII 脱敏与 6,000 字截断、5 MB/30 页/5 万字/每会话 10 次限制），简历解析缓存改为 session 级。测试 296→**310**（308 快测 + 2 slow），语料/指标保持 5832 条 / 81 家、160/161（`docs/metrics.md` 零 diff）。
+- **v1.6.0 已发布（数据新鲜度 + 来源健康 + 简历隐私边界，tag `v1.6.0` / commit `01aae4f`）**：迭代 8 的 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active`、跨构建 `job_freshness.json`、近 7/30 天筛选与 14 来源健康报告全部带上；新增 `src/data/privacy.py`（上传前隐私确认、AI 增强默认关闭、外发前 PII 脱敏与 6,000 字截断、5 MB/30 页/5 万字/每会话 10 次限制），简历解析缓存改为 session 级。测试 296→**310**（308 快测 + 2 slow），语料/指标保持 5832 条 / 81 家、160/161（`docs/metrics.md` 零 diff）。
 - **迭代 3 已完成（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）**：规则学习路径、报告导出（md/docx）、多岗对比、反向岗位推荐、技能画像、公司×技能矩阵、简历补强建议；抽取/匹配回归基线 + 语料快照 + 覆盖率门槛（55%）+ 3.10/3.12 矩阵 + nightly + `docs/metrics.md`；测试 131→201 全绿（v1.3.1 后 203，迭代 6 后 213；W13–W16 数据扩充后 267：265 快测 + 2 slow；迭代 7 后 284：282 快测 + 2 slow；v1.5.0 后 285：283 快测 + 2 slow）
 - 迭代 2 已交付（commit `5777ff9`）：技能 147→161、学习资源 11→106、`Skill.skip_extract` 修正「量化」噪声
 - 迭代 1 已交付（commit `427f271`）：must/nice 三级判定、零技能岗位代理兜底、岗位内 tf 加权、简历解析缓存
@@ -87,7 +87,7 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 发布 v1.6.0（数据新鲜度 + 来源健康 + 简历隐私边界）：`docs/release-notes/v1.6.0.md`、`pyproject` 1.5.0→1.6.0 已完成；提交后打 tag 并观察 CI / Release；重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
+1. 观察 v1.6.0 的 CI（3.10/3.12 + metrics）结果；Release 已发布（tag `v1.6.0` / commit `01aae4f`）。重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
 2. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
 3. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 4. 岗位订阅（邮件/站内提醒，收藏夹已交付）

@@ -77,7 +77,7 @@
 - DeepSeek API key 已配置到用户环境变量
 - 首屏冷启动（v1.3.1）：全语料抽取 24.3s → 1.5s（`str.find` 替代逐 token `re.finditer`，输出逐条一致），默认首屏不再 import sklearn；本机 AppTest 首屏 32s → 3.9s
 - 版本元数据（v1.3.1）：`pyproject.toml` 的 `version` 由 `0.1.0` 对齐为 `1.3.1`；README 加动态 Release 徽章 + 「版本与发布」章节 + 路线图 W10；新增 `docs/RELEASING.md`（含重打 tag 路径）与 `tests/test_release_metadata.py`（pyproject 版本必须等于最新 `docs/release-notes/vX.Y.Z.md`，漏改即红）
-- v1.6.0 工作区：数据新鲜度 + 来源健康 + 简历隐私边界已实现并通过 308 快测 + 2 slow，**待提交/推送/tag**；上一版本 `v1.5.0` 已发布（求职闭环：经历分类 + 岗位收藏夹 + 云端缓存修复）
+- v1.6.0 已发布：数据新鲜度 + 来源健康 + 简历隐私边界，tag `v1.6.0`（commit `01aae4f`），Release 由工作流创建；本地 308 快测 + 2 slow 全绿，等待 main CI 矩阵结果；上一版本 `v1.5.0`（求职闭环：经历分类 + 岗位收藏夹 + 云端缓存修复）
 - CI：v1.5.0 时 GitHub Actions 全绿（`metrics` + `test (3.10)` + `test (3.12)`）；v1.6.0 本地 **308 快测 + 2 slow = 310 用例**，提交/tag 后观察 3.10/3.12 矩阵（3.10 不跑覆盖率；3.12 覆盖率门槛 55%）
 - AppTest「3.10 超时」根因（已定位并修复）：不是 AppTest 挂起，而是 `pytest --cov` 在 3.10 上走 `sys.settrace` 逐行追踪，把首屏「全语料抽取」的约 160 万次 Python 层 `re.finditer` 放慢约 15 倍（实测正则调用 5.8k/s；3.12 用 PEP 669 `sys.monitoring` 为 80k/s，只慢 1.3 倍）→ 首屏 14.5s 膨胀到 ~240s，正好撞 `default_timeout=240`。修复：CI 在 3.10 上不传 `--cov`（用例全跑），覆盖率门槛保留在 3.12；`tests/test_app.py` 的版本 skip 已删除
 - 首屏冷启动优化：`RuleBaselineExtractor._iter_matches()` 不再「每 token 一次 `re.finditer`」，改为 `str.find` + 手工词边界（CJK token 的 pattern 本来就是 `re.escape`，ASCII token 只多「前后非字母数字」断言，步进规则与 `finditer` 对齐）→ 全语料 4582 条（v1.3.1 时口径）抽取 **24.3s → 1.5s**（同机 3.12）；`tests/test_rule_baseline.py::test_iter_matches_equivalent_to_regex_reference` 用旧正则做参照逐位置比对，全语料输出逐条一致。同时 `src/app/app.py` 把 `load_core()` 拆成「轻核心（词表 + 抽取器）」+ `load_engine()`（TF-IDF / 差距分析，才 import sklearn，本机冷导入 4.5s），默认首屏「技能图谱」不再付 sklearn 开销 → AppTest 首屏 **32s → 3.9s**（本机；仅抽优化后是 8.8s）；新增 `scripts/bench_extract.py` 复现抽取耗时

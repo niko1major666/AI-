@@ -13,6 +13,8 @@ from dataclasses import asdict, dataclass, field
 
 import requests
 
+from .privacy import LLM_RESUME_CHARS, mask_pii
+
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PHONE_RE = re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)")
 DEGREE_RE = re.compile(r"(博士|硕士|研究生|本科|学士|大专|专科)")
@@ -169,8 +171,6 @@ _LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提
 
 字段（没有就填空值 / 空数组）：
 - name: 姓名（字符串）
-- email: 邮箱（字符串）
-- phone: 手机号（字符串）
 - highest_degree: 最高学历（博士/硕士/本科/大专/其他 之一）
 - school: 毕业院校（字符串）
 - major: 所学专业（字符串）
@@ -182,6 +182,9 @@ _LLM_PROMPT = """你是专业的简历解析助手。从下面的简历文本提
     tech_stack(用到的技术栈字符串数组)
     （同一段经历只出现一次；不要把教育经历写进 experiences）
 - skills: 技能字符串数组（编程语言/框架/算法/工具，尽量用标准名称）
+
+注意：邮箱、手机号、身份证号、银行卡号、微信/QQ、详细住址已替换为「[xx已隐藏]」，
+不要猜测或补全这些内容，也不要输出 email / phone 字段。
 
 简历文本：
 {text}
@@ -215,18 +218,25 @@ def _get_api_key() -> str:
     return ""
 
 
+def has_llm_api_key() -> bool:
+    """是否配置了可用的 DeepSeek key（页面用于展示 AI 增强是否真正可用）。"""
+    return bool(_get_api_key())
+
+
 def llm_parse_resume(text: str) -> dict | None:
     """用 DeepSeek LLM 增强解析（姓名/工作经历等正则难做的字段）。无 key/失败返回 None。
 
-    超时从 90s 收紧到 25s 并重试一次：原值在网络抖动时会把页面卡住一分半，
-    而解析失败已有正则兜底，宁可快速降级。
+    隐私边界：发送前强制用 `mask_pii` 替换直接联系方式，并只截取前
+    `LLM_RESUME_CHARS` 字。超时从 90s 收紧到 25s 并重试一次：原值在网络抖动时
+    会把页面卡住一分半，而解析失败已有正则兜底，宁可快速降级。
     """
     api_key = _get_api_key()
     if not api_key:
         return None
+    safe_text = mask_pii(text).text[:LLM_RESUME_CHARS]
     payload = {
         "model": _DEEPSEEK_MODEL,
-        "messages": [{"role": "user", "content": _LLM_PROMPT.format(text=text[:6000])}],
+        "messages": [{"role": "user", "content": _LLM_PROMPT.format(text=safe_text)}],
         "response_format": {"type": "json_object"},
         "temperature": 0,
         "max_tokens": 1500,
@@ -313,17 +323,19 @@ def _extract_experiences_regex(text: str) -> list:
     return exps
 
 
-def parse_resume_full(text: str) -> ResumeProfile:
-    """正则 + LLM 合并解析：LLM 优先（更准确完整），正则兜底（无 key/失败时）。"""
+def parse_resume_full(text: str, *, allow_llm: bool = True) -> ResumeProfile:
+    """正则 + LLM 合并解析：LLM 优先（更准确完整），正则兜底（无 key/失败时）。
+
+    allow_llm=False 用于用户未授权外发简历的场景：完全不调用 LLM，只跑本地正则。
+    联系方式（email / phone）只认本地正则结果，**不接受 LLM 返回值**——LLM 收到的
+    文本已经脱敏，返回联系方式只可能是猜测。
+    """
     profile = parse_resume(text)
-    llm = llm_parse_resume(text)
+    llm = llm_parse_resume(text) if allow_llm else None
     if llm:
-        if llm.get("name"):
-            profile.name = str(llm["name"])
-        if llm.get("email"):
-            profile.email = str(llm["email"])
-        if llm.get("phone"):
-            profile.phone = str(llm["phone"])
+        name = str(llm.get("name") or "").strip()
+        if name and "已隐藏" not in name and not profile.name:
+            profile.name = name
         if llm.get("highest_degree"):
             profile.highest_degree = str(llm["highest_degree"])
         if llm.get("school"):

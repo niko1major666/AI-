@@ -121,6 +121,10 @@ def test_resume_page_strength_and_recommendations(monkeypatch):
     at.sidebar.radio[0].set_value("简历匹配").run()
     assert not at.exception, f"app exceptions: {at.exception}"
 
+    consent = next(c for c in at.checkbox if "我已阅读并同意" in c.label)
+    consent.set_value(True).run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
     extract_btn = next(b for b in at.button if b.label == "提取技能")
     extract_btn.click().run()
     assert not at.exception, f"app exceptions: {at.exception}"
@@ -129,6 +133,29 @@ def test_resume_page_strength_and_recommendations(monkeypatch):
     assert any("适合我的岗位" in s.value for s in at.subheader)
     assert any("覆盖率" in m.label for m in at.metric)
     assert at.dataframe, "岗位推荐应有表格"
+
+
+def test_resume_page_requires_privacy_consent(monkeypatch):
+    """未勾选隐私同意时，即使 file_uploader 返回了文件也不能读取内容。"""
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    import streamlit as st
+
+    class _ExplodingUpload:
+        name = "resume.txt"
+
+        def getvalue(self):
+            raise AssertionError("未同意隐私说明时不应读取上传文件")
+
+    monkeypatch.setattr(st, "file_uploader", lambda *a, **k: _ExplodingUpload())
+
+    at = AppTest.from_file(str(APP), default_timeout=180)
+    at.run()
+    at.sidebar.radio[0].set_value("简历匹配").run()
+    assert not at.exception, f"app exceptions: {at.exception}"
+
+    consent = next(c for c in at.checkbox if "我已阅读并同意" in c.label)
+    assert consent.value is False
+    assert any("请先阅读并勾选同意" in i.value for i in at.info)
 
 
 def test_load_jobs_cache_invalidates_when_data_file_changes(tmp_path, monkeypatch):

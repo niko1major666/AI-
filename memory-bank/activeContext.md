@@ -1,7 +1,7 @@
 # 活跃上下文（Active Context）
 
 ## 当前工作焦点
-- **迭代 8 已交付（数据新鲜度 + 来源健康，待发版）**：岗位新增 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active`；`merge_jobs` 按文件名写来源、按源 CSV mtime 写抓取时间，`build_dataset` 用 `data/processed/job_freshness.json` 跨构建保留首次发现时间；差距报告支持「全部 / 近 7 天 / 近 30 天」筛选、显示“N 天前更新”、超 30 天提示可能下线；新增 `docs/source_health.md`（14 来源）并由 CI 校验不陈旧。测试 285→**296**（294 快测 + 2 slow），语料/指标保持 5832 条 / 81 家、160/161（`docs/metrics.md` 零 diff）。
+- **v1.6.0 已交付（数据新鲜度 + 来源健康 + 简历隐私边界，待提交/推送）**：迭代 8 的 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active`、跨构建 `job_freshness.json`、近 7/30 天筛选与 14 来源健康报告全部带上；新增 `src/data/privacy.py`（上传前隐私确认、AI 增强默认关闭、外发前 PII 脱敏与 6,000 字截断、5 MB/30 页/5 万字/每会话 10 次限制），简历解析缓存改为 session 级。测试 296→**310**（308 快测 + 2 slow），语料/指标保持 5832 条 / 81 家、160/161（`docs/metrics.md` 零 diff）。
 - **迭代 3 已完成（功能扩展 C1–C7 + 评测/CI 加固 D1–D7）**：规则学习路径、报告导出（md/docx）、多岗对比、反向岗位推荐、技能画像、公司×技能矩阵、简历补强建议；抽取/匹配回归基线 + 语料快照 + 覆盖率门槛（55%）+ 3.10/3.12 矩阵 + nightly + `docs/metrics.md`；测试 131→201 全绿（v1.3.1 后 203，迭代 6 后 213；W13–W16 数据扩充后 267：265 快测 + 2 slow；迭代 7 后 284：282 快测 + 2 slow；v1.5.0 后 285：283 快测 + 2 slow）
 - 迭代 2 已交付（commit `5777ff9`）：技能 147→161、学习资源 11→106、`Skill.skip_extract` 修正「量化」噪声
 - 迭代 1 已交付（commit `427f271`）：must/nice 三级判定、零技能岗位代理兜底、岗位内 tf 加权、简历解析缓存
@@ -14,11 +14,12 @@
 - 词表 **161 技能**（命中 160/161，仅「联邦学习」语料未出现）；学习资源 **106/161（65.8%）**
 - 硬性要求 **60.0% 岗位 / 平均 1.80 项**（句内触发词 7340 / 章节归属 974 / 占比兜底 2191）；最高技能需求占比 **38.6%**（大模型）
 - 抽取 F1 test 0.9565 / 全量 0.9123；TF-IDF Recall@5 skill_pair 0.9750 / resume_sentence 0.2200
-- 测试 **296**（294 快测 + 2 slow）；覆盖率 64.65%（CI 门槛 55%）
+- 测试 **310**（308 快测 + 2 slow）；覆盖率 CI 门槛 55%（v1.6.0 新增用例后需以 CI 结果为准）
 
 ## 近期变更（按时间倒序）
 
-- **迭代 8：数据新鲜度 + 来源健康（2026-10-30，待发版）**：① `merge_jobs.py` 用文件名映射写入 `source`、用源 CSV mtime 写入 `crawl_time`（此前所有岗位被写成 `local_csv` + 构建时间）；② 新增 `src/data/freshness.py`：`first_seen_at` 跨构建保留、`last_seen_at` 取源抓取时间、历史未出现 job_id 标记 `active=false`，状态落 `data/processed/job_freshness.json`；③ `build_dataset` 输出新字段并保持向后兼容；④ 差距报告下拉显示“N 天前更新”，新增「全部 / 近 7 天 / 近 30 天」筛选，超 30 天岗位提示“可能已下线”，简历 Top10 增加“更新”列；⑤ 新增 `src/data/source_health.py` + `scripts/source_health.py` 生成 `docs/source_health.md`（14 来源：岗位/公司/最新抓取/发布覆盖/零技能/超期/已消失/状态），CI main 分支重跑并 `git diff --exit-code` 防陈旧；⑥ 新增 `test_freshness.py` / `test_source_health.py` / `test_merge_jobs.py`，测试 285→**296**；重跑 `docs/metrics.md` 零 diff。
+- **v1.6.0：隐私 / PII / 上传限制（2026-10-30，随 v1.6.0 发版）**：① 新增 `src/data/privacy.py`——上传前必须确认隐私说明，DeepSeek 增强单独 opt-in 且默认关闭；`mask_pii` 对外发文本强制隐藏邮箱、手机号、18 位身份证、16–19 位银行卡、微信/QQ、详细住址，并只发送前 6,000 字；② `validate_upload` / `validate_resume_text` / `parse_bytes(max_pages=...)` 限制 5 MB、PDF 30 页、文本 5 万字、DOCX 解压 50 MB，`.streamlit/config.toml` 设服务端 5 MB；③ 简历解析缓存从跨会话 `st.cache_data` 改为 `st.session_state`（SHA-256 键，最多 3 份），每会话最多 10 次简历 LLM；未同意时清除 `resume_text` / `resume_profile_cache`；④ LLM 返回的 email/phone 不再覆盖本地正则结果，联系方式只认本地；⑤ `docs/privacy.md` 完整说明 + 页面 `docs/privacy.md` 摘要版本 `2026-10-30`；测试 296→**310**。
+- **迭代 8：数据新鲜度 + 来源健康（2026-10-30，随 v1.6.0 发版）**：① `merge_jobs.py` 用文件名映射写入 `source`、用源 CSV mtime 写入 `crawl_time`（此前所有岗位被写成 `local_csv` + 构建时间）；② 新增 `src/data/freshness.py`：`first_seen_at` 跨构建保留、`last_seen_at` 取源抓取时间、历史未出现 job_id 标记 `active=false`，状态落 `data/processed/job_freshness.json`；③ `build_dataset` 输出新字段并保持向后兼容；④ 差距报告下拉显示“N 天前更新”，新增「全部 / 近 7 天 / 近 30 天」筛选，超 30 天岗位提示“可能已下线”，简历 Top10 增加“更新”列；⑤ 新增 `src/data/source_health.py` + `scripts/source_health.py` 生成 `docs/source_health.md`（14 来源：岗位/公司/最新抓取/发布覆盖/零技能/超期/已消失/状态），CI main 分支重跑并 `git diff --exit-code` 防陈旧；⑥ 新增 `test_freshness.py` / `test_source_health.py` / `test_merge_jobs.py`，测试 285→**296**；重跑 `docs/metrics.md` 零 diff。
   - 诚实限制：源 CSV 本身不含抓取时间，`crawl_time` 用文件 mtime 近似；状态文件首次启用时 `first_seen_at` 以当前各源抓取时间为准，之后增量维护。
   - 新增 `data/processed/job_freshness.json` 为新鲜度状态文件（已加入 `.gitignore` 白名单），需与 `jobs.jsonl` 一起提交。
 
@@ -86,14 +87,15 @@
 28. 迭代 1 缺陷修复：must/nice 改为 JD 原文三级判定（`src/matcher/jd_requirements.py`：句内触发词 → 章节标题 → 全行业占比兜底），修复「需求占比 ≥ 0.4 恒不成立 → P0 恒空」；零技能岗位（1085 条 / 23.7%）改用同公司相似岗位代理（`src/matcher/job_neighbors.py`，覆盖 98.7%）并在页面标注来源；匹配度加权加入岗位内 `1 + ln tf`；`rule_baseline.extract()` 单次扫描同时产出 span 与词频；简历结构化解析按文本 `st.cache_data` 缓存，DeepSeek 超时 90s→25s 并重试一次；测试 108 → 122（新增 `test_jd_requirements.py` / `test_job_neighbors.py` / AppTest 差距页交互）
 
 ## 下一步（按价值排序）
-1. 发布 v1.6.0（数据新鲜度 + 来源健康）：提交/CI 绿后补 `docs/release-notes/v1.6.0.md`、`pyproject` 1.5.0→1.6.0、tag；重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
+1. 发布 v1.6.0（数据新鲜度 + 来源健康 + 简历隐私边界）：`docs/release-notes/v1.6.0.md`、`pyproject` 1.5.0→1.6.0 已完成；提交后打 tag 并观察 CI / Release；重点复核 `docs/source_health.md` 的 14 来源状态与 `data/processed/job_freshness.json` 入库
 2. 阿里/智谱数据补充（需继续探查招聘渠道）；美团校招/实习走 PC 版 `jobType` 过滤（校招 196 / 实习 371，JD 齐全）待接入；滴滴校招/实习在 Moka（响应 AES 密文），可逆向密钥后补齐
 3. 观察 keep-alive 任务 + nightly 全量测试（Actions 页面确认跑通，必要时 `workflow_dispatch` 手动触发）
 4. 岗位订阅（邮件/站内提醒，收藏夹已交付）
 5. BGE 进 CI（模型缓存化）
 
 ## 活跃决策与考量
-- 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）
+- 简历解析：**LLM 优先、正则兜底**（LLM 更准确完整，无 key 时降级）；但 **AI 增强默认关闭**，必须用户主动 opt-in
+- 简历隐私：外发前强制 `mask_pii` + 前 6,000 字；联系方式只认本地正则（LLM 返回值忽略）；解析缓存只放 `st.session_state`，不进入跨会话缓存；差距报告的 AI 解读在未开启简历 AI 增强时不发送专业名称
 - API key 获取：**环境变量优先、Streamlit secrets 兜底**，并过滤占位符/非 ASCII 值（避免 `.streamlit/secrets.toml` 占位符覆盖真实 key）
 - 行业重要度：**数据驱动**（JD 需求频率），而非人工标定
 - 匹配：差距报告「简历自由文本→技能」场景**优先用 BGE**（有评测实证）
@@ -104,9 +106,11 @@
 - 数据/脚本/测试分离；改动后必跑 pytest + 语法检查
 - **上下文/输出预算按 `memory-bank/workingAgreements.md` 执行**：单文件单次 ≤400 行（大文件分页）、命令输出先过滤、里程碑后固化记忆并优先新开会话；不为省 token 牺牲安全、测试口径与关键决策
 - **Streamlit 缓存必须绑定文件指纹**：`@st.cache_data` 不感知数据文件变化，云端会「代码新版、语料旧版」；缓存键参数用 `mtime_ns`/`size`，且**不要以下划线开头**（Streamlit 跳过这类参数）
+- **含 PII 的数据不能用跨会话 `st.cache_data`**：简历解析结果只放 `st.session_state`；对外部 LLM 的调用必须先脱敏并单独取得用户同意，页面要显示实际隐藏了哪些类别
 
 ## 学习与洞察
 - st.secrets 会读取本地 `.streamlit/secrets.toml` 占位符，覆盖环境变量 key → HTTP header latin-1 编码崩溃；key 获取应环境变量优先 + 过滤占位符
+- `st.cache_data` 是跨会话缓存：把完整简历文本作为键会让 PII 在服务端长期驻留，且可能在后续会话命中；含个人数据的派生结果应放 `st.session_state`（会话结束释放）
 - CI 只装轻量依赖（requirements.txt），测试需避免触发重依赖路径（如 PDF 文字 <10 字符会回退 OCR，需要 pymupdf，CI 未装）
 - 快手 JD 含 U+2028/2029（行/段分隔符）：json.dumps(ensure_ascii=False) 保留裸字符，splitlines() 读回误当换行符截断 JSON → build_dataset 写时显式转义 + load_jobs 改用 split("\n")
 - 弱标注无法替代人工标注的边界精度（NER 细粒度任务）

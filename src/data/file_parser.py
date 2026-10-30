@@ -6,18 +6,24 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
+
+from .privacy import UploadValidationError
 
 _SUPPORTED = {".pdf", ".docx", ".txt", ".md", ".text"}
 
 
-def parse_bytes(filename: str, data: bytes) -> str:
-    """解析上传文件字节流为文本（用于 Streamlit file_uploader）。"""
+def parse_bytes(filename: str, data: bytes, *, max_pages: Optional[int] = None) -> str:
+    """解析上传文件字节流为文本（用于 Streamlit file_uploader）。
+
+    max_pages 仅对 PDF 生效：在提取文字/OCR 前拒绝超页文件，避免扫描件把
+    整个请求拖入长时间 OCR。默认 None 表示不限制（脚本解析本地文件时可用）。
+    """
     suffix = Path(filename).suffix.lower()
     if suffix == ".pdf":
-        text = _pdf_text(data)
+        text = _pdf_text(data, max_pages=max_pages)
         if len(text.strip()) < 10:
-            text = _pdf_ocr(data)
+            text = _pdf_ocr(data, max_pages=max_pages)
         return text
     if suffix == ".docx":
         import docx
@@ -33,13 +39,14 @@ def parse_file(path: Union[str, Path]) -> str:
     return parse_bytes(p.name, p.read_bytes())
 
 
-def _pdf_text(data: bytes) -> str:
+def _pdf_text(data: bytes, *, max_pages: Optional[int] = None) -> str:
     from pypdf import PdfReader
     reader = PdfReader(BytesIO(data))
+    _check_page_limit(len(reader.pages), max_pages)
     return "\n".join((page.extract_text() or "") for page in reader.pages).strip()
 
 
-def _pdf_ocr(data: bytes) -> str:
+def _pdf_ocr(data: bytes, *, max_pages: Optional[int] = None) -> str:
     """扫描件兜底：pymupdf 渲染页面 + rapidocr OCR。"""
     try:
         import fitz  # pymupdf
@@ -51,6 +58,7 @@ def _pdf_ocr(data: bytes) -> str:
     try:
         engine = RapidOCR()
         doc = fitz.open(stream=data, filetype="pdf")
+        _check_page_limit(len(doc), max_pages)
         lines = []
         for page in doc:
             pix = page.get_pixmap(dpi=200)
@@ -62,6 +70,11 @@ def _pdf_ocr(data: bytes) -> str:
         return "\n".join(lines).strip()
     except Exception as e:  # noqa: BLE001
         return f"[OCR 失败：{e}]"
+
+
+def _check_page_limit(pages: int, max_pages: Optional[int]) -> None:
+    if max_pages and pages > max_pages:
+        raise UploadValidationError(f"PDF 页数过多：{pages} 页（上限 {max_pages} 页）")
 
 
 def _docx_to_text(doc) -> str:

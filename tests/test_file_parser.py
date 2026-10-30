@@ -3,6 +3,7 @@ from io import BytesIO
 import pytest
 
 from src.data.file_parser import parse_bytes
+from src.data.privacy import UploadValidationError
 
 
 def test_parse_txt():
@@ -29,6 +30,22 @@ def test_parse_unsupported():
 def test_parse_pdf():
     pdf = _make_minimal_pdf("Hello PDF text layer")
     assert "Hello PDF" in parse_bytes("a.pdf", pdf)
+
+
+def test_parse_pdf_rejects_too_many_pages():
+    from pypdf import PdfWriter
+    writer = PdfWriter()
+    writer.add_blank_page(width=612, height=792)
+    writer.add_blank_page(width=612, height=792)
+    buf = BytesIO()
+    writer.write(buf)
+    with pytest.raises(UploadValidationError, match="PDF 页数过多"):
+        parse_bytes("resume.pdf", buf.getvalue(), max_pages=1)
+
+
+def test_parse_pdf_allows_page_limit():
+    pdf = _make_minimal_pdf("Hello PDF text layer")
+    assert "Hello PDF" in parse_bytes("a.pdf", pdf, max_pages=1)
 
 
 def _make_minimal_pdf(text):

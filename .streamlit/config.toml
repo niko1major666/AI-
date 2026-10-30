@@ -1,0 +1,4 @@
+# Streamlit 服务端上传上限（MB）。应用层还会再次校验文件类型/大小/PDF 页数/文本长度，
+# 见 src/data/privacy.py；这里先拦住超大请求，避免文件被完整传入进程。
+[server]
+maxUploadSize = 5

@@ -4,10 +4,10 @@
 - **语言**：Python 3.12
 - **技能抽取**：规则基线（词表字典）+ BERT-NER（transformers 微调 bert-base-chinese）
 - **语义匹配**：TF-IDF（char n-gram）+ BGE-base-zh-v1.5（sentence-transformers）
-- **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）
-- **前端**：Streamlit + pyvis（图谱可视化）
+- **简历解析**：正则 + DeepSeek LLM（`requests` 直调 chat/completions，兼容 OpenAI 接口）；AI 增强默认关闭，外发前经 `src/data/privacy.py` 脱敏并截断
+- **前端**：Streamlit + pyvis（图谱可视化）；`.streamlit/config.toml` 设 `server.maxUploadSize = 5`
 - **爬虫**：requests + Playwright（chromium headless）
-- **工程**：pytest（296 用例 = 294 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`；来源健康 `scripts/source_health.py`
+- **工程**：pytest（310 用例 = 308 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`；来源健康 `scripts/source_health.py`
 
 ## 开发设置
 - 项目根目录：`D:\ai-skill-gap`
@@ -18,8 +18,8 @@
 - SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
-- 当前版本：**v1.5.0**（tag，2026-10-29；发布说明 `docs/release-notes/v1.5.0.md`）
-- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，296 测试；3.10 只跑用例、3.12 加覆盖率门槛；metrics job 同时校验 `docs/metrics.md` 与 `docs/source_health.md`）
+- 当前版本：**v1.6.0**（tag，2026-10-30；发布说明 `docs/release-notes/v1.6.0.md`）
+- CI：`.github/workflows/ci.yml`（push/PR 跑 `requirements.txt` 轻量依赖 + pytest，310 测试；3.10 只跑用例、3.12 加覆盖率门槛；metrics job 同时校验 `docs/metrics.md` 与 `docs/source_health.md`）
 
 ## 技术约束（★ 关键，防崩）
 - **版本锁**：`transformers<5`、`sentence-transformers<6`（ModelScope 1.x 的 siamese_uie 是 transformers 4.x 时代代码，装 5.x 会崩）
@@ -28,6 +28,8 @@
 - **国内镜像**：`HF_ENDPOINT=https://hf-mirror.com`
 - **Windows**：无 symlink（HF 缓存降级警告无害）；PowerShell 环境
 - **Streamlit 缓存**：`@st.cache_data` / `@st.cache_resource` 不感知数据文件变化，数据类缓存统一把 `(_file_fingerprint)` 的 `(path, mtime_ns, size)` 作为参数；参数名**不要以下划线开头**（会被跳过、不进缓存键）
+- **PII 不进全局缓存**：`st.cache_data` 是跨会话缓存，简历文本/解析结果不可放进去；用 `st.session_state`（会话结束释放），并限制每会话 LLM 次数
+- **上传边界**：单文件 ≤5 MB（`.streamlit/config.toml` + `privacy.validate_upload` 双重）、PDF ≤30 页、文本 ≤50,000 字、DOCX 解压 ≤50 MB；外发 LLM 前强制 `mask_pii` + 前 6,000 字
 - **新鲜度时间口径**：`last_seen_at` = 源 CSV mtime（不是构建时间），构建不会刷新；`first_seen_at` 由 `data/processed/job_freshness.json` 跨构建保留。该状态文件已加入 `.gitignore` 白名单，需与 `jobs.jsonl` 一起提交。
 
 ## 依赖要点

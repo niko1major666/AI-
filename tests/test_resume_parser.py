@@ -1,3 +1,4 @@
+import src.data.resume_parser as resume_parser
 from src.data.resume_parser import (ats_suggestions, llm_parse_resume,
                                     parse_resume, parse_resume_full,
                                     _extract_experiences_regex,
@@ -49,6 +50,55 @@ def test_ats_quantify_suggestion():
 def test_llm_no_key_returns_none(monkeypatch):
     monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
     assert llm_parse_resume("张三 本科 清华大学") is None
+
+
+def test_llm_payload_is_masked_before_send(monkeypatch):
+    """外发前必须脱敏；否则手机号/邮箱会直接进入第三方 API。"""
+    captured = {}
+
+    class _Resp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"choices": [{"message": {"content": "{}"}}]}
+
+    def _fake_post(url, headers=None, json=None, timeout=None):
+        captured["payload"] = json
+        return _Resp()
+
+    monkeypatch.setattr(resume_parser, "_get_api_key", lambda: "sk-test")
+    monkeypatch.setattr(resume_parser.requests, "post", _fake_post)
+    text = "张三 13800138000 zhangsan@example.com 身份证 110101199003071234 技能 Python"
+    assert llm_parse_resume(text) == {}
+    content = captured["payload"]["messages"][0]["content"]
+    assert "13800138000" not in content
+    assert "zhangsan@example.com" not in content
+    assert "110101199003071234" not in content
+    assert "手机号已隐藏" in content
+    assert "邮箱已隐藏" in content
+
+
+def test_parse_full_can_disable_llm(monkeypatch):
+    """用户未授权时不得调用 LLM，即使配置了 API key。"""
+    def _must_not_call(_text):
+        raise AssertionError("allow_llm=False 时不应调用 LLM")
+
+    monkeypatch.setattr(resume_parser, "llm_parse_resume", _must_not_call)
+    text = "2023.06-至今 腾讯科技有限公司 算法工程师"
+    profile = parse_resume_full(text, allow_llm=False)
+    assert profile.experiences[0]["company"] == "腾讯科技有限公司"
+
+
+def test_parse_full_ignores_llm_contact_fields(monkeypatch):
+    """LLM 收到的是脱敏文本，它返回的联系方式只能是猜测，不能覆盖本地正则结果。"""
+    monkeypatch.setattr(
+        resume_parser, "llm_parse_resume",
+        lambda _text: {"email": "fake@example.com", "phone": "13900000000"},
+    )
+    profile = parse_resume_full("张三 13800138000 real@example.com 本科 清华大学")
+    assert profile.email == "real@example.com"
+    assert profile.phone == "13800138000"
 
 
 def test_parse_full_fallback_without_key(monkeypatch):

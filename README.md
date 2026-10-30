@@ -25,6 +25,7 @@
 8. 学习与投递闭环：**规则版学习路径**（无 API key 也出三阶段计划，含先修顺序/学时/周数）、**简历补强建议**（针对 P0 缺口给出「改写要点」或「补小项目」，不编造经历）、**报告导出**（Markdown / Word）
 9. 多岗位视角：**多岗位对比**（匹配度、共性缺口、各岗独有缺口）、**反向岗位推荐**（简历技能 → Top 10 岗位）、**技能画像**（按类别的需求加权覆盖率）、**公司 × Top 技能矩阵**（技能图谱页）
 10. 求职闭环：简历经历区分 **工作/实习** 与 **项目**（LLM 判定 → 正则按章节/角色兜底，教育经历不计入），ATS 建议分别提示缺哪类经历；**岗位收藏夹**（差距报告/简历推荐一键收藏，按「公司 + 归一化标题」去重、上限 20，收藏写进链接 `?fav=` 刷新不丢，可导出 JSON），侧边栏跨页面查看与移除
+11. 简历隐私与上传边界：上传前必须确认**隐私说明**，DeepSeek 增强**单独可选、默认关闭**；仅外发前 6,000 字且强制隐藏邮箱/手机号/证件号/银行卡/微信 QQ/详细住址；单文件 ≤5 MB、PDF ≤30 页、文本 ≤5 万字、每会话 ≤10 次 AI 简历解析。完整说明见 [`docs/privacy.md`](docs/privacy.md)
 
 ## 二、技术选型
 
@@ -55,6 +56,7 @@ modelscope[framework]>=1.40
 
 ```
 ai-skill-gap/
+├── .streamlit/         config.toml（服务端上传上限 5 MB）+ secrets（不入库）
 ├── configs/            dataset / extraction / matching 三份 YAML
 ├── data/
 │   ├── raw/            原始 JD（seed 样例 sample_jobs.csv 已入库）
@@ -62,15 +64,15 @@ ai-skill-gap/
 │   ├── gold/           人工标注金标准（算 F1 / Recall@5）
 │   └── kb/             skill_taxonomy(161技能·难度+重要度[需求频率驱动]) / learning_resources(106 项)
 ├── src/
-│   ├── data/           schema / normalize / freshness(★新鲜度) / source_health(来源健康) / job_filter(★标题过滤) / load / build_dataset / skill_stats / resume_advice
+│   ├── data/           schema / normalize / freshness(★新鲜度) / source_health(来源健康) / privacy(★PII/上传边界) / job_filter(★标题过滤) / load / build_dataset / skill_stats / resume_advice
 │   ├── extractor/      SiameseUIE / BERT-NER / 规则基线
 │   ├── matcher/        TF-IDF / BGE / gap 分析 / jd_requirements(must 判定) / job_neighbors(零技能代理)
 │   │                   / learning_path(规则学习路径) / job_compare(多岗对比) / job_recommender(反向推荐) / strength_profile(技能画像) / job_favorites(岗位收藏)
 │   ├── crawler/        13 个爬虫模块 / 14 个数据源（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/哔哩哔哩/滴滴/美团/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面 + report_export（报告导出）
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / source_health(来源健康) / validate_kb(KB 校验)
-├── tests/              pytest（296 用例已通过，其中 2 个 slow 留给 nightly）
-├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）+ source_health.md（来源健康）
+├── tests/              pytest（310 用例已通过，其中 2 个 slow 留给 nightly）
+├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）+ source_health.md（来源健康）+ privacy.md（简历隐私说明）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
 └── README.md
@@ -119,7 +121,7 @@ powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1
 
 ![公司 × Top 12 技能](docs/images/company_skill_matrix.png)
 
-**简历匹配**：上传简历 → 结构化解析（正则 + DeepSeek LLM，含工作/实习 vs 项目经历分类 + 细粒度职责/量化成果/技术栈）→ 技能提取 → ATS 建议
+**简历匹配**：确认隐私说明 → 可选开启 DeepSeek 增强 → 上传简历 → 结构化解析（正则 + LLM，含工作/实习 vs 项目经历分类 + 细粒度职责/量化成果/技术栈）→ 技能提取 → ATS 建议（AI 外发前自动脱敏，关闭时只走本地规则）
 
 ![简历匹配](docs/images/resume_match.png)
 
@@ -225,6 +227,7 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 | W19 | 修复云端显示旧语料（Streamlit 缓存） | ✅ 285 测试通过（283 快测 + 2 slow）；线上代码已有收藏夹但首屏仍是旧版 4582 条 / 78 家 → `@st.cache_data` 不随 `data/processed/jobs.jsonl` 变化失效。新增 `app._file_fingerprint()`（路径 + mtime_ns + size）并接入 `load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 缓存键；注意 Streamlit 跳过下划线开头参数，首版 `_mtime_ns`/`_size` 实际未参与哈希，已改正常命名并加缓存失效回归；推送后线上验收 5832 条 / 81 家 |
 | W20 | 发布 v1.5.0：求职闭环 + 云端缓存修复 | ✅ 285 测试全绿；`docs/release-notes/v1.5.0.md` + tag v1.5.0，`release.yml` 自动建 Release；包含经历分类、岗位收藏夹、缓存指纹与收藏夹文案修复；语料/指标保持 5832 条 / 81 家、160/161 |
 | W21 | 数据新鲜度 + 来源健康 | ✅ 296 测试通过（294 快测 + 2 slow）；岗位新增 `first_seen_at` / `last_seen_at` / `is_active`，`merge_jobs` 写 `source` / `crawl_time`，跨构建状态 `job_freshness.json`；差距报告显示“更新于 X 天前”、支持近 7 / 30 天筛选、超 30 天提示“可能已下线”；新增 `docs/source_health.md`（14 来源的规模/发布时间覆盖/零技能率/超期统计）+ CI 陈旧校验；语料仍 5832 条 / 81 家，指标零 diff |
+| W22 | 简历隐私告知 + PII 脱敏 + 上传限制 | ✅ 310 测试通过（308 快测 + 2 slow）；新增 `src/data/privacy.py`：上传前必确认隐私说明、AI 增强单独 opt-in（默认关闭）、外发前强制脱敏 6 类直接联系方式、仅发送前 6,000 字；限制 5 MB / PDF 30 页 / 5 万字 / DOCX 解压 50 MB / 每会话 10 次 LLM；简历解析缓存从跨会话 `st.cache_data` 改为 session 级；新增 `docs/privacy.md` 与 `tests/test_privacy.py` |
 
 ## 八、数据采集与爬虫
 
@@ -269,6 +272,14 @@ Streamlit Community Cloud 的应用在一段时间无人访问后会休眠（sle
 # 重新合并 + 构建后生成来源健康报告（含零技能抽取，约 2 秒）
 .\.venv\Scripts\python.exe scripts/source_health.py
 ```
+### 简历隐私与上传边界
+
+- 上传前必须勾选同意；**AI 增强默认关闭**，关闭时简历只在本服务进程内用正则解析，不调用第三方 API。
+- 开启 AI 增强后，只发送简历前 6,000 字；发送前自动隐藏邮箱、手机号、身份证号、银行卡号、微信/QQ 与详细住址。姓名、学校、公司、项目经历等正文仍可能可识别，**并非完全匿名**。
+- 上传限制：单文件 ≤5 MB（`.streamlit/config.toml` + 应用层双重校验）、支持 PDF/DOCX/TXT/MD、PDF ≤30 页、解析文本 ≤50,000 字、DOCX 解压后 ≤50 MB；每会话最多 10 次 AI 简历解析。
+- 简历解析结果不再进入跨会话的 `st.cache_data`，改为 `st.session_state` 会话级缓存；完整数据处理说明见 [`docs/privacy.md`](docs/privacy.md)。
+
+
 
 
 1. **`_signature` 签名**（字节 / 小米校招 / MiniMax）：岗位接口 POST 带前端 JS 生成的 `_signature` 签名，直接构造请求成本高，改为 Playwright 让页面自行发请求并拦截响应（`page.on("response")`）拿到真实 JSON。

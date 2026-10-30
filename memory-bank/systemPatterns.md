@@ -36,7 +36,7 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 1. **双路技能抽取**：规则基线（词表字典，F1 0.957 对词表内极稳）+ 微调 BERT-NER（能学上下文）。SiameseUIE 零样本对抽象技能 F1=0 已被弃用。
 2. **双路语义匹配**：TF-IDF（char n-gram 基线）+ BGE-base-zh（语义 SOTA）。差距报告的「简历自由文本→技能」场景优先 BGE（口语化句子评测 2.25 倍于 TF-IDF）。
 3. **importance 数据驱动**：行业重要度 = 5832 条 JD 需求频率分档（≥10%→5 … <1%→1），替换人工标定；优先级算法叠加学习难度加权修正「频率≠价值」偏差。语料每次扩容后跑 `scripts/recalc_importance.py` 重算，并同步更新 `tests/test_skillkb.py` 中的分档断言。
-4. **LLM 增强 + 正则降级**：简历解析用 DeepSeek（`DEEPSEEK_API_KEY`），LLM 优先、正则兜底，无 key 不报错。
+4. **LLM 增强 + 正则降级（隐私优先）**：简历解析用 DeepSeek（`DEEPSEEK_API_KEY`），LLM 优先、正则兜底，无 key 不报错；但 AI 增强必须用户主动 opt-in（默认关闭），外发前强制 `mask_pii` 并只发前 6,000 字，联系方式只认本地正则返回值。
 5. **云端部署分层**：运行依赖（requirements.txt）与重模型依赖（requirements-ml.txt）拆分；清洗数据 `data/processed/jobs.jsonl` 入库；LLM key 走 Streamlit secrets 优先、环境变量兜底；app.py 启动时把项目根目录加入 sys.path。
 6. **岗位标题过滤**：只按**标题**剔除土建/施工等非 AI 岗位（黑名单 + AI 白名单保护），不做正文过滤——正文里的「桥梁」多为「业务与技术之间的桥梁」比喻（25 条真实样本验证过），按正文删会误伤真岗位。实现 `src/data/job_filter.py`，开关与词表覆盖在 `configs/dataset.yaml` 的 `cleaning.title_filter`，剔除条数计入 `build_stats.json` 的 `dropped_offtopic`。
 7. **must/nice 读 JD 原文，不读全行业频率**：曾经用 `demand >= 0.4` 判硬性要求，但语料里最高需求占比只有 38.6%，判据恒为 False（P0 恒空、must_weight 失效）。现在 `src/matcher/jd_requirements.py` 三级判定：句内触发词（加分语气优先，避免「熟悉 X 优先」被判硬门槛）→ 章节标题（任职要求 / 加分项）→ 全行业占比兜底；`demand` 只用于优先级排序与说明文案。实测 60.0% 岗位可判出 ≥1 项硬性要求（1.80 项/岗；句内 7340 / 章节 974 / 兜底 2191）。
@@ -56,12 +56,14 @@ scripts/         eval_all / validate_kb / merge_jobs / recrawl_all / recalc_impo
 
 18. **Streamlit 缓存必须显式绑定数据文件指纹**：`@st.cache_data` / `@st.cache_resource` 只看函数代码与**显式参数**，不会感知被读取文件的变化。v1.4.0 数据已入库、云端代码也已有收藏夹，但线上首屏仍是旧版 **4582 条 / 78 家**（新版应为 5832 / 81）——原因就是 `load_jobs` / `extract_corpus` 的缓存键没变。修复：`app._file_fingerprint()` 返回 `(path, mtime_ns, size)`，`load_core` / `load_engine` / `load_jobs` / `extract_corpus` / `_recommendations` 都把它作为缓存参数；注意 Streamlit **会跳过以下划线开头的参数**（不参与哈希），所以缓存键参数不能命名为 `_mtime_ns` / `_size`（首版就是这么写错的，被回归用例抓住）。锁死用例：`tests/test_app.py::test_load_jobs_cache_invalidates_when_data_file_changes`；线上验收数字：JD 5832、公司 81（旧版 4582 / 78）。
 
+19. **简历隐私边界：先授权、再脱敏、最后才外发**：`src/data/privacy.py` 把隐私说明、上传校验、PII 脱敏、会话配额集中在一处。上传前必须勾选说明；DeepSeek 增强单独 opt-in、默认关闭；`llm_parse_resume` 在构造请求前调用 `mask_pii`（邮箱/手机号/身份证/银行卡/微信 QQ/详细住址）并截前 6,000 字；`parse_resume_full` 只接受本地正则提取的 email/phone，LLM 返回值一律忽略。上传限制 5 MB / PDF 30 页 / 文本 5 万字 / DOCX 解压 50 MB / 每会话 10 次 LLM。含 PII 的简历解析结果**不能放跨会话 `st.cache_data`**，改用 `st.session_state` + SHA-256 键（最多 3 份）；用户撤回同意时清除 `resume_text` / `resume_profile_cache`。注意：正则脱敏不等于匿名化，姓名/学校/公司/经历仍可能识别个人，页面与 `docs/privacy.md` 必须如实说明。
+
 ## 设计模式
 - **接口抽象**：`Extractor.extract()`、`Matcher.fit()/search()`，便于多实现对比评测
 - **dataclass 数据模型**：`JobPosting`、`SkillSpan`、`GapItem`、`GapReport`、`ResumeProfile`、`LearningPath/Stage/Step`、`ComparedJob/CompareResult`、`JobSuggestion`
 - **纯函数 + 薄 UI**：`learning_path` / `job_compare` / `job_recommender` / `strength_profile` / `skill_stats` / `resume_advice` / `report_export` 都不依赖 Streamlit，页面只做取值与渲染，便于单测
 - **配置化**：configs/*.yaml（dataset/extraction/matching），column_mapping 适配未知 CSV
-- **缓存资源**：Streamlit `@st.cache_resource`（load_core）、`@st.cache_data`（load_jobs/extract_corpus/_resume_profile/_recommendations）
+- **缓存资源**：Streamlit `@st.cache_resource`（load_core）、`@st.cache_data`（load_jobs/extract_corpus/_recommendations；均绑定文件指纹）；含 PII 的 `_resume_profile` 只放 `st.session_state`
 - **诚实标注**：所有实验（含失败）记录在 README / PROJECT_REPORT.md
 
 ## 组件关系

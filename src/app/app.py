@@ -16,6 +16,17 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.data import freshness
+from src.data.privacy import (
+    LLM_RESUME_CHARS,
+    MAX_PDF_PAGES,
+    MAX_RESUME_LLM_CALLS,
+    PRIVACY_NOTICE_VERSION,
+    UploadValidationError,
+    mask_pii,
+    privacy_notice_markdown,
+    validate_resume_text,
+    validate_upload,
+)
 from src.data.source_health import source_label as _source_label
 from src.data.translate import translate_title as _translate_title
 from src.matcher.jd_requirements import judge_requirements
@@ -461,27 +472,110 @@ def _cooccurrence_html(taxonomy, rows):
     for a, b in edges:
         net.add_edge(a, b)
     return net.generate_html()
-@st.cache_data(show_spinner=False, max_entries=32)
-def _resume_profile(text: str):
-    """简历结构化解析缓存：同一份简历在后续 rerun 中不再重复调 LLM（原先每次 rerun 都调）。"""
-    from src.data.resume_parser import parse_resume_full
-    return parse_resume_full(text)
+
+
+def _resume_profile(text: str, *, allow_llm: bool):
+    """当前会话内缓存简历解析结果；不再使用全局 `st.cache_data` 保存简历/解析结果。
+
+    Streamlit 的 `st.cache_data` 是**跨会话**缓存：把完整简历文本作为键会让 PII
+    在服务端长期驻留，且可能在后续会话命中。这里改为 `st.session_state`，随会话
+    结束释放；同一份简历在 rerun 时仍不会重复调用 LLM。
+    """
+    import hashlib
+
+    from src.data.resume_parser import has_llm_api_key, parse_resume_full
+
+    cache = st.session_state.setdefault("resume_profile_cache", {})
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    key_llm = f"{digest}:1"
+    key_local = f"{digest}:0"
+    if allow_llm and key_llm in cache:
+        return cache[key_llm]
+    if not allow_llm and key_local in cache:
+        return cache[key_local]
+
+    llm_allowed = bool(allow_llm and has_llm_api_key())
+    if allow_llm and llm_allowed:
+        used = int(st.session_state.get("resume_llm_calls", 0))
+        if used >= MAX_RESUME_LLM_CALLS:
+            st.warning(f"本会话 AI 简历解析已达 {MAX_RESUME_LLM_CALLS} 次上限，"
+                       "本次改用本地规则解析")
+            llm_allowed = False
+        else:
+            st.session_state["resume_llm_calls"] = used + 1
+
+    key = key_llm if llm_allowed else key_local
+    if key not in cache:
+        if len(cache) >= 3:
+            cache.clear()
+        cache[key] = parse_resume_full(text, allow_llm=llm_allowed)
+    return cache[key]
 
 
 def page_resume(taxonomy, rule, analyzer, rows=None):
     st.header("简历匹配")
-    uploaded = st.file_uploader("上传简历附件（支持 PDF / DOCX / TXT）",
-                                type=["pdf", "docx", "txt", "md"])
+
+    # ---- 隐私告知与授权（上传前必读；AI 增强单独可选）----
+    st.subheader("🔐 简历数据处理说明")
+    with st.expander("查看隐私说明（上传前必读）", expanded=True):
+        st.markdown(privacy_notice_markdown())
+    acknowledged = st.checkbox(
+        "我已阅读并同意《简历数据处理说明》，知悉直接联系方式会在外发前脱敏",
+        key=f"resume_privacy_ack_{PRIVACY_NOTICE_VERSION}",
+    )
+    allow_llm = st.checkbox(
+        f"允许将脱敏后的简历前 {LLM_RESUME_CHARS:,} 字发送至 DeepSeek API（可选）",
+        key="resume_llm_optin",
+        disabled=not acknowledged,
+        help="不勾选时只使用本地正则解析，不调用第三方 API；勾选后仍会自动隐藏邮箱、手机号、证件号等",
+    )
+
+    from src.data.resume_parser import has_llm_api_key
+    llm_available = has_llm_api_key()
+    if acknowledged and allow_llm and not llm_available:
+        st.info("当前未配置 DeepSeek API key，AI 增强不可用；将使用本地规则解析。")
+    if not acknowledged:
+        # 撤回授权时同步清除当前会话中的简历与解析结果，避免残留继续被报告页使用
+        for session_key in ("resume_text", "resume_profile_cache"):
+            st.session_state.pop(session_key, None)
+        st.info("请先阅读并勾选同意，再上传简历；未同意时不会读取文件内容。")
+
+    uploaded = st.file_uploader(
+        "上传简历附件（支持 PDF / DOCX / TXT / MD，单个文件 ≤ 5 MB，PDF ≤ 30 页）",
+        type=["pdf", "docx", "txt", "md"],
+        disabled=not acknowledged,
+    )
+    if not acknowledged:
+        return
     if uploaded is None:
         st.info("上传你的简历文件，系统会解析文本并提取技能")
         return
 
     try:
         from src.data.file_parser import parse_bytes
-        text = parse_bytes(uploaded.name, uploaded.getvalue())
+
+        raw = uploaded.getvalue()
+        validate_upload(uploaded.name, raw)
+        text = validate_resume_text(
+            parse_bytes(uploaded.name, raw, max_pages=MAX_PDF_PAGES)
+        )
+    except UploadValidationError as e:
+        st.error(str(e))
+        return
     except Exception as e:  # noqa: BLE001
         st.error(f"文件解析失败：{e}")
         return
+
+    if allow_llm and llm_available:
+        masked = mask_pii(text)
+        if masked.total:
+            st.caption(f"🔐 已启用 AI 增强：发送前将隐藏{masked.summary}，"
+                       f"且仅发送前 {LLM_RESUME_CHARS:,} 字；姓名/学校/公司/经历等正文仍可能可识别。")
+        else:
+            st.caption(f"🔐 已启用 AI 增强：未检测到邮箱/手机号等直接联系方式；"
+                       f"仅发送前 {LLM_RESUME_CHARS:,} 字，姓名/学校/公司/经历等正文仍可能可识别。")
+    else:
+        st.caption("🔒 未启用 AI 增强：简历只在当前服务进程内用规则解析，不发送给第三方 API。")
 
     # 供「差距报告」页生成针对 P0 的简历补强建议
     st.session_state["resume_text"] = text
@@ -489,9 +583,9 @@ def page_resume(taxonomy, rule, analyzer, rows=None):
     with st.expander("查看解析出的文本", expanded=False):
         st.text(text[:5000] + ("…" if len(text) > 5000 else ""))
 
-    # 结构化解析（正则 + DeepSeek LLM 增强，无 key 自动降级正则）；结果按简历文本缓存
+    # 结构化解析（正则 + 可选 DeepSeek 增强）；结果缓存在当前会话，不跨会话共享
     from src.data.resume_parser import ats_suggestions
-    profile = _resume_profile(text)
+    profile = _resume_profile(text, allow_llm=allow_llm)
     # 与「差距报告」联动：把解析出的专业写入会话，报告页据此生成专业相关建议
     st.session_state["user_majors"] = list(profile.majors or [])
 
@@ -698,14 +792,19 @@ def _render_learning_path(taxonomy, rep, meta):
 def _render_ai_plan(rep, meta):
     """AI 解读（按「岗位 + 技能」缓存：勾选已学进度触发的 rerun 不会重复调 LLM）。"""
     st.subheader("🤖 AI 解读 + 学习计划")
-    key = (meta.get("job_id"), tuple(meta.get("skills") or []))
+    st.caption("AI 解读只发送目标岗位与技能名称；专业名称仅在你开启简历 AI 增强时发送，"
+               "不发送简历原文。")
+    # 用户未授权简历外发时，不把从简历解析出的专业名称带给第三方
+    user_majors = (st.session_state.get("user_majors", [])
+                   if st.session_state.get("resume_llm_optin") else [])
+    key = (meta.get("job_id"), tuple(meta.get("skills") or []), tuple(user_majors))
     if st.session_state.get("gap_interp_key") != key:
         with st.spinner("正在生成 AI 解读与学习计划…"):
             from src.matcher.report_interpreter import interpret_report
             st.session_state["gap_interp"] = interpret_report(
                 rep, target_job=meta.get("job_title", ""),
                 user_skills=meta.get("skills") or [],
-                user_majors=st.session_state.get("user_majors", []),
+                user_majors=user_majors,
             )
         st.session_state["gap_interp_key"] = key
     interp = st.session_state.get("gap_interp") or {}

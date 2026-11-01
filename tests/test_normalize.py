@@ -23,6 +23,27 @@ def test_normalize_company_strips_parenthetical():
     assert normalize_company("阿里巴巴（中国）有限公司") == "阿里巴巴"
 
 
+def test_normalize_company_merges_explicit_alias():
+    assert normalize_company("字节跳动") == "字节跳动"
+    assert normalize_company("字节") == "字节跳动"
+    assert normalize_company("字节") == normalize_company("字节跳动")
+
+
+def test_normalize_company_alias_applied_after_cleanup():
+    # 别名表在去括号 / 去法律后缀 / 去空白之后生效
+    assert normalize_company("字节（北京）") == "字节跳动"
+    assert normalize_company(" 字节 有限公司 ") == "字节跳动"
+
+
+def test_normalize_company_alias_is_exact_match_only():
+    # 反例：小红书不与任何公司合并
+    assert normalize_company("小红书") == "小红书"
+    assert normalize_company("小红书") != normalize_company("字节")
+    # 只做精确整串匹配，不做前缀 / 子串匹配
+    assert normalize_company("字节智能") == "字节智能"
+    assert normalize_company("字节跳动科技") == "字节跳动科技"
+
+
 def test_parse_salary_k_month():
     assert parse_salary("30-60K·15薪") == (30.0, 60.0, 15)
 

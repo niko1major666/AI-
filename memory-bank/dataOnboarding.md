@@ -72,7 +72,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 
 | 位置 | 要改什么 |
 |---|---|
-| `tests/test_dataset_snapshot.py` | 精确常量 `5832 / 81 / 5645`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
+| `tests/test_dataset_snapshot.py` | 精确常量 `5837 / 81 / 5649`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
 | `tests/test_skillkb.py` | 个别技能 importance 断言（如 `PROG.PYTHON=5`、`BIGDATA.FLINK=3`）——占比变了就要重跑 `recalc_importance.py` 再对齐 |
 | `scripts/preflight_new_source.py` | `ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`（与 snapshot 测试同步） |
 | `docs/metrics.md` | `python scripts/eval_all.py` 生成，CI 在 main 上 `git diff --exit-code` 校验是否过期 |
@@ -80,15 +80,15 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 | `README.md` | 数据源表「条数」+ 公司分布行 + 量化指标段 + 路线图新增 W 行 |
 | `PROJECT_REPORT.md` | §四 各源条数、§五 数据规模 / 零技能 / must 占比 |
 | `memory-bank/*` | `activeContext`（当前状态）、`progress`（本轮记录）、`techContext`（测试数）、`systemPatterns`（口径） |
-| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 1252 / 21.5% / 98.1%）、`src/matcher/jd_requirements.py`（60.0% / 4580 / 7340·974·2191）、`src/extractor/rule_baseline.py`（5832） |
+| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 1254 / 21.5% / 98.1%）、`src/matcher/jd_requirements.py`（60.0% / 4580 / 7340·974·2191）、`src/extractor/rule_baseline.py`（5837） |
 
 ## 6. 当前基线（W16 接入美团之后，2026-10）
 
 | 指标 | 值 | 来源 |
 |---|---|---|
-| 语料 | 5832 条 / 81 家 / 5645 唯一「公司+标题」 | `build_stats.json` |
-| 原始抓取 | 6321 条（过短 7 + 标题过滤 6 + 去重 476） | 同上 |
-| 零技能岗位 | 1252 条（21.5%），98.1% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
+| 语料 | 5837 条 / 81 家 / 5649 唯一「公司+标题」 | `build_stats.json` |
+| 原始抓取 | 6632 条（过短 7 + 标题过滤 6 + 去重 476） | 同上 |
+| 零技能岗位 | 1254 条（21.5%），98.1% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
 | 有技能岗位 | 4580 条（must 判定的分母） | `jd_requirements` |
 | 技能覆盖 | 160/161（缺「联邦学习」，语料未出现） | `test_dataset_snapshot` slow |
 | 学习资源 | 106/161（65.8%） | `learning_resources.yaml` |

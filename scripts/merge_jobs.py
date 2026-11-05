@@ -19,7 +19,7 @@ FILES = ["tech_jobs.csv", "tencent_ai_jobs.csv", "bytedance_ai_jobs.csv",
          "huawei_ai_jobs.csv", "xiaomi_ai_jobs.csv", "xiaomi_campus_jobs.csv",
          "deepseek_ai_jobs.csv", "kimi_ai_jobs.csv", "minimax_ai_jobs.csv",
          "kuaishou_ai_jobs.csv", "xiaohongshu_ai_jobs.csv", "bilibili_ai_jobs.csv",
-         "didi_ai_jobs.csv", "meituan_ai_jobs.csv"]
+         "didi_ai_jobs.csv", "meituan_ai_jobs.csv", "meituan_campus_jobs.csv"]
 
 SOURCE_BY_FILE = {
     "tech_jobs.csv": "tech_kaggle",
@@ -36,6 +36,7 @@ SOURCE_BY_FILE = {
     "bilibili_ai_jobs.csv": "bilibili",
     "didi_ai_jobs.csv": "didi",
     "meituan_ai_jobs.csv": "meituan",
+    "meituan_campus_jobs.csv": "meituan_campus",
 }
 
 

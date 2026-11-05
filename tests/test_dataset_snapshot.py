@@ -17,9 +17,9 @@ JOBS = ROOT / "data" / "processed" / "jobs.jsonl"
 STATS = ROOT / "data" / "processed" / "build_stats.json"
 TAX = ROOT / "data" / "kb" / "skill_taxonomy.yaml"
 
-EXPECTED_ROWS = 5832
+EXPECTED_ROWS = 5837
 EXPECTED_COMPANIES = 81
-EXPECTED_UNIQUE_COMPANY_TITLE = 5645
+EXPECTED_UNIQUE_COMPANY_TITLE = 5649
 REQUIRED_FIELDS = {"job_id", "title", "company", "jd_text", "source",
                    "first_seen_at", "last_seen_at", "is_active"}
 

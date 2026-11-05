@@ -27294,6 +27294,36 @@
       "last_seen_at": "2026-10-26T11:20:46.194685+00:00",
       "source": "meituan"
     },
+    "mtc_3763421415": {
+      "active": true,
+      "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "source": "meituan_campus"
+    },
+    "mtc_4794351656": {
+      "active": true,
+      "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "source": "meituan_campus"
+    },
+    "mtc_4877169253": {
+      "active": true,
+      "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "source": "meituan_campus"
+    },
+    "mtc_4881355498": {
+      "active": true,
+      "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "source": "meituan_campus"
+    },
+    "mtc_4885726947": {
+      "active": true,
+      "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
+      "source": "meituan_campus"
+    },
     "xhs_10056": {
       "active": true,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -34993,6 +35023,6 @@
       "source": "xiaohongshu"
     }
   },
-  "updated_at": "2026-10-30T09:35:23.969366+00:00",
+  "updated_at": "2026-11-05T19:57:19.710049+00:00",
   "version": 1
 }

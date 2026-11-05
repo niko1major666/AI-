@@ -14,6 +14,14 @@ _COMPANY_SUFFIXES = [
     "inc.", "inc", "ltd.", "ltd", "llc", "plc",
 ]
 
+# 公司别名表：只收敛「同一家公司的不同写法」，收敛到语料里已有的规范写法（统计口径不变）。
+# key = 归一后（去括号 / 去法律后缀 / 去空白 / 小写）的写法，value = 现有语料中的规范写法。
+# 仅做「精确整串匹配」，不做前缀 / 子串匹配，避免把「字节智能」这类其它主体误合并。
+# 扩展方式：右侧统一填现有语料中的写法；新增 key 前先确认唯一公司数 / 零技能率是否变化。
+_COMPANY_ALIASES = {
+    "字节": "字节跳动",
+}
+
 _SALARY_NEG = {"面议", "薪资面议", "薪资面谈", "open", "薪资open"}
 
 
@@ -30,7 +38,7 @@ def clean_text(s) -> str:
 
 
 def normalize_company(s) -> str:
-    """公司名归一：去括号、去法律形式后缀、小写。"""
+    """公司名归一：去括号、去法律形式后缀、去空白、小写，再按别名表收敛到规范写法。"""
     t = clean_text(s).lower()
     t = re.sub(r"[（(].*?[)）]", "", t)
     t = re.sub(r"\s+", "", t)
@@ -43,7 +51,8 @@ def normalize_company(s) -> str:
                 break
         if not stripped:
             break
-    return t.strip()
+    t = t.strip()
+    return _COMPANY_ALIASES.get(t, t)
 
 
 def sha1_text(s) -> str:

@@ -31,8 +31,8 @@
 - `scripts/merge_jobs.py` 的 `FILES`（合并顺序 = 去重时的保留优先级）与 `SOURCE_BY_FILE`（来源标识，写入 `source`）
 - `scripts/recrawl_all.py` 的 `CRAWLERS`（一键重爬能看到它）
 
-> 已知硬化债：`merge_jobs.py` / `analyze_skills.py` / `verify_real.py` 里仍是
-> `ROOT = Path("D:/ai-skill-gap")` 绝对路径，换机器要先改成仓库相对路径。
+> 历史硬化债已在 v1.7.0 清零：`merge_jobs.py` / `analyze_skills.py` / `verify_real.py` 的 `ROOT`
+> 全部改为 `Path(__file__).resolve().parents[1]`，并由 `tests/test_script_paths.py` 静态拦截回退。
 
 ## 3. 体检（`scripts/preflight_new_source.py`，只读，约 2 秒）
 
@@ -111,8 +111,8 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 
 ## 8. 已知缺口（按优先级）
 
-1. `company_aliases` 配置 + 接进 `normalize_company()`——体检只能报「写法分裂」，不能自动合并。
-2. `analyze_skills.py` / `verify_real.py` 的 `ROOT = Path("D:/ai-skill-gap")` 改仓库相对路径（`merge_jobs.py` 已在迭代 8 改为 `Path(__file__).parents[1]`）。
+1. **已完成（v1.7.0）**：公司别名显式映射 —— `src/data/normalize.py` 的 `_COMPANY_ALIASES`（精确整串匹配，`字节`→`字节跳动`），配 `tests/test_normalize.py` 反例（小红书 / 字节智能 不得合并）。注意 `configs/dataset.yaml` 的 `company_aliases` 是**候选列名**，不是别名表。
+2. **已完成（v1.7.0）**：`analyze_skills.py` / `verify_real.py` 的 `ROOT` 改为 `Path(__file__).resolve().parents[1]`；`tests/test_script_paths.py` 静态回归（正/反斜杠写法都拦，且不 import 脚本以免拉 datasets）。
 3. `data/processed/jobs.jsonl`（18.9MB）入库而 `data/raw/*` 不入库 ⇒ **语料不可复现**，每次扩数据多一个二进制 blob；建议 raw 走 Release 附件或 Git LFS。
 4. 代理（`job_neighbors`）对「无可用相似岗位的公司」缺兜底文案，扩源后要复测。
 

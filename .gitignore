@@ -30,3 +30,13 @@ data/gold/*.tmp
 .DS_Store
 Thumbs.db
 *.log
+
+# 密钥与本机配置（v1.7.0 加固：这些文件即便误建也不该入库）
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519

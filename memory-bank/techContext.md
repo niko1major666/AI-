@@ -10,7 +10,7 @@
 - **工程**：pytest（310 用例 = 308 快测 + 2 slow）、Docker、yaml 配置化、pandas；数据扩充体检 `scripts/preflight_new_source.py`；来源健康 `scripts/source_health.py`
 
 ## 开发设置
-- 项目根目录：`D:\ai-skill-gap`
+- 项目根目录：仓库根（脚本一律用 `Path(__file__)` 推导，勿写死本机路径；`tests/test_no_hardcoded_paths.py` 会拦）
 - 虚拟环境：`.venv\Scripts\python.exe`
 - 模型缓存：`models/hf_cache`（HF_HOME）、`models/ms_cache`（ModelScope）
 - 环境变量：`DEEPSEEK_API_KEY`（用户级，简历 LLM 解析）

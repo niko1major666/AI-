@@ -2,13 +2,18 @@
 # Creates a Python 3.12 venv on the project drive, installs deps,
 # and keeps all heavy caches INSIDE the project (delete project = free disk).
 $ErrorActionPreference = "Stop"
-$UV    = "C:\Users\QWB20\.local\bin\uv.exe"
+# Resolve uv from PATH (override with $env:UV_EXE); never hardcode a machine path.
+$UV = $env:UV_EXE
+if (-not $UV) {
+    $cmd = Get-Command uv -ErrorAction SilentlyContinue
+    if ($cmd) { $UV = $cmd.Source }
+}
 $Root  = Split-Path -Parent $PSScriptRoot
 $Venv  = Join-Path $Root ".venv"
 $Req   = Join-Path $Root "requirements.txt"
 $Models = Join-Path $Root "models"
 
-if (-not (Test-Path $UV)) { throw "uv not found at $UV. Install uv first." }
+if (-not $UV -or -not (Test-Path $UV)) { throw "uv not found. Install uv (https://docs.astral.sh/uv/) or set UV_EXE to its full path." }
 
 Write-Host "[1/5] Creating Python 3.12 venv ..."
 if (Test-Path $Venv) { Remove-Item -Recurse -Force $Venv }

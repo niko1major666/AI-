@@ -1,6 +1,7 @@
 # 进度（Progress）
 
 ## 什么能用（已完成）
+- ✅ v1.7.0 工程加固：脚本根路径与 `uv` 不再写死本机路径（4 个脚本）、公司别名显式映射（`字节`→`字节跳动`，精确整串）、`.gitignore` 覆盖 secrets/.env/证书、`tests/test_no_hardcoded_paths.py` 防回退；新增 `docs/source-triage-v1.7.md`（14 源体检基线：5832 条 / 81 家 / 14 来源，发布覆盖 72.0%，零技能 21.5%，重复 id 0 条）
 - ✅ 数据采集：5832 条真实 JD / 81 家公司（腾讯/字节/小米/DeepSeek/华为/Kimi/MiniMax/快手/小红书/美团/滴滴/哔哩哔哩 + 英文科技岗位），含部门/发布时间与 `source` / `crawl_time` / `first_seen_at` / `last_seen_at` / `is_active` 新鲜度字段
 - ✅ 技能抽取：规则基线（F1 0.957）+ BERT-NER（exact 0.636 / overlap 0.909，已恢复旧模型），161 技能（难度+重要度）
 - ✅ 语义匹配：TF-IDF + BGE；口语化句子评测 Recall@5：BGE 0.54 vs TF-IDF 0.24（147 技能词表时期；161 技能下 TF-IDF 当前基线 0.2200，见 `docs/metrics.md`）

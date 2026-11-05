@@ -10,6 +10,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Iterable, Optional
 
+from . import job_family
 from .freshness import parse_time
 
 SOURCE_LABELS = {
@@ -27,6 +28,7 @@ SOURCE_LABELS = {
     "bilibili": "哔哩哔哩",
     "didi": "滴滴",
     "meituan": "美团",
+    "meituan_campus": "美团校招",
     "local_csv": "本地 CSV",
 }
 
@@ -85,6 +87,14 @@ def build_report(jobs: Iterable[dict], *, state: Optional[dict] = None,
                 if zero_skill_ids is not None else None)
         zero_ratio = _pct(zero, total) if zero is not None else None
 
+        # 技术岗分层：职能岗（运营/产品/销售/财务…）抽不到技术技能是正常现象，
+        # 混在一起算会让零技能率长期偏高。见 src/data/job_family.py。
+        tech_rows = [r for r in group if job_family.is_tech_title(r.get("title"))]
+        tech_total = len(tech_rows)
+        tech_zero = (sum(1 for r in tech_rows if str(r.get("job_id") or "") in zero_skill_ids)
+                     if zero_skill_ids is not None else None)
+        tech_zero_ratio = _pct(tech_zero, tech_total) if (tech_zero is not None and tech_total) else None
+
         status = "ok"
         if zero_ratio is not None and total >= 20:
             if zero_ratio >= 0.50:
@@ -109,6 +119,9 @@ def build_report(jobs: Iterable[dict], *, state: Optional[dict] = None,
             "publish_time_coverage": _pct(publish_ok, total),
             "zero_skill_jobs": zero,
             "zero_skill_ratio": zero_ratio,
+            "tech_jobs": tech_total,
+            "tech_zero_skill_jobs": tech_zero,
+            "tech_zero_skill_ratio": tech_zero_ratio,
             "inactive_jobs": inactive_by_source.get(source, 0),
             "status": status,
         })
@@ -120,6 +133,9 @@ def build_report(jobs: Iterable[dict], *, state: Optional[dict] = None,
     total_publish = sum(s["publish_time_jobs"] for s in sources)
     total_zero = (sum(s["zero_skill_jobs"] or 0 for s in sources)
                   if zero_skill_ids is not None else None)
+    total_tech = sum(s["tech_jobs"] for s in sources)
+    total_tech_zero = (sum(s["tech_zero_skill_jobs"] or 0 for s in sources)
+                       if zero_skill_ids is not None else None)
     seen_all = [parse_time(r.get("last_seen_at")) for r in rows]
     latest = max((x for x in seen_all if x is not None), default=None)
     totals = {
@@ -132,6 +148,10 @@ def build_report(jobs: Iterable[dict], *, state: Optional[dict] = None,
         "publish_time_coverage": _pct(total_publish, total_jobs),
         "zero_skill_jobs": total_zero,
         "zero_skill_ratio": _pct(total_zero, total_jobs) if total_zero is not None else None,
+        "tech_jobs": total_tech,
+        "tech_zero_skill_jobs": total_tech_zero,
+        "tech_zero_skill_ratio": (_pct(total_tech_zero, total_tech)
+                                  if (total_tech_zero is not None and total_tech) else None),
         "inactive_history_jobs": sum(inactive_by_source.values()),
         "latest_seen_at": latest.isoformat() if latest else "",
     }
@@ -176,20 +196,25 @@ def render_markdown(report: dict) -> str:
     if t.get("zero_skill_jobs") is not None:
         lines.append(f"- 零技能岗位：**{t['zero_skill_jobs']}** 条"
                      f"（{_fmt_pct(t['zero_skill_ratio'])}，由规则抽取器统计）")
+    if t.get("tech_zero_skill_jobs") is not None:
+        lines.append(f"- 技术岗零技能：**{t['tech_zero_skill_jobs']}** 条 / 技术岗 **{t['tech_jobs']}** 条"
+                     f"（{_fmt_pct(t['tech_zero_skill_ratio'])}；职能岗不计入分母）")
     lines += [
         "",
         "## 分来源",
         "",
-        "| 来源 | 岗位 | 公司 | 最新抓取 | 距今 | 发布覆盖 | 零技能 | 可能下线 | 已消失 | 状态 |",
-        "|---|---:|---:|---|---:|---:|---:|---:|---:|---|",
+        "| 来源 | 岗位 | 公司 | 最新抓取 | 距今 | 发布覆盖 | 零技能 | 技术岗零技能 | 可能下线 | 已消失 | 状态 |",
+        "|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---|",
     ]
     for s in report["sources"]:
         zero = (f"{s['zero_skill_jobs']}（{_fmt_pct(s['zero_skill_ratio'])}）"
                 if s.get("zero_skill_jobs") is not None else "-")
+        tech_zero = (f"{s['tech_zero_skill_jobs']}（{_fmt_pct(s['tech_zero_skill_ratio'])}）"
+                     if s.get("tech_zero_skill_jobs") is not None else "-")
         lines.append(
             f"| {s['label']} (`{s['source']}`) | {s['jobs']} | {s['companies']} | "
             f"{s['last_seen_at'][:10] or '-'} | {_fmt_age(s['age_days'])} | "
-            f"{_fmt_pct(s['publish_time_coverage'])} | {zero} | {s['stale_jobs']} | "
+            f"{_fmt_pct(s['publish_time_coverage'])} | {zero} | {tech_zero} | {s['stale_jobs']} | "
             f"{s['inactive_jobs']} | {STATUS_LABELS.get(s['status'], s['status'])} |"
         )
     lines += [
@@ -197,6 +222,8 @@ def render_markdown(report: dict) -> str:
         "## 判定口径",
         "",
         "- 零技能率 ≥ 50%（岗位数 ≥ 20）→ 异常；≥ 35% → 关注（差距报告会用同公司相似岗位兜底）。",
+        "- 「技术岗零技能」只统计标题判定为技术岗的岗位（`src/data/job_family.py`），"
+        "用于区分「抽取器坏了」与「这岗位本来就不是技术岗」；**状态判定仍按总零技能率，未改阈值**。",
         f"- 超过 {report['stale_days']} 天未更新占比 ≥ 50% → 关注；发布时间覆盖 < 30% → 关注。",
         "- “已消失”依赖状态文件：只有跑过多次构建后才会累积，首次启用时为 0。",
         "",

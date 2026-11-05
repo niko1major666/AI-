@@ -15,6 +15,8 @@ from urllib.parse import quote
 import pandas as pd
 import requests
 
+from src.crawler.util import fmt_publish_time
+
 SECRET = "652f962a-0575-4575-98d2-f04e2291bee2"
 BASE = "https://zhaopin.kuaishou.cn/recruit/e/api/v1/open/positions/simple"
 CSV = "data/raw/kuaishou_ai_jobs.csv"
@@ -83,7 +85,10 @@ def to_rows(batch: list) -> list[dict]:
             "education": p.get("educationLimitCode") or "",
             "jd_text": jd.strip(),
             "department": p.get("departmentCode") or "",
-            "publish_time": "",
+            # 社招列表接口字段名不统一：按候选顺序取，取到即用，取不到留空（不编造）
+            "publish_time": fmt_publish_time(
+                p.get("releaseTime") or p.get("publishTime") or p.get("createTime") or ""
+            ),
         })
     return rows
 

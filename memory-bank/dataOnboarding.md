@@ -23,7 +23,7 @@
 | `job_id` **必须带源前缀**（`ks_` / `kimi_` / `hw51_` / `xhs_` / 自建 `ali_`） | `merge_jobs` 按 `job_id` `keep="first"` 去重，撞车 = 静默丢行（体检报 FAIL） |
 | `company` 用**统一中文名** | `normalize_company()` 只去后缀/括号/小写，**没有别名表**，「阿里」与「阿里巴巴」会算成两家 |
 | 正文放 `jd_text`，岗位名放 `title` | 标题黑/白名单只作用于 `title`，不做正文过滤 |
-| 整站爬虫要按岗位类别过滤 | 全站岗位里非技术岗大量零技能（哔哩哔哩 876 条中 42.4%、滴滴 1081 条中 39.8%、美团 3231 条中 57.4% 抽不到技能，全量入语料会把零技能率从当前 11.1% 显著拉高）；`bilibili.py` 默认只留「技术类 + AI类」、`didi.py` 默认只留「技术」、`meituan.py` 默认只留「技术类」，`--all` 才全量 |
+| 整站爬虫要按岗位类别过滤 | 全站岗位里非技术岗大量零技能（哔哩哔哩 876 条中 42.4%、滴滴 1081 条中 39.8%、美团 3231 条中 57.4% 抽不到技能，全量入语料会把零技能率从当前 8.0% 显著拉高）；`bilibili.py` 默认只留「技术类 + AI类」、`didi.py` 默认只留「技术」、`meituan.py` 默认只留「技术类」，`--all` 才全量 |
 | CSV 落在 `data/raw/`，**不要提交** | `.gitignore` 例外只有 `data/raw/sample_jobs.csv`；语料走 `data/processed/jobs.jsonl` |
 
 ## 2. 双处注册（漏一处就静默不进语料）
@@ -72,7 +72,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 
 | 位置 | 要改什么 |
 |---|---|
-| `tests/test_dataset_snapshot.py` | 精确常量 `4496 / 81 / 4265`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
+| `tests/test_dataset_snapshot.py` | 精确常量 `4240 / 81 / 4018`；slow 用例的「零技能占比 `0.20~0.28`」「技能覆盖 ≥ `159`」 |
 | `tests/test_skillkb.py` | 个别技能 importance 断言（如 `PROG.PYTHON=5`、`BIGDATA.FLINK=3`）——占比变了就要重跑 `recalc_importance.py` 再对齐 |
 | `scripts/preflight_new_source.py` | `ZERO_SKILL_BAND` / `MIN_SKILL_COVERAGE`（与 snapshot 测试同步） |
 | `docs/metrics.md` | `python scripts/eval_all.py` 生成，CI 在 main 上 `git diff --exit-code` 校验是否过期 |
@@ -80,15 +80,15 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 | `README.md` | 数据源表「条数」+ 公司分布行 + 量化指标段 + 路线图新增 W 行 |
 | `PROJECT_REPORT.md` | §四 各源条数、§五 数据规模 / 零技能 / must 占比 |
 | `memory-bank/*` | `activeContext`（当前状态）、`progress`（本轮记录）、`techContext`（测试数）、`systemPatterns`（口径） |
-| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 500 / 11.1% / 98.1%）、`src/matcher/jd_requirements.py`（60.0% / 4580 / 7340·974·2191）、`src/extractor/rule_baseline.py`（4496） |
+| 三处模块 docstring | `src/matcher/job_neighbors.py`（零技能 339 / 8.0% / 98.1%）、`src/matcher/jd_requirements.py`（60.0% / 4580 / 7340·974·2191）、`src/extractor/rule_baseline.py`（4240） |
 
 ## 6. 当前基线（W16 接入美团之后，2026-10）
 
 | 指标 | 值 | 来源 |
 |---|---|---|
-| 语料 | 4496 条 / 79 家 / 4265 唯一「公司+标题」 | `build_stats.json` |
+| 语料 | 4240 条 / 79 家 / 4018 唯一「公司+标题」 | `build_stats.json` |
 | 原始抓取 | ? 条（过短 7 + 标题过滤 6 + 去重 476） | 同上 |
-| 零技能岗位 | 500 条（11.1%），98.1% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
+| 零技能岗位 | 339 条（8.0%），98.1% 可同公司代理 | `job_neighbors`、`docs/metrics.md` |
 | 有技能岗位 | 4580 条（must 判定的分母） | `jd_requirements` |
 | 技能覆盖 | 161/161（缺「联邦学习」，语料未出现） | `test_dataset_snapshot` slow |
 | 学习资源 | 106/161（65.8%） | `learning_resources.yaml` |
@@ -97,7 +97,7 @@ python scripts/preflight_new_source.py --source a.csv --source b.csv --json pref
 
 **单公司零技能率**（决定「还能不能加列表式短 JD」）：
 小红书 37.4%、快手 32.5%、Kimi 20%、小米 19.8%、腾讯 16.6%、滴滴 11.9%、美团 6.0%、字节 5.0%、哔哩哔哩 2.1%、英文岗 ~0%。
-→ 再加约 3170 条列表式 JD（约 40% 零技能）会把整体从 11.1% 推到 28% 上界。
+→ 再加约 3170 条列表式 JD（约 40% 零技能）会把整体从 8.0% 推到 28% 上界。
 
 ## 7. 静默坑（脚本已覆盖，人工评审也别放过）
 

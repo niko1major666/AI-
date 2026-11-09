@@ -10543,7 +10543,7 @@
       "source": "tech_kaggle"
     },
     "ac0f417f-75cc-480a-8e03-cc86f7a04869": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "source": "tech_kaggle"
@@ -10742,6 +10742,12 @@
     },
     "ba274bda-dce8-4151-8574-2b6d3b215b70": {
       "active": false,
+      "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "source": "tech_kaggle"
+    },
+    "ba54585c-8001-48c7-912a-d4eebd27be29": {
+      "active": true,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "source": "tech_kaggle"
@@ -14628,6 +14634,12 @@
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "source": "tech_kaggle"
     },
+    "e821379f-5c8f-4acb-a41d-9ccf023a3af0": {
+      "active": false,
+      "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "source": "tech_kaggle"
+    },
     "e8d2ee4c-83af-42b6-b333-f17a70055e46": {
       "active": true,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
@@ -18181,7 +18193,7 @@
       "source": "kuaishou"
     },
     "ks_26470": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -30366,6 +30378,12 @@
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
     },
+    "xhs_16974": {
+      "active": false,
+      "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "source": "xiaohongshu"
+    },
     "xhs_17095": {
       "active": true,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -30721,7 +30739,7 @@
       "source": "xiaohongshu"
     },
     "xhs_18088": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -32125,7 +32143,7 @@
       "source": "xiaohongshu"
     },
     "xhs_20431": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -33991,7 +34009,7 @@
       "source": "xiaohongshu"
     },
     "xhs_2836": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -36661,7 +36679,7 @@
       "source": "xiaohongshu"
     },
     "xhsc_22542": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -37033,6 +37051,6 @@
       "source": "xiaohongshu"
     }
   },
-  "updated_at": "2026-11-09T09:24:49.053274+00:00",
+  "updated_at": "2026-11-09T09:27:05.435711+00:00",
   "version": 1
 }

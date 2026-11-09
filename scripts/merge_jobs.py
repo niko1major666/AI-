@@ -64,6 +64,25 @@ def _with_source_meta(part: pd.DataFrame, path: Path, source: str) -> pd.DataFra
     return part
 
 
+EXCLUDE_FILE = ROOT / "configs" / "exclude_job_ids.txt"
+
+
+def load_exclusions(path: Path = EXCLUDE_FILE) -> set:
+    """读取排除清单（每行一个 job_id，`#` 开头为注释）。
+
+    清单由 `tools/apply-relevance.py` 生成：标题规则判定的职能岗 + LLM 复核为 drop 的岗位。
+    放在仓库里而不是运行时算，是为了**可 review、可复现**——剔除依据能像代码一样被审查。
+    """
+    if not path.exists():
+        return set()
+    ids = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        text = line.strip()
+        if text and not text.startswith("#"):
+            ids.add(text)
+    return ids
+
+
 def main():
     parts = []
     for f in FILES:
@@ -74,6 +93,13 @@ def main():
     if not parts:
         raise SystemExit("data/raw 下没有可合并的源 CSV")
     out = pd.concat(parts, ignore_index=True)
+
+    excluded = load_exclusions()
+    if excluded:
+        before = len(out)
+        out = out[~out["job_id"].astype(str).isin(excluded)]
+        print(f"排除清单命中 {before - len(out)} 行（清单 {len(excluded)} 条）-> {len(out)}")
+
     out.drop_duplicates(subset="job_id", keep="first", inplace=True)
     out.to_csv(ROOT / "data" / "raw" / "all_jobs.csv", index=False, encoding="utf-8-sig")
     print(f"合并 {len(parts)} 个文件 -> {len(out)} 条 → data/raw/all_jobs.csv")

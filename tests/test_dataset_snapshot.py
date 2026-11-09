@@ -17,9 +17,9 @@ JOBS = ROOT / "data" / "processed" / "jobs.jsonl"
 STATS = ROOT / "data" / "processed" / "build_stats.json"
 TAX = ROOT / "data" / "kb" / "skill_taxonomy.yaml"
 
-EXPECTED_ROWS = 6098
-EXPECTED_COMPANIES = 81
-EXPECTED_UNIQUE_COMPANY_TITLE = 5833
+EXPECTED_ROWS = 4557
+EXPECTED_COMPANIES = 79
+EXPECTED_UNIQUE_COMPANY_TITLE = 4325
 REQUIRED_FIELDS = {"job_id", "title", "company", "jd_text", "source",
                    "first_seen_at", "last_seen_at", "is_active"}
 
@@ -81,4 +81,6 @@ def test_full_corpus_extraction_coverage(jobs):
         hit |= ids
     assert len(hit) >= 159, f"语料技能覆盖下降：{len(hit)}/{len(tax.all_skills())}"
     ratio = zero / len(jobs)
-    assert 0.20 <= ratio <= 0.28, f"零技能岗位占比异常：{ratio:.1%}"
+    # 零技能占比区间：v1.10.0 主动剔除职能/非软件岗后，全站从 22.7% 降到 11.4%，
+    # 区间随之收紧。放开上界会掩盖"又混进非技术岗"，收太紧会误报。
+    assert 0.08 <= ratio <= 0.16, f"零技能岗位占比异常：{ratio:.1%}"

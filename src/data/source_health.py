@@ -29,6 +29,7 @@ SOURCE_LABELS = {
     "didi": "滴滴",
     "meituan": "美团",
     "meituan_campus": "美团校招",
+    "huawei_campus": "华为校招",
     "local_csv": "本地 CSV",
 }
 

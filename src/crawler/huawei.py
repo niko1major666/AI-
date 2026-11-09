@@ -65,15 +65,16 @@ def _clean(value) -> str:
     return "" if text in ("None", "null") else text
 
 
-def fetch_page(page: int, page_size: int = PAGE_SIZE) -> tuple[list[dict], dict]:
-    resp = _session.post(API, json={"curPage": page, "pageSize": page_size, "jobType": JOB_TYPE},
+def fetch_page(page: int, page_size: int = PAGE_SIZE, job_type: str = JOB_TYPE) -> tuple[list[dict], dict]:
+    resp = _session.post(API, json={"curPage": page, "pageSize": page_size, "jobType": job_type},
                          timeout=30)
     payload = resp.json()
     data = payload.get("data") or {}
     return data.get("result") or [], data.get("pageVO") or {}
 
 
-def to_rows(items: list[dict], families: tuple[str, ...] | None = TECH_FAMILIES) -> list[dict]:
+def to_rows(items: list[dict], families: tuple[str, ...] | None = TECH_FAMILIES,
+            prefix: str = "hw_") -> list[dict]:
     rows = []
     for item in items:
         family = _clean(item.get("jobFamilyName"))
@@ -85,7 +86,7 @@ def to_rows(items: list[dict], families: tuple[str, ...] | None = TECH_FAMILIES)
         if not job_id or len(jd) < 20:
             continue
         rows.append({
-            "job_id": f"hw_{job_id}",
+            "job_id": f"{prefix}{job_id}",
             "company": "华为",
             "title": _clean(item.get("jobName")) or _clean(item.get("jobNameNew")),
             "location": _clean(item.get("workPlace")) or _clean(item.get("cityName")),
@@ -99,24 +100,25 @@ def to_rows(items: list[dict], families: tuple[str, ...] | None = TECH_FAMILIES)
     return rows
 
 
-def crawl(families: tuple[str, ...] | None = TECH_FAMILIES, delay: float = 0.25) -> list[dict]:
+def crawl(families: tuple[str, ...] | None = TECH_FAMILIES, delay: float = 0.25,
+          job_type: str = JOB_TYPE, prefix: str = "hw_") -> list[dict]:
     rows, seen = [], set()
-    first, page_vo = fetch_page(1)
+    first, page_vo = fetch_page(1, job_type=job_type)
     if not first:
         raise SystemExit("getJobPage 返回空：接口参数或请求头可能变了（见 docs/source-triage-v1.7.md §7）")
     total_pages = int(page_vo.get("totalPages") or 1)
     total_rows = page_vo.get("totalRows")
-    print(f"华为社招：共 {total_rows} 条 / {total_pages} 页，pageSize={PAGE_SIZE}", flush=True)
+    print(f"华为岗位（jobType={job_type}）：共 {total_rows} 条 / {total_pages} 页，pageSize={PAGE_SIZE}", flush=True)
 
     batches = [first]
     for page in range(2, total_pages + 1):
         time.sleep(delay)
-        items, _ = fetch_page(page)
+        items, _ = fetch_page(page, job_type=job_type)
         batches.append(items)
         print(f"  第 {page}/{total_pages} 页 +{len(items)}", flush=True)
 
     for items in batches:
-        for row in to_rows(items, families):
+        for row in to_rows(items, families, prefix=prefix):
             if row["job_id"] in seen:
                 continue
             seen.add(row["job_id"])

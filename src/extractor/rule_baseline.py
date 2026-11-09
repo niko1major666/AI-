@@ -41,7 +41,7 @@ class RuleBaselineExtractor:
     def _iter_matches(text_lower, token):
         """返回 token 在 text_lower 中的全部 (start, end)，语义等价于旧的正则实现。
 
-        旧实现每个 token 一次 `re.finditer`：6054 条 JD × 359 个 token ≈ 209 万次
+        旧实现每个 token 一次 `re.finditer`：6098 条 JD × 359 个 token ≈ 209 万次
         全文正则扫描，首屏冷启动 12.4s（CI）。但非 ASCII token 的 pattern 就是
         `re.escape(token)`，与 `str.find` 完全等价；ASCII token 只多一个「前后不是
         字母数字」的边界断言，用两次字符判断即可——`str.find` 走 C 层 Boyer-Moore，

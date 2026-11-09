@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 CRAWLERS = ["tencent", "xiaomi", "huawei", "deepseek", "xiaomi_campus", "bytedance",
             "kimi", "minimax", "kuaishou", "xiaohongshu", "bilibili", "didi", "meituan",
-            "meituan_campus"]
+            "meituan_campus", "huawei_campus"]
 
 
 def main():

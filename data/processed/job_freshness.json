@@ -16044,6 +16044,270 @@
       "last_seen_at": "2026-11-09T08:28:17.608758+00:00",
       "source": "huawei"
     },
+    "hwc_101728": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_106260": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_106261": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_106262": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114390": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114391": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114392": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114393": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114394": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_114395": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_115234": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116072": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116081": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116086": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116087": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116100": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116101": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116102": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116103": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116152": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116153": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116155": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116157": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116158": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116159": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116161": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116162": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_116295": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_120750": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_125262": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_128696": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_128697": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_128698": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_128699": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_129369": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_96922": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_96945": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_96946": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_96947": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_97008": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_97227": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_97272": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_97368": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
+    "hwc_97369": {
+      "active": true,
+      "first_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "last_seen_at": "2026-11-09T08:43:43.528937+00:00",
+      "source": "huawei_campus"
+    },
     "kimi_0079d23b-912d-40": {
       "active": true,
       "first_seen_at": "2026-10-16T14:54:28.747173+00:00",
@@ -36337,6 +36601,6 @@
       "source": "xiaohongshu"
     }
   },
-  "updated_at": "2026-11-09T08:28:40.794196+00:00",
+  "updated_at": "2026-11-09T08:44:00.745974+00:00",
   "version": 1
 }

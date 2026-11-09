@@ -116,7 +116,47 @@
 - 改了数据又回滚时，必须一起清理 gitignored 派生文件（`build_stats.json`、`all_jobs.csv`），
   否则测试拿旧统计比对，出现"本地红、CI 绿"。
 
-## 7. 下一批的验收口径（v1.7.2 更新）
+## 7. 华为数据源现状：不是抓漏，是渠道迁移（v1.8.1）
+
+**结论：老门户接口已枯竭（全站 2 条），华为已迁到新站 `career.huawei.com/cn`；校招需登录。**
+
+### 证据（2026-11 实测）
+
+| 检查 | 结果 |
+|---|---|
+| 老接口 `portalpub/getJob/newHr/page/10/1?jobType=1` | **totalRows = 2**（社招）、`jobType=2` 返回 0 |
+| 浏览器打开老门户社招页，看它自己发的请求 | 同一个接口、同样 **2 条** → 不是我们参数错 |
+| 新站 `/cn/social-recruitment` 页面文案 | **“共 269 个职位”** |
+| 新站 `/cn/campus-recruitment` 页面文案 | 提示需**登录华为账号**后可查看 |
+| 51job 第三方通道（仓库中 `huawei_51job.py` 的既有实验） | 9 城市仅 3 条 AI 岗，且无完整 JD |
+
+### 新站接口现状
+
+- 已确认可用：`POST https://apigw-dgg-b0.huawei.com/api/apig/channelhw/recruitmentPosition/pub/calculateSocialRecruitmentJob`
+  （`X-HW-ID: app_000000035886`，body `{"jobType":"SR"}`）→ 返回 **175 个类目**，
+  字段 `category / categoryName / familyCount / jobFamily / children`。
+- **岗位列表接口未暴露**：该页所有 JSON 响应里只有类目树、推荐位、埋点；
+  `hcomponent-career-multiPage-search` 等 JS bundle 里也搜不到列表接口路径；
+  页面 HTML 为纯前端壳（无 SSR），列表由前端渲染。
+
+### 因此华为接入有三条路（按成本排序）
+
+1. **浏览器渲染抓取**（无需账号）：打开社招页 → 点类目 → 读渲染后的岗位卡片与详情页。
+   能拿到 269 条，但慢（每条约 1-2 秒）且依赖 DOM 结构。
+2. **继续逆向新站列表接口**：需要再花时间观察点击类目后的 XHR（本次未捕获到），不确定能否成功。
+3. **用账号登录校招站**：校招岗位必须登录才可见；账号对**社招无帮助**（社招本来就公开）。
+
+### 复现要点
+
+- 老接口是否枯竭：`GET .../getJob/newHr/page/10/1?curPage=1&pageSize=20&jobType=1&searchType=1` → 看 `pageVO.totalRows`
+- 新站类目：`POST .../calculateSocialRecruitmentJob` with `{"jobType":"SR"}` + `X-HW-ID` 头
+- 新站是否 SSR：抓 `/cn/social-recruitment` HTML，搜岗位标题（本次只有占位文案，无列表数据）
+
+> 在拿到新站列表接口或改用渲染抓取之前，`huawei` 源会一直是 2 条 / 发布覆盖 0%；
+> `docs/source_health.md` 里它的「⚠️ 关注」是**渠道迁移**导致，不是抽取器问题。
+
+
+## 8. 下一批的验收口径（v1.8.1 更新）
 
 1. **快手发布时间**：修复已入库；**覆盖率提升需下次真实抓取验证**，抓取后 `docs/source_health.md` 数字应上升（允许 diff，但需在 release notes 里解释）。
 2. ~~零技能归因~~ **已完成**：见 §4，结论是「主要非技术岗」，因此**不改阈值、不扩词表**；仅小红书 `ios/android/swift/oc/sdk` 约 40+ 条值得单独核对别名。

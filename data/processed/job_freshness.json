@@ -655,7 +655,7 @@
       "source": "tencent"
     },
     "2010549806400954368": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -1279,7 +1279,7 @@
       "source": "tencent"
     },
     "2062455031348772864": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -1441,7 +1441,7 @@
       "source": "tencent"
     },
     "2067084535190962176": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -1537,7 +1537,7 @@
       "source": "tencent"
     },
     "2070518527399477248": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -1741,7 +1741,7 @@
       "source": "tencent"
     },
     "2076533096072790016": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -1891,7 +1891,7 @@
       "source": "tencent"
     },
     "2078002769058512896": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -3025,7 +3025,7 @@
       "source": "tencent"
     },
     "2101587041182724096": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "last_seen_at": "2026-10-14T17:42:45.350758+00:00",
       "source": "tencent"
@@ -4165,7 +4165,7 @@
       "source": "tech_kaggle"
     },
     "6aa29c14-2d41-4510-80e1-9e76302858b1": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "source": "tech_kaggle"
@@ -4177,7 +4177,7 @@
       "source": "tech_kaggle"
     },
     "6c6d0689-cf61-4161-abc2-f4ad2b4dd155": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "source": "tech_kaggle"
@@ -4531,7 +4531,7 @@
       "source": "xiaomi"
     },
     "7208364208287006828": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -5539,7 +5539,7 @@
       "source": "xiaomi"
     },
     "7546126740533608556": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -5635,7 +5635,7 @@
       "source": "xiaomi"
     },
     "7568397033128888619": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -6211,7 +6211,7 @@
       "source": "bytedance"
     },
     "7625999641696667914": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-16T15:00:52.198764+00:00",
       "last_seen_at": "2026-10-16T15:00:52.198764+00:00",
       "source": "minimax"
@@ -7177,7 +7177,7 @@
       "source": "xiaomi"
     },
     "7660334855938574628": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -7651,7 +7651,7 @@
       "source": "xiaomi"
     },
     "7670885162934716714": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -7729,7 +7729,7 @@
       "source": "xiaomi"
     },
     "7670890904535009582": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -8263,7 +8263,7 @@
       "source": "xiaomi"
     },
     "7670924160045992246": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -8323,7 +8323,7 @@
       "source": "xiaomi"
     },
     "7670928765471852843": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -8335,7 +8335,7 @@
       "source": "xiaomi"
     },
     "7670928894476405033": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -8539,7 +8539,7 @@
       "source": "xiaomi"
     },
     "7671225705711929643": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -8617,7 +8617,7 @@
       "source": "xiaomi_campus"
     },
     "7671293278901537060": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "last_seen_at": "2026-10-14T17:42:54.674471+00:00",
       "source": "xiaomi"
@@ -9121,7 +9121,7 @@
       "source": "xiaomi"
     },
     "7681256024946542857": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "last_seen_at": "2026-10-14T17:48:37.900792+00:00",
       "source": "xiaomi_campus"
@@ -10537,6 +10537,12 @@
       "source": "tech_kaggle"
     },
     "abdd59be-974f-4b0b-bf32-d6206d925fe9": {
+      "active": true,
+      "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
+      "source": "tech_kaggle"
+    },
+    "ac0f417f-75cc-480a-8e03-cc86f7a04869": {
       "active": true,
       "first_seen_at": "2026-10-12T19:08:46.380162+00:00",
       "last_seen_at": "2026-10-12T19:08:46.380162+00:00",
@@ -17269,7 +17275,7 @@
       "source": "kuaishou"
     },
     "ks_20837": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -17893,7 +17899,7 @@
       "source": "kuaishou"
     },
     "ks_25580": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -18157,7 +18163,7 @@
       "source": "kuaishou"
     },
     "ks_26429": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -18169,6 +18175,12 @@
       "source": "kuaishou"
     },
     "ks_26453": {
+      "active": true,
+      "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
+      "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
+      "source": "kuaishou"
+    },
+    "ks_26470": {
       "active": true,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
@@ -20443,7 +20455,7 @@
       "source": "kuaishou"
     },
     "ks_30504": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -20701,7 +20713,7 @@
       "source": "kuaishou"
     },
     "ks_30765": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -21193,7 +21205,7 @@
       "source": "kuaishou"
     },
     "ks_31237": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -21343,7 +21355,7 @@
       "source": "kuaishou"
     },
     "ks_31366": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -22435,7 +22447,7 @@
       "source": "kuaishou"
     },
     "ks_32259": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -23137,7 +23149,7 @@
       "source": "kuaishou"
     },
     "ks_32814": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -23527,7 +23539,7 @@
       "source": "kuaishou"
     },
     "ks_8174": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "last_seen_at": "2026-10-19T12:29:03.653260+00:00",
       "source": "kuaishou"
@@ -27673,7 +27685,7 @@
       "source": "meituan"
     },
     "meituan_4657476970": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-26T11:20:46.194685+00:00",
       "last_seen_at": "2026-10-26T11:20:46.194685+00:00",
       "source": "meituan"
@@ -29083,43 +29095,43 @@
       "source": "meituan"
     },
     "mtc_2984157945": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_2995805692": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_2997413577": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_3054133943": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_3159876283": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_3379269866": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_3643704509": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
@@ -29131,49 +29143,49 @@
       "source": "meituan_campus"
     },
     "mtc_4104268126": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4167596696": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4499867840": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4500420647": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4501188515": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4501193441": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4501197131": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
     },
     "mtc_4748418063": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
@@ -29185,7 +29197,7 @@
       "source": "meituan_campus"
     },
     "mtc_4837378614": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "last_seen_at": "2026-11-05T19:43:37.818443+00:00",
       "source": "meituan_campus"
@@ -29227,7 +29239,7 @@
       "source": "xiaohongshu"
     },
     "xhs_10109": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -29467,7 +29479,7 @@
       "source": "xiaohongshu"
     },
     "xhs_12460": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -30708,6 +30720,12 @@
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
     },
+    "xhs_18088": {
+      "active": true,
+      "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "source": "xiaohongshu"
+    },
     "xhs_18106": {
       "active": true,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -31027,7 +31045,7 @@
       "source": "xiaohongshu"
     },
     "xhs_18674": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -31093,7 +31111,7 @@
       "source": "xiaohongshu"
     },
     "xhs_18791": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -32106,6 +32124,12 @@
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
     },
+    "xhs_20431": {
+      "active": true,
+      "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "source": "xiaohongshu"
+    },
     "xhs_20434": {
       "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -32293,7 +32317,7 @@
       "source": "xiaohongshu"
     },
     "xhs_20756": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -32503,7 +32527,7 @@
       "source": "xiaohongshu"
     },
     "xhs_20992": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -32791,7 +32815,7 @@
       "source": "xiaohongshu"
     },
     "xhs_21336": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -32863,7 +32887,7 @@
       "source": "xiaohongshu"
     },
     "xhs_21385": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -33966,6 +33990,12 @@
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
     },
+    "xhs_2836": {
+      "active": true,
+      "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "source": "xiaohongshu"
+    },
     "xhs_3707": {
       "active": true,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -34207,7 +34237,7 @@
       "source": "xiaohongshu"
     },
     "xhs_8862": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -34519,7 +34549,7 @@
       "source": "xiaohongshu"
     },
     "xhsc_18974": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -35185,7 +35215,7 @@
       "source": "xiaohongshu"
     },
     "xhsc_21153": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -36630,6 +36660,12 @@
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
     },
+    "xhsc_22542": {
+      "active": true,
+      "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
+      "source": "xiaohongshu"
+    },
     "xhsc_22555": {
       "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
@@ -36637,7 +36673,7 @@
       "source": "xiaohongshu"
     },
     "xhsc_22558": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -36811,7 +36847,7 @@
       "source": "xiaohongshu"
     },
     "xhsc_22678": {
-      "active": true,
+      "active": false,
       "first_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "last_seen_at": "2026-10-20T11:50:23.974126+00:00",
       "source": "xiaohongshu"
@@ -36997,6 +37033,6 @@
       "source": "xiaohongshu"
     }
   },
-  "updated_at": "2026-11-09T09:06:47.532900+00:00",
+  "updated_at": "2026-11-09T09:24:49.053274+00:00",
   "version": 1
 }

@@ -15,7 +15,7 @@
 - 模型缓存：`models/hf_cache`（HF_HOME）、`models/ms_cache`（ModelScope）
 - 环境变量：`DEEPSEEK_API_KEY`（用户级，简历 LLM 解析）
 - 云端密钥：Streamlit Cloud Settings → Secrets 填 `DEEPSEEK_API_KEY`（模板 `.streamlit/secrets.toml`，真实 key 不入 git）
-- SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/AI-.git`
+- SSH 免密推送：`~/.ssh/id_ed25519` + `~/.ssh/config`（github.com 走该 key）；远程 `git@github.com:niko1major666/ai-skill-gap.git`
 - 启动前端：`python -m streamlit run src/app/app.py`（端口 8501）
 - 在线体验：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/（Streamlit Cloud 已部署）
 - 当前版本：**v1.6.0**（tag，2026-10-30；发布说明 `docs/release-notes/v1.6.0.md`）
@@ -48,7 +48,7 @@
 - git 提交需内联身份：`git -c user.name='QWB20' -c user.email='qwb20@example.com' commit`
 - git 推送/拉取：SSH 免密（`git push` 直接可用，无需凭证）
 - 云端部署：推 GitHub → Streamlit Cloud 新建 app → Main file `src/app/app.py` → Secrets 填 `DEEPSEEK_API_KEY` → Deploy（详见 README「云端部署」）
-- 发 Release：push `v*` tag → `.github/workflows/release.yml` 自动 create/edit（标题取 `docs/release-notes/<tag>.md` 首行）；本机未装 `gh`，验证走 `https://api.github.com/repos/niko1major666/AI-/releases/tags/<tag>`；完整步骤见 `docs/RELEASING.md`
+- 发 Release：push `v*` tag → `.github/workflows/release.yml` 自动 create/edit（标题取 `docs/release-notes/<tag>.md` 首行）；本机未装 `gh`，验证走 `https://api.github.com/repos/niko1major666/ai-skill-gap/releases/tags/<tag>`；完整步骤见 `docs/RELEASING.md`
 - 快手爬虫：`python -m src.crawler.kuaishou`（社招 sign 逆向 + 校招 POST，约 1445 条）
 - 哔哩哔哩爬虫：`python -m src.crawler.bilibili`（匿名 CSRF；默认只落技术类+AI类，`--all` 保留全站 876 条）
 - 滴滴爬虫：`python -m src.crawler.didi`（公开 GET 无鉴权；默认只落「技术」，`--all` 保留全站 1081 条；`size` 上限 100）

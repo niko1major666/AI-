@@ -10,7 +10,7 @@
 - ✅ 前端：Streamlit 三页面（技能图谱/简历匹配/差距报告），卡片式 UI、星级展示
 - ✅ 工程：310 测试全通过（308 快测 + 2 slow；含保活脚本纯函数测试 + 小红书/哔哩哔哩/美团/滴滴爬虫解析测试 + 岗位标题过滤 + 岗位收藏纯函数 + Streamlit 缓存失效回归 + 数据新鲜度/来源健康/合并元数据回归 + PII 脱敏/上传限制/未授权不读取回归）、Docker、报告导出 Word、README + 项目报告
 - ✅ 云端部署：依赖分层（requirements.txt 轻量 / requirements-ml.txt 重模型）、清洗数据 jobs.jsonl 入库、Streamlit secrets 支持、sys.path 兼容（Streamlit Community Cloud）
-- ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/AI-`）
+- ✅ SSH 推送：生成 ed25519 key + `~/.ssh/config` + 公钥，main 分支已同步远程（`niko1major666/ai-skill-gap`）
 - ✅ GitHub 发行：public 仓库 + Description/Topics + MIT License + Release v1.0.0 + GitHub Actions CI（66 测试绿）+ README 三页面截图/徽章/在线体验链接
 - ✅ 发行 v1.4.0（2026-10-26）：数据源扩充三家（哔哩哔哩 194 + 滴滴 387 + 美团 669），语料 4582→4240 条 / 79 家、零技能 25.4%→8.0%、must 56.5%→60.0%、测试 203→267；`docs/release-notes/v1.4.0.md` + 附注 tag，`release.yml` 自动建 Release；README 目录结构两处过期数字（13 爬虫模块 / 14 数据源、267 用例）同时修
 - ✅ 发行 v1.5.0（2026-10-29）：把 v1.4.0 之后的 W18/W19 一并发版——简历经历分类、岗位收藏夹、云端缓存指纹、收藏夹文案修复；`pyproject` 1.4.0→1.5.0、`docs/release-notes/v1.5.0.md` + 附注 tag；语料/指标保持 4240 条 / 79 家、161/161，测试 267→285

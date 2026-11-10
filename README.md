@@ -1,19 +1,72 @@
 # AI 岗位技能差距分析系统（ai-skill-gap）
 
-[![CI](https://github.com/niko1major666/AI-/actions/workflows/ci.yml/badge.svg)](https://github.com/niko1major666/AI-/actions)
-[![Release](https://img.shields.io/github/v/release/niko1major666/AI-?label=release&sort=semver)](https://github.com/niko1major666/AI-/releases)
+中文 · [English](README.en.md)
+
+[![CI](https://github.com/niko1major666/ai-skill-gap/actions/workflows/ci.yml/badge.svg)](https://github.com/niko1major666/ai-skill-gap/actions)
+[![Release](https://img.shields.io/github/v/release/niko1major666/ai-skill-gap?label=release&sort=semver)](https://github.com/niko1major666/ai-skill-gap/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-red.svg)](https://streamlit.io/)
 
-> 🚀 **在线体验（Streamlit Cloud）**：https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
+> **上传一份简历，告诉你目标 AI 岗位还差什么、先学什么。**
+>
+> **4240** 条真实 AI 岗位 JD · **79** 家公司 · **16** 个招聘源 · **161** 项技能 · **106** 项学习资源，
+> 全部来自公开招聘信息；免注册、免登录，上传前明确告知数据外发边界。
 
-面向**非科班与转行求职者**的个人项目：分析目标 AI 岗位所需技能，与自身简历对比，
-输出技能差距报告与学习优先级。体现 **NLP 信息抽取 + 语义匹配 + 工程落地** 能力。
+[**🚀 在线体验**](https://hdwqwu3howppf2z2xv9i2q.streamlit.app/) ·
+[**📈 评测指标**](docs/metrics.md) ·
+[**🔒 隐私说明**](docs/privacy.md) ·
+[**📦 发布记录**](https://github.com/niko1major666/ai-skill-gap/releases)
 
-> 作者背景：非科班大四学生，转投 AI+ 岗位。系统不预设用户的具体专业背景，任何专业均可直接使用。
+![30 秒演示：技能图谱 → 简历匹配 → 差距报告](docs/images/demo.gif)
+
+## 30 秒看懂
+
+| 输入 | 处理 | 输出 |
+|---|---|---|
+| 你的简历（PDF / Word / 粘贴文本） | 结构化解析 → 技能实体抽取 → 与 JD 技能语义匹配 | 匹配度打分、must/nice 缺口、P0/P1/P2 优先级、学习资源、可导出报告 |
+
+**它能回答三个问题：**
+
+1. 这个岗位的**硬性要求**到底是什么？（must/nice 读 JD 原文判定，不靠人工拍脑袋）
+2. 我**还差哪几项**，哪些只是加分项？
+3. 接下来**先学什么**、大概要多久？
+
+## 三步上手（在线版，无需安装）
+
+1. **简历匹配** — 粘贴简历文本或上传 PDF/Word，自动解析技能与经历
+2. **选岗位** — 从 4240 条 JD 中按公司 / 关键词搜索，选中要投的那个
+3. **看差距报告** — 匹配度、缺口清单、学习路径；可导出 Markdown / Word，也可收藏岗位
+
+> 首次访问若遇 Streamlit Cloud 休眠，需唤醒 1–3 分钟；也可用下方「快速开始」在本地跑。
+
+## 为什么做这个
+
+非科班转行最常见的问题不是「不够努力」，而是**不知道该学什么**：
+JD 写得含糊（「熟悉分布式训练优先」到底是硬门槛还是加分项？），
+学习资源又散落各处，很容易把时间投在错误的方向上。
+
+这个项目把「招聘市场实际需要什么」数据化：从 16 个公开招聘渠道采集 4240 条 JD，
+抽取 161 项技能并区分 must / nice，再与你的简历逐项比对，输出一份可执行的补强清单。
+
+> 作者背景：非科班大四学生，转投 AI+ 岗位。系统不预设具体专业背景，任何专业均可直接使用。
 
 ## 一、功能
+
+**速览**
+
+| # | 能力 | 一句话 |
+|---|---|---|
+| 1 | 技能抽取 | 从 JD 抽取 161 项细粒度技能，规则基线 F1 **0.96** |
+| 2 | must / nice 判定 | 读 JD 原文三级判定，避免把加分项当硬门槛 |
+| 3 | 简历匹配 | 简历文本 → 技能 → 与岗位语义匹配打分 |
+| 4 | 差距报告 | 缺口 / 优先级 / 学习资源 / AI 解读，可导出 Markdown、Word |
+| 5 | 多岗位视角 | 多岗对比、反向岗位推荐、技能画像、公司 × 技能矩阵 |
+| 6 | 求职闭环 | 岗位收藏（链接持久化）、工作/项目经历分类、ATS 建议 |
+| 7 | 隐私边界 | 上传前确认、AI 增强默认关闭、外发前 PII 脱敏 |
+
+<details>
+<summary><b>完整清单（11 项，含实现细节）</b></summary>
 
 1. 采集 AI 岗位 JD（Kaggle / 爬虫 / 本地 CSV，以华为等公司优先）
 2. 从 JD 抽取细粒度技能实体（`分布式训练`、`向量数据库`、`Transformer` 等专有技能）
@@ -26,6 +79,8 @@
 9. 多岗位视角：**多岗位对比**（匹配度、共性缺口、各岗独有缺口）、**反向岗位推荐**（简历技能 → Top 10 岗位）、**技能画像**（按类别的需求加权覆盖率）、**公司 × Top 技能矩阵**（技能图谱页）
 10. 求职闭环：简历经历区分 **工作/实习** 与 **项目**（LLM 判定 → 正则按章节/角色兜底，教育经历不计入），ATS 建议分别提示缺哪类经历；**岗位收藏夹**（差距报告/简历推荐一键收藏，按「公司 + 归一化标题」去重、上限 20，收藏写进链接 `?fav=` 刷新不丢，可导出 JSON），侧边栏跨页面查看与移除
 11. 简历隐私与上传边界：上传前必须确认**隐私说明**，DeepSeek 增强**单独可选、默认关闭**；仅外发前 6,000 字且强制隐藏邮箱/手机号/证件号/银行卡/微信 QQ/详细住址；单文件 ≤5 MB、PDF ≤30 页、文本 ≤5 万字、每会话 ≤10 次 AI 简历解析。完整说明见 [`docs/privacy.md`](docs/privacy.md)
+
+</details>
 
 ## 二、技术选型
 
@@ -71,7 +126,7 @@ ai-skill-gap/
 │   ├── crawler/        13 个爬虫模块 / 14 个数据源（腾讯/字节/小米社招/小米校招/DeepSeek/Kimi/MiniMax/快手/小红书/哔哩哔哩/滴滴/美团/华为 + 英文科技岗位）
 │   └── app/            Streamlit 三页面 + report_export（报告导出）
 ├── scripts/            setup_env / check_env / merge_jobs / recrawl_all / recalc_importance / eval_all(评测) / source_health(来源健康) / validate_kb(KB 校验)
-├── tests/              pytest（310 用例已通过，其中 2 个 slow 留给 nightly）
+├── tests/              pytest（383 用例：381 快测 + 2 slow，slow 留给 nightly）
 ├── docs/               images/（README 界面预览截图 5 张，scripts/capture_screenshots.py 可重截）+ metrics.md（自动生成的回归基线）+ source_health.md（来源健康）+ privacy.md（简历隐私说明）
 ├── models/             模型与缓存（重资产，git 忽略）
 ├── requirements.txt
@@ -423,7 +478,7 @@ jobs.jsonl     skills_long        skill_id 匹配      GapReport        3 页面
 
 ## 十三、版本与发布
 
-- 版本号以 git tag 为准，最新版本见顶部 **Release** 徽章或 [Releases](https://github.com/niko1major666/AI-/releases)（徽章由 shields.io 动态读取最新 Release，**不需要改 README**）
+- 版本号以 git tag 为准，最新版本见顶部 **Release** 徽章或 [Releases](https://github.com/niko1major666/ai-skill-gap/releases)（徽章由 shields.io 动态读取最新 Release，**不需要改 README**）
 - 每个版本对应一份发布说明 `docs/release-notes/vX.Y.Z.md`（首行标题即 Release 标题，其余作正文），索引见 [`docs/release-notes/`](docs/release-notes/)
 - `pyproject.toml` 的 `version` 与该文件对齐，由 `tests/test_release_metadata.py` 守护（「`pyproject` 版本 == 最新发布说明的 tag」不一致就让 CI 红），避免元数据静默漂移
 - 推送 `v*` tag 后 `.github/workflows/release.yml` 自动创建/更新 GitHub Release；完整步骤（含改版本号、跑门禁、重打 tag）见 [`docs/RELEASING.md`](docs/RELEASING.md)

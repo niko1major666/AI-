@@ -23,7 +23,7 @@ README 不用改：顶部 Release 徽章由 shields.io 动态读取最新 Releas
 - 变更点：改了什么文件、为什么、实测数据
 
 ## 完整变更
-https://github.com/niko1major666/AI-/compare/v1.3.1...v1.4.0
+https://github.com/niko1major666/ai-skill-gap/compare/v1.3.1...v1.4.0
 
 ## 在线体验
 https://hdwqwu3howppf2z2xv9i2q.streamlit.app/
@@ -51,7 +51,7 @@ git push origin vX.Y.Z              # 推 tag 触发 .github/workflows/release.y
 
 ```powershell
 gh release view vX.Y.Z
-# 或：curl -s https://api.github.com/repos/niko1major666/AI-/releases/tags/vX.Y.Z
+# 或：curl -s https://api.github.com/repos/niko1major666/ai-skill-gap/releases/tags/vX.Y.Z
 ```
 
 确认 `draft=false`、标题与正文符合预期；同时看 main 上 CI（`metrics` / `test (3.10)` / `test (3.12)`）全绿。

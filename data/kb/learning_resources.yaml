@@ -358,3 +358,30 @@ resources:
   - skill_id: ENGINEERING.DISTSTORAGE
     items:
       - {type: doc, title: "Ceph 分布式存储", url: "https://ceph.io/en/discover/technology/"}
+
+  # ---- v1.11.0 移动端技能（小红书等客户端岗的差距报告需要对应学习建议）----
+  - skill_id: PROG.SWIFT
+    items:
+      - {type: doc, title: "The Swift Programming Language（官方）", url: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/"}
+      - {type: course, title: "Apple SwiftUI 官方教程", url: "https://developer.apple.com/tutorials/swiftui"}
+  - skill_id: PROG.KOTLIN
+    items:
+      - {type: doc, title: "Kotlin 官方文档", url: "https://kotlinlang.org/docs/home.html"}
+      - {type: course, title: "Android Kotlin 基础 Codelab", url: "https://developer.android.com/courses/android-basics-kotlin/course"}
+  - skill_id: PROG.OBJC
+    items:
+      - {type: doc, title: "Objective-C 官方文档", url: "https://developer.apple.com/documentation/objectivec"}
+  - skill_id: ENGINEERING.IOS
+    items:
+      - {type: doc, title: "Apple iOS 开发者文档", url: "https://developer.apple.com/documentation/ios-ipados"}
+      - {type: doc, title: "Apple 人机界面指南（HIG）", url: "https://developer.apple.com/design/human-interface-guidelines/"}
+  - skill_id: ENGINEERING.ANDROID
+    items:
+      - {type: course, title: "Android 官方开发者课程", url: "https://developer.android.com/courses"}
+      - {type: doc, title: "Android 官方文档", url: "https://developer.android.com/docs"}
+  - skill_id: ENGINEERING.FLUTTER
+    items:
+      - {type: doc, title: "Flutter 官方文档", url: "https://docs.flutter.dev/"}
+  - skill_id: ENGINEERING.REACTNATIVE
+    items:
+      - {type: doc, title: "React Native 官方文档", url: "https://reactnative.dev/docs/getting-started"}

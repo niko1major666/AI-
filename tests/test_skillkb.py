@@ -12,8 +12,30 @@ def _tax() -> Taxonomy:
 def test_load_counts():
     t = _tax()
     # 147 + 迭代 2 新增 16（MCP/Function Calling/扩散模型/VLM/…）- 合并 2（文本向量化、华为云）
-    assert len(t.all_skills()) == 161
+    # + v1.11.0 移动端 7（iOS/Android/Swift/Kotlin/Objective-C/Flutter/React Native）
+    assert len(t.all_skills()) == 168
     assert len(t.categories) == 6
+
+
+def test_mobile_skills_resolve():
+    """v1.11.0：小红书等客户端岗此前整族词条缺失（零技能误报），补词条后须能解析。"""
+    t = _tax()
+    cases = {
+        "iOS": "ENGINEERING.IOS",
+        "Android": "ENGINEERING.ANDROID",
+        "Swift": "PROG.SWIFT",
+        "SwiftUI": "PROG.SWIFT",
+        "Kotlin": "PROG.KOTLIN",
+        "Objective-C": "PROG.OBJC",
+        "ObjC": "PROG.OBJC",
+        "Flutter": "ENGINEERING.FLUTTER",
+        "React Native": "ENGINEERING.REACTNATIVE",
+    }
+    for text, want in cases.items():
+        got = t.resolve(text)
+        assert got is not None, f"{text} 未命中词表"
+        assert got.id == want, f"{text} -> {got.id}，期望 {want}"
+
 
 
 def test_iter2_new_skills_resolve():

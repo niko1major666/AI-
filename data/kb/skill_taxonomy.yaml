@@ -189,3 +189,17 @@ skills:
   - {id: FRAMEWORK.LANGGRAPH, name: LangGraph, category: FRAMEWORK, aliases: [langgraph], difficulty: 3, importance: 2}
   - {id: FRAMEWORK.DIFY, name: Dify, category: FRAMEWORK, aliases: [dify, coze, 扣子], difficulty: 2, importance: 1}
   - {id: ENGINEERING.ASCEND, name: 昇腾, category: ENGINEERING, aliases: [ascend, 昇腾, npu, 昇腾芯片], difficulty: 4, importance: 2}
+
+  # ---- 扩充：v1.11.0 移动端技能（小红书/小米/快手客户端岗零技能归因，2026-11）----
+  # 依据：4240 条语料实测——零技能岗位里有 19 条标题含 ios/android/客户端，
+  # 另有 44 条 JD 正文出现 ios/android/swift/objective-c 等 token 却抽不到技能；
+  # 原词表 161 条里**完全没有移动端技能族**（不是别名写错，是缺词条）。
+  # 补这 7 条后零技能 339→311（8.0%→7.3%），金标抽取 F1 不变（0.9565 / 0.9123）。
+  # importance 口径同 scripts/recalc_importance.py：>=2%→3  >=1%→2  <1%→1
+  - {id: PROG.SWIFT, name: Swift, category: PROG, aliases: [swift, swiftui], difficulty: 2, importance: 2}
+  - {id: PROG.KOTLIN, name: Kotlin, category: PROG, aliases: [kotlin], difficulty: 2, importance: 3}
+  - {id: PROG.OBJC, name: Objective-C, category: PROG, aliases: [objective-c, objective c, objc], difficulty: 3, importance: 1}
+  - {id: ENGINEERING.IOS, name: iOS, category: ENGINEERING, aliases: [ios, iphone], difficulty: 3, importance: 3}
+  - {id: ENGINEERING.ANDROID, name: Android, category: ENGINEERING, aliases: [android], difficulty: 3, importance: 3}
+  - {id: ENGINEERING.FLUTTER, name: Flutter, category: ENGINEERING, aliases: [flutter], difficulty: 2, importance: 1}
+  - {id: ENGINEERING.REACTNATIVE, name: React Native, category: ENGINEERING, aliases: [react native, react-native], difficulty: 2, importance: 1}

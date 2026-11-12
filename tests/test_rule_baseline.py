@@ -34,6 +34,29 @@ def test_rule_baseline_ascii_word_boundary():
     assert all(s.skill_id != "PROG.GO" for s in spans)
 
 
+def test_mobile_client_jd_extracts_skills():
+    """v1.11.0：客户端岗 JD 以前整条零技能（词表无移动端技能族）。
+
+    语料事实：小红书零技能里 74.6% 属「疑似词表缺词」，top token = ios/android/swift/objective-c。
+    """
+    ex = _extractor()
+    text = "负责 iOS 客户端研发，熟练使用 Swift 与 Objective-C，了解 SwiftUI；" \
+           "Android 方向需掌握 Kotlin，跨端可用 Flutter 或 React Native。"
+    ids = {s.skill_id for s in ex.extract_spans("j10", text)}
+    assert {"ENGINEERING.IOS", "PROG.SWIFT", "PROG.OBJC", "ENGINEERING.ANDROID",
+            "PROG.KOTLIN", "ENGINEERING.FLUTTER", "ENGINEERING.REACTNATIVE"} <= ids
+
+
+def test_react_native_does_not_shadow_react():
+    """长 token 优先：React Native 命中时不应只落到 ENGINEERING.REACT。"""
+    ex = _extractor()
+    ids = {s.skill_id for s in ex.extract_spans("j11", "熟悉 React Native 跨端开发")}
+    assert "ENGINEERING.REACTNATIVE" in ids
+    ids2 = {s.skill_id for s in ex.extract_spans("j12", "熟悉 React 与 Redux")}
+    assert "ENGINEERING.REACT" in ids2
+    assert "ENGINEERING.REACTNATIVE" not in ids2
+
+
 def test_skip_extract_ignores_noisy_cjk_token():
     """「可量化/量化指标」不得抽成模型量化技能；真正的写法仍要抽到。"""
     ex = _extractor()

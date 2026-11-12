@@ -60,6 +60,30 @@
 
 
 
+## 8. 「别名没写对」经常其实是「整族词条不存在」（v1.11.0）
+
+**事件**：v1.7.1 起一直挂着「小红书 `ios/android/swift/objective-c/sdk` 约 40+ 条待核别名」。
+真正去核对时发现：词表 161 条里**一条移动端技能都没有**——不是别名拼错，而是这一族从未建过。
+按「疑似词表缺词」口径统计，小红书 59 条零技能里 44 条（74.6%）属于这一类，
+top missing token 是 ios 17 / android 8 / swift 7 / objective-c 5。
+
+**规则**：
+1. 核对别名前先确认**技能族是否存在**（`grep` 词表 / `py -c` 打印 category），再谈别名拼写。
+2. 用脚本算证据：`tools/zero-skill-attribution.py` 的 `topMissingTokens` 比人眼翻 JD 可靠，也能区分「非技术岗 / 缺词 / 待人工」。
+3. 补词条后必须重跑 `scripts/eval_all.py`，同时看**金标 F1** 与 **TF-IDF 匹配**两处（新 token 可能抢走匹配位次）。
+
+## 9. 技能名里的通用词会污染 TF-IDF 匹配（v1.11.0）
+
+**事件**：新增技能初版命名为「iOS 开发 / Android 开发」，「开发」是 JD 里的高频通用词。
+TF-IDF 字符 n-gram 把它算成强信号，把 `resume_sentence` gold 里
+「用面向对象的语言开发企业级后台系统 → Java」这条 query 的 top-5 位次挤掉，
+Recall@5 从 0.2200 掉到 0.2000（刚好卡在 2pt 容差线上）。
+
+**规则**：
+1. 技能 `name` 用**专有名词**（iOS / Android / Kotlin / Flutter），通用词只放 `aliases`，或干脆不放。
+2. 词表改动后先跑 `python scripts/eval_all.py` 看 §2 匹配表；只看抽取 F1 会漏掉这类回归。
+3. 匹配指标「刚好不超容差」不算通过——要找根因，而不是把容差当预算花掉。
+
 ## 6. 凭据只从仓库外读
 
 **事件（v1.8.0）**：用户提供美团 cookie，实测接口**匿名可用**，凭据完全不需要。

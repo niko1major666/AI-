@@ -66,7 +66,7 @@ def test_company_title_duplication_rate(jobs):
 
 @pytest.mark.slow
 def test_full_corpus_extraction_coverage(jobs):
-    """全语料抽取（约 10s）：技能覆盖 160/161，零技能岗位约 21.5%。
+    """全语料抽取（约 10s）：v1.11.0 补移动端 7 词条后 168/168 命中，零技能 7.3%。
 
     标记 slow：PR 只跑快测，nightly 跑全量（见 .github/workflows/nightly.yml）。
     """

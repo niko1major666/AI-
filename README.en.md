@@ -10,8 +10,8 @@ English · [中文](README.md)
 
 > **Upload a resume, and get told what a target AI job actually requires — and what to learn first.**
 >
-> **4,240** real AI job postings · **79** companies · **16** recruiting sources · **161** skills ·
-> **106** learning resources. All collected from public job boards. No sign-up, no login,
+> **4,240** real AI job postings · **79** companies · **16** recruiting sources · **168** skills ·
+> **113** learning resources. All collected from public job boards. No sign-up, no login,
 > and the data-egress boundary is disclosed before any upload.
 
 [**🚀 Live demo**](https://hdwqwu3howppf2z2xv9i2q.streamlit.app/) ·
@@ -50,7 +50,7 @@ Job posts are vague ("familiarity with distributed training is a plus" — hard 
 and learning material is scattered, so it is easy to spend months on the wrong things.
 
 This project turns "what the job market actually asks for" into data: 4,240 postings from 16 public
-recruiting channels, 161 granular skills with must/nice separation, compared against your resume to
+recruiting channels, 168 granular skills with must/nice separation, compared against your resume to
 produce an actionable gap list.
 
 > Background: built by an undergraduate from a non-CS major switching into AI roles.
@@ -60,7 +60,7 @@ produce an actionable gap list.
 
 | # | Capability | One-line summary |
 |---|---|---|
-| 1 | Skill extraction | 161 granular skills extracted from job text; rule baseline **F1 0.96** |
+| 1 | Skill extraction | 168 granular skills extracted from job text; rule baseline **F1 0.96** |
 | 2 | must / nice classification | Three-level rule over the original posting text, so bonuses are not treated as hard gates |
 | 3 | Resume matching | Resume text → skills → semantic matching with per-job scoring |
 | 4 | Gap report | Missing skills, priority, learning resources, optional LLM commentary; Markdown / Word export |
@@ -156,9 +156,9 @@ Every number below is produced by `python scripts/eval_all.py` and re-verified i
 ### Corpus snapshot
 
 - **4,240** job postings / **79** companies / **16** recruiting sources
-- Zero-skill postings: **339 (8.0%)**, backfilled from similar postings at the same company
-- Skill vocabulary coverage: **161/161 (100%)**
-- Learning-resource coverage: **106/161** skills (65.8%), 118 resources
+- Zero-skill postings: **311 (7.3%)**, backfilled from similar postings at the same company
+- Skill vocabulary coverage: **168/168 (100%)**
+- Learning-resource coverage: **113/168** skills (67.3%), 129 resources
 
 ## How it works
 
@@ -214,7 +214,7 @@ Full details: [docs/privacy.md](docs/privacy.md).
 ## Limitations
 
 - The corpus is **Chinese-market only** (aside from one English dataset); skill demand differs by region
-- The dictionary approach cannot discover skills outside the 161-item vocabulary
+- The dictionary approach cannot discover skills outside the 168-item vocabulary
 - BGE is not part of automated CI metrics because the weights are large; its figures come from
   `scripts/eval_resume_match.py`
 - 31 of 79 companies have ≤ 2 postings, so those rows in the company × skill matrix are noisy
@@ -229,7 +229,7 @@ ai-skill-gap/
 │   ├── raw/           raw postings per source (seed sample committed)
 │   ├── processed/     jobs.jsonl + freshness state (tracked)
 │   ├── gold/          manually annotated gold sets
-│   └── kb/            skill taxonomy (161) + learning resources (106)
+│   └── kb/            skill taxonomy (168) + learning resources (113)
 ├── src/
 │   ├── data/          schema, normalise, freshness, source health, privacy, build
 │   ├── extractor/     dictionary baseline / BERT-NER / SiameseUIE
